@@ -4,11 +4,39 @@
 
 Par exemple, si nous avons 5 tâches, et un temps par défaut de 2 heures, les tâches seront proposées dans le désordre, jusqu'à ce que chacune ait été accomplie pendant au moins 2 heures avant que le cycle ne recommence.
 
+## Mode Electron
+
+Pour pouvoir enrouler l’application à l’intérieur d’une application *Electron*, nous avons besoin de mettre son code dans le dossier `./Electron`. Il faut donc veiller à être dans le bon dossier lorsqu’on joue une commande.
+
+Voici un petit rappel :
+
+| À la racine DE L’APPLICATION |                                                              | Dans le dossier Electron |
+| ---------------------------- | :----------------------------------------------------------: | ------------------------ |
+| **`bun run watch_ts`**       | Pour surveiller les fichiers `ts`<br />du dossier `./public` |                          |
+|                              |       Pour lancer l’application en mode développement.       | **`bun run start`**      |
+|                              |                   Pour produire la release                   | **`bun run build`**      |
+|                              |                                                              |                          |
+
+
+
+## Lancer en mode développement
+
+* rejoindre le dossier `electron/` (**`cd electron/`**)
+* jouer la commande **`bun run start`**
+
+Pour lancer un watcher sur les fichiers `public/main.ts` et `public/ui.ts` (et les futurs modules peut-être), jouer (à la racine de l’application) : 
+
+~~~shell
+bun run watch_ts
+~~~
+
+
+
 ## Fonctionnement au quotidien
 
-* Mettre dans le fichier `TASKS.yaml` les tâches courantes, en définissant leur dossier principal ou le script qui doit être joué pour les "lancer".
+* Mettre dans un fichier `TASKS.yaml`, à l’extérieur de l’application, les tâches courantes, en définissant leur dossier principal ou le script qui doit être joué pour les "lancer".
 * Définir le temps par défaut en haut du fichier.
-* Lancer ETC au démarrage de l'ordinateur.
+* Lancer ETC au démarrage de l'ordinateur (si possible dans le dossier contenant le fichier des tâches, sinon avec un chemin d’accès complet précisant où il se trouve).
 
 ## Aspect du fichier `_TASKS_`.yaml
 
@@ -16,7 +44,7 @@ Par exemple, si nous avons 5 tâches, et un temps par défaut de 2 heures, les t
 ---
 duration: 120 # nombre de minutes par défaut pour chaque tâche
 
-tasks:
+works:
   - id: pss
     name: "Passé sous Silence"
     content: "Travailler sur le deuxième Tome"
@@ -45,20 +73,3 @@ tasks:
 
 
 ~~~
-
-
-## Lancer depuis le code
-
-To install dependencies:
-
-```bash
-bun install
-```
-
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.2.21. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.

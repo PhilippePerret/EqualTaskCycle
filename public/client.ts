@@ -1,5 +1,6 @@
 import type { RecType, WorkType } from "../lib/types.js";
 import { PORT } from "./constants.js";
+import { ui } from "./ui.js";
 
 const HOST = `http://localhost:${PORT}/`;
 
@@ -23,12 +24,21 @@ class Work {
 
   constructor(
     private data: WorkType
-  ){
-  }
+  ){}
 
+  /**
+   * Fonction appelée pour afficher le travail (courant)
+   */
   display(){
-    console.log("Je dois apprendre à afficher le travail : ", this.data);
     this.dispatchData();
+    ui.showButtons({
+      Start: true,
+      Stop: false,
+      Pause: false,
+      Change: true,
+      runScript: true, // TODO À DÉFINIR
+      openFolder: true, // TODO à définir
+    });
   }
 
   dispatchData(){
