@@ -1,3 +1,20 @@
+import express from 'express';
+import path from 'path';
+import { PORT } from './common/constants';
+
+const app = express();
+
+app.use(express.json());
+app.use(express.static('public'));
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
+
 import { Dialog } from "./lib/Dialog";
 import { Work } from "./lib/work";
 
@@ -47,4 +64,3 @@ class DayWork {
 
 const daywork = new DayWork();
 daywork.start();
-

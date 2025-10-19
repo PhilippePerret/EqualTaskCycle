@@ -1,0 +1,11 @@
+{
+  "main": "main.js",
+  "commande à jouer pour build": "bun run build",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-packager .. EqualTaskCycle --platform=darwin --arch=arm64 --out=dist"
+  },
+  "devDependencies": {
+    "electron": "^38.3.0"
+  }
+}

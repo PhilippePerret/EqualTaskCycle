@@ -1,16 +1,22 @@
 {
   "name": "equaltasktime",
-  "module": "index.ts",
-  "type": "module",
   "private": true,
+  "type": "module",
+  "main": "main.js",
   "devDependencies": {
     "@types/bun": "latest",
+    "@types/express": "^5.0.3",
     "@types/js-yaml": "^4.0.9"
+  },
+  "scripts": {
+    "build": "bun build main.ts --outfile=main.js --target=node",
+    "start": "bun run build && npx electron ."
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
+    "express": "^5.1.0",
     "js-yaml": "^4.1.0"
   }
 }
