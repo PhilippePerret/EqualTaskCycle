@@ -1,9 +1,13 @@
 import express from 'express';
 import path from 'path';
-import { PORT } from './common/constants';
+import { PORT } from './public/constants';
+import { Dialog } from "./lib/Dialog";
+import { Work } from "./lib/work";
+
 
 const app = express();
 
+app.use(express.static(__dirname));
 app.use(express.json());
 app.use(express.static('public'));
 
@@ -11,12 +15,23 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+app.post('/api/task/start', (req, res) => {
+  const { taskId } = req.body;
+  // ... ton traitement
+  res.json({ success: true, data: {ok: true} });
+});
+
+app.get('/api/tasks', (req, res) => {
+  // res.json(Work.getAll());
+  console.log("Je reviens");
+  res.json({ok: 'true aussi'});
+});
+
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
 
-import { Dialog } from "./lib/Dialog";
-import { Work } from "./lib/work";
 
 
 /**
