@@ -21,10 +21,10 @@ app.post('/api/task/start', (req, res) => {
   res.json({ success: true, data: {ok: true} });
 });
 
-app.get('/api/tasks', (req, res) => {
+app.get('/task/current', (req, res) => {
   // res.json(Work.getAll());
-  console.log("Je reviens");
-  res.json({ok: 'true aussi'});
+  console.log("Je dois envoyer la tâche courante");
+  res.json({task: {name: "Son nom", id: "Son id etc.", content: "Le contenu exact de la tâche, du travail."}});
 });
 
 

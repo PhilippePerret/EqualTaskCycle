@@ -32,7 +32,8 @@ app.whenReady().then(() => {
   const win = new BrowserWindow({
     x: 10,
     y: 800,
-    width: 600,
+    // width: 600,
+    width: 2000,
     height: 400,
     icon: ICON_PATH
   });
