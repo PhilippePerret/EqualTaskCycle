@@ -1,6 +1,7 @@
 import yaml from 'js-yaml';
 import { existsSync, readFileSync } from 'fs';
-import type { RecType } from './types';
+import type { RecType, WorkType } from './types';
+import path from 'path';
 
 
 export class DataManager {
@@ -11,7 +12,15 @@ export class DataManager {
     if (existsSync('_TASKS_.yaml')) {
       this._data = yaml.load(readFileSync('_TASKS_.yaml', 'utf8')) as RecType;
     } else {
-      this._data = {}
+      this._data = {
+        duration: 120,
+        works: [{
+          id: 'init',
+          name: "Init the app",
+          content: "Build a _TASKS_.yaml file with data.",
+          folder: path.resolve('.')
+        } as WorkType]
+      }
     }
     return this._data;
   }
