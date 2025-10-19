@@ -1,4 +1,8 @@
 {
+  "name": "equal-task-cycle",
+  "productName": "Equal Task Cycle",
+  "description": "Pour gérer des tâches parallèles",
+  "version": "0.1.0",
   "main": "main.js",
   "commande à jouer pour build": "bun run build",
   "scripts": {
@@ -7,5 +11,12 @@
   },
   "devDependencies": {
     "electron": "^38.3.0"
+  },
+  "build": {
+    "appId": "com.philapp.equaltaskcycle",
+    "icon": "../icon.ics",
+    "identity": null,
+    "target": "dir"
   }
+
 }

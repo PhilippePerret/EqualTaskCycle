@@ -1,3 +1,4 @@
+const { existsSync } = require('fs');
 const { app, BrowserWindow } = require('electron');
 const { spawn } = require('child_process');
 const { PORT } = require('../common/constants');
@@ -6,7 +7,18 @@ let server = null;
 
 const path = require('path');
 
+const ICON_PATH = path.join(path.resolve(__dirname, 'icon.png'));
+// const ICON_PATH = path.join(path.resolve(__dirname, 'icon.icns'));
+if (existsSync(ICON_PATH)) {
+  console.log("Icon path: ", ICON_PATH);
+} else {
+  throw new Error("Unfound icon");
+}
+
+app.name = "Equal Task Cycle";
+
 app.whenReady().then(() => {
+  app.dock.setIcon(ICON_PATH);
   const serverPath = path.join(__dirname, '..', 'index.ts');
   server = spawn('bun', ['run', serverPath], {
     cwd: path.join(__dirname, '..')
@@ -21,7 +33,8 @@ app.whenReady().then(() => {
     x: 10,
     y: 800,
     width: 600,
-    height: 400
+    height: 400,
+    icon: ICON_PATH
   });
 
 
