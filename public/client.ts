@@ -3,11 +3,13 @@ import { HOST } from "./js/constants";
 import { DGet } from "./js/dom";
 import { Flash } from "./js/flash";
 import { ui } from "./js/ui";
+import { prefs } from "./prefs.js";
 
 class Work {
 
   public static init(){
     Work.getCurrent();
+    prefs.init();
     Flash.notice("L'application est prête.")
   }
 
@@ -24,7 +26,7 @@ class Work {
     const dataCurrentWork = retour.task;
     // console.log("Current Task", currentWork);
     this.currentWork = new Work(dataCurrentWork);
-    this.currentWork.display();
+    this.currentWork.display(retour.options);
   }
 
   constructor(
@@ -34,13 +36,13 @@ class Work {
   /**
    * Fonction appelée pour afficher le travail (courant)
    */
-  display(){
+  display(options: {[x: string]: any}){
     this.dispatchData();
     ui.showButtons({
       Start: true,
       Stop: false,
       Pause: false,
-      Change: true,
+      Change: options.canChange,
       runScript: !!this.data.startupScript,
       openFolder: !!this.data.folder,
     });

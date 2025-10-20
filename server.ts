@@ -22,8 +22,22 @@ app.post('/api/task/start', (req, res) => {
 });
 
 app.get('/task/current', (req, res) => {
-  // TODO Envoyer la tâche courante
-  res.json({task: {project: "Son nom", id: "Son id etc.", content: "Le contenu exact de la tâche, du travail."}});
+  // TODO Envoyer la tâche courante et ses options
+  // TODO Il faut donc implémenter l'algorithme de choix de
+  // la tâche
+  res.json({
+    task: {project: "Son nom", id: "Son id etc.", content: "Le contenu exact de la tâche, du travail."},
+    options: {canChange: true /* TODO À RÉGLER */}
+  });
+});
+
+app.post('/prefs/save', (req, res) => {
+  const prefs = req.body;
+  // console.log("prefs", prefs);
+  res.json({
+    ok: false, // ou pas…
+    error: 'Une erreur est survenue'
+  })
 });
 
 

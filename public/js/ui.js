@@ -1,3 +1,11 @@
+// public/js/dom.js
+function DGet(selector, container) {
+  if (container === undefined) {
+    container = document.body;
+  }
+  return container.querySelector(selector);
+}
+
 // public/ui.ts
 function stopEvent(ev) {
   ev.stopPropagation();
@@ -13,6 +21,12 @@ class UI {
   }
   showButtons(states) {
     this.buttons.forEach((bouton) => bouton.setState(states[bouton.id]));
+  }
+  closeSectionWork() {
+    DGet("section#work").classList.add("hidden");
+  }
+  openSectionWord() {
+    DGet("section#work").classList.remove("hidden");
   }
   onStart(ev) {}
   onStop(ev) {}

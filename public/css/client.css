@@ -5,6 +5,14 @@ body {
   padding:2em;
 }
 
+h1, h2, h3 {
+  font-weight: normal;
+}
+
+input, select, select option, textarea {
+  font-size: inherit;
+}
+
 button {
   cursor: pointer;
 }
@@ -46,3 +54,18 @@ button {
 
 
 .invisible { visibility: hidden; }
+.hidden {display: none;}
+
+
+section#preferences {
+  font-size: 14pt;
+}
+label + input,
+label + select {
+  margin-left: 1em;
+}
+
+div.buttons {
+  margin-top: 1em;
+  text-align: right;
+}

@@ -1,3 +1,5 @@
+import { DGet } from "./js/dom";
+
 function stopEvent(ev: Event){
   ev.stopPropagation();
   ev.preventDefault();
@@ -24,6 +26,13 @@ class UI {
   public showButtons(states: {[x: string]: boolean}):void {
     this.buttons.forEach((bouton: Button) => bouton.setState(states[bouton.id] as boolean));
   };
+
+  public closeSectionWork(){
+    DGet('section#work').classList.add('hidden')
+  }
+  public openSectionWord(){
+    DGet('section#work').classList.remove('hidden')
+  }
 
   private onStart(ev: Event){}
   private onStop(ev: Event){}

@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build_main_js": "bun build main.ts --outfile=main.js --target=node",
-    "watch_ts": "bun build ./public/client.ts --outfile=./public/js/client.js --target=browser --watch & bun build ./public/ui.ts --outfile=./public/js/ui.js --target=browser --watch",
+    "watch_ts": "bun build ./public/client.ts --outfile=./public/js/client.js --target=browser --watch & bun build ./public/ui.ts --outfile=./public/js/ui.js --target=browser --watch & bun build ./public/prefs.ts --outfile=./public/js/prefs.js --target=browser --watch",
     "build": "bun run build_main_js",
     "start": "bun run build && npx electron ."
   },

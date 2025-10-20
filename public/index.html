@@ -11,18 +11,37 @@
   <link rel="stylesheet" href="./css/horloge.css"/>
 </head>
 <body>
-  <!-- Affichage du travail courant -->
-  <section id="current-work-container">
-    <div id="current-work-id"></div>
-    <div id="current-work-project"></div>
-    <div id="current-work-content"></div>
+  <section id="work">
+
+    <!-- Affichage du travail courant -->
+    <section id="current-work-container">
+      <div id="current-work-id"></div>
+      <div id="current-work-project"></div>
+      <div id="current-work-content"></div>
+    </section>
+
+    <!--  Pour contenir les boutons -->
+    <div id="buttons-container">
+      <div id="row1"></div>
+      <div id="row2">
+        <button class="btn-prefs" style="width:60px;float:left;text-align:center;">⚙️</button>
+      </div>
+    </div>
+
   </section>
 
-  <!--  Pour contenir les boutons -->
-  <div id="buttons-container">
-    <div id="row1"></div>
-    <div id="row2"></div>
-  </div>
+
+  <section id="preferences" class="hidden">
+    <button class="btn-close-prefs" style="float:right;width:40px;padding:0;font-size: 12pt">x</button>
+    <h2>Préférences</h2>
+    <div style="display: flex;width: 480px;">
+      <label>Works File</label>
+      <input type="text" id="works-file-path" style="flex: 1 1 auto" />
+    </div>
+    <div class="buttons">
+      <button class="btn-save-prefs">Save…</button>
+    </div>
+  </section>
 
   <div id="flash-group">
 
