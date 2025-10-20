@@ -1,3 +1,16 @@
+// public/js/dom.js
+function DGet(selector, container) {
+  if (container === undefined) {
+    container = document.body;
+  }
+  return container.querySelector(selector);
+}
+function stopEvent(ev) {
+  ev.stopPropagation();
+  ev.preventDefault();
+  return false;
+}
+
 // lib/Clock.ts
 class Clock {
   static time2horloge(mn) {
@@ -12,24 +25,51 @@ class Clock {
       return "---";
     }
   }
+  static setClockStyle(style) {
+    this.clockObj.classList.add(style);
+  }
+  static start() {
+    this.clockObj.classList.remove("hidden");
+    this.clockObj.innerHTML = "0:00:00";
+    this.startTime = new Date().getTime();
+    this.timeLeft = 0;
+    this.timer = setInterval(this.run.bind(this), 1000);
+  }
+  static timer;
+  static startTime;
+  static timeLeft;
+  static pause() {
+    clearInterval(this.timer);
+    this.timeLeft += this.lapsFromStart();
+  }
+  static stop() {
+    clearInterval(this.timer);
+    this.clockObj.classList.add("hidden");
+  }
+  static run() {
+    this.clockObj.innerHTML = this.s2h(this.timeLeft + this.lapsFromStart());
+  }
+  static lapsFromStart() {
+    return Math.round((new Date().getTime() - this.startTime) / 1000);
+  }
+  static get clockObj() {
+    return this._clockobj || (this._clockobj = DGet("#clock"));
+  }
+  static _clockobj;
+  static s2h(s) {
+    let h = Math.floor(s / 3600);
+    s = s % 3600;
+    let m = Math.floor(s / 60);
+    const mstr = m < 10 ? `0${m}` : String(m);
+    s = s % 60;
+    const sstr = s < 10 ? `0${s}` : String(s);
+    return `${h}:${mstr}:${sstr}`;
+  }
 }
 
 // public/js/constants.js
 var PORT = 3002;
 var HOST = `http://localhost:${PORT}/`;
-
-// public/js/dom.js
-function DGet(selector, container) {
-  if (container === undefined) {
-    container = document.body;
-  }
-  return container.querySelector(selector);
-}
-function stopEvent(ev) {
-  ev.stopPropagation();
-  ev.preventDefault();
-  return false;
-}
 
 // public/js/flash.js
 class Flash {
@@ -129,6 +169,61 @@ function DGet2(selector, container) {
   }
   return container.querySelector(selector);
 }
+
+class Clock2 {
+  static time2horloge(mn) {
+    let hrs = Math.floor(mn / 60);
+    let mns = mn % 60;
+    let horloge = [];
+    mns > 0 && horloge.push(`${mns} mns`);
+    hrs > 0 && horloge.push(`${hrs} hrs`);
+    if (horloge.length) {
+      return horloge.join(" ");
+    } else {
+      return "---";
+    }
+  }
+  static setClockStyle(style) {
+    this.clockObj.classList.add(style);
+  }
+  static start() {
+    this.clockObj.classList.remove("hidden");
+    this.clockObj.innerHTML = "0:00:00";
+    this.startTime = new Date().getTime();
+    this.timeLeft = 0;
+    this.timer = setInterval(this.run.bind(this), 1000);
+  }
+  static timer;
+  static startTime;
+  static timeLeft;
+  static pause() {
+    clearInterval(this.timer);
+    this.timeLeft += this.lapsFromStart();
+  }
+  static stop() {
+    clearInterval(this.timer);
+    this.clockObj.classList.add("hidden");
+  }
+  static run() {
+    this.clockObj.innerHTML = this.s2h(this.timeLeft + this.lapsFromStart());
+  }
+  static lapsFromStart() {
+    return Math.round((new Date().getTime() - this.startTime) / 1000);
+  }
+  static get clockObj() {
+    return this._clockobj || (this._clockobj = DGet2("#clock"));
+  }
+  static _clockobj;
+  static s2h(s) {
+    let h = Math.floor(s / 3600);
+    s = s % 3600;
+    let m = Math.floor(s / 60);
+    const mstr = m < 10 ? `0${m}` : String(m);
+    s = s % 60;
+    const sstr = s < 10 ? `0${s}` : String(s);
+    return `${h}:${mstr}:${sstr}`;
+  }
+}
 function stopEvent2(ev) {
   ev.stopPropagation();
   ev.preventDefault();
@@ -150,9 +245,21 @@ class UI {
   openSectionWork() {
     DGet2("section#work").classList.remove("hidden");
   }
-  onStart(ev) {}
-  onStop(ev) {}
-  onPause(ev) {}
+  startDate;
+  stopDate;
+  pauseDate;
+  onStart(ev) {
+    this.startDate = new Date;
+    Clock2.start();
+  }
+  onStop(ev) {
+    this.stopDate = new Date;
+    Clock2.stop();
+  }
+  onPause(ev) {
+    this.pauseDate = new Date;
+    Clock2.pause();
+  }
   onChange(ev) {}
   onRunScript(ev) {}
   onOpenFolder(ev) {}
@@ -241,6 +348,8 @@ class Button {
     this[state ? "show" : "hide"]();
   }
   onClick(ev) {
+    console.log("Click sur le bouton", this);
+    this.data.onclick();
     return stopEvent2(ev);
   }
   build() {
@@ -295,9 +404,21 @@ class UI2 {
   openSectionWork() {
     DGet("section#work").classList.remove("hidden");
   }
-  onStart(ev) {}
-  onStop(ev) {}
-  onPause(ev) {}
+  startDate;
+  stopDate;
+  pauseDate;
+  onStart(ev) {
+    this.startDate = new Date;
+    Clock.start();
+  }
+  onStop(ev) {
+    this.stopDate = new Date;
+    Clock.stop();
+  }
+  onPause(ev) {
+    this.pauseDate = new Date;
+    Clock.pause();
+  }
   onChange(ev) {}
   onRunScript(ev) {}
   onOpenFolder(ev) {}
@@ -386,6 +507,8 @@ class Button2 {
     this[state ? "show" : "hide"]();
   }
   onClick(ev) {
+    console.log("Click sur le bouton", this);
+    this.data.onclick();
     return stopEvent3(ev);
   }
   build() {
@@ -515,6 +638,7 @@ class Work {
     this.currentWork = new Work(dataCurrentWork);
     this.currentWork.display(retour.options);
     prefs.setData(retour.prefs);
+    Clock.setClockStyle(retour.prefs.clock);
   }
   constructor(data) {
     this.data = data;
@@ -552,9 +676,4 @@ class Work {
     return Work.obj.querySelector(`#current-work-${prop}`);
   }
 }
-await fetch(HOST + "api/task/start", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ taskId: 123 })
-});
 Work.init();

@@ -1,3 +1,4 @@
+import { Clock } from "../lib/Clock";
 import { DGet } from "./js/dom";
 
 function stopEvent(ev: Event){
@@ -34,9 +35,22 @@ class UI {
     DGet('section#work').classList.remove('hidden')
   }
 
-  private onStart(ev: Event){}
-  private onStop(ev: Event){}
-  private onPause(ev: Event){}
+  private startDate!: Date;
+  private stopDate!: Date;
+  private pauseDate!: Date;
+
+  private onStart(ev: Event){
+    this.startDate = new Date();
+    Clock.start();
+  }
+  private onStop(ev: Event){
+    this.stopDate = new Date();
+    Clock.stop();
+  }
+  private onPause(ev: Event){
+    this.pauseDate = new Date();
+    Clock.pause();
+  }
   private onChange(ev: Event){}
   private onRunScript(ev: Event){}
   private onOpenFolder(ev: Event){}
@@ -95,6 +109,8 @@ class Button {
   }
 
   onClick(ev: MouseEvent){
+    console.log("Click sur le bouton", this);
+    this.data.onclick();
     return stopEvent(ev);
   }
 

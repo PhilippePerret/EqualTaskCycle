@@ -1,9 +1,0 @@
-div#horloge {
-  position: relative;
-  display: inline-block;
-  font-family: Monospace;
-  font-size: 38pt;
-  text-align: center;
-  width: 240px;
-  background-color: inherit;
-}

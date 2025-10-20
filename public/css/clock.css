@@ -1,0 +1,28 @@
+div#clock {
+  position: relative;
+  display: inline-block;
+  font-family: Monospace;
+  font-size: 38pt;
+  text-align: center;
+  width: 240px;
+  background-color: inherit;
+  color: rgb(56, 207, 53);
+  z-index: 100;
+}
+
+div#clock.big {
+  font-size: 40pt;
+  position: absolute;
+  top: 100px;
+  text-align: center;
+  font-size: 140pt;
+}
+
+div#clock.mediane {
+  position: relative;
+  font-size: 30pt;
+}
+div#clock.mini {
+  position: relative;
+  font-size: 16pt;
+}

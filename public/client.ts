@@ -29,6 +29,7 @@ class Work {
     this.currentWork = new Work(dataCurrentWork);
     this.currentWork.display(retour.options);
     prefs.setData(retour.prefs);
+    Clock.setClockStyle(retour.prefs.clock);
   }
 
   constructor(
@@ -74,11 +75,11 @@ class Work {
   }
 }
 
-// POST
-await fetch(HOST + 'api/task/start', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ taskId: 123 })
-});
+// // POST
+// await fetch(HOST + 'api/task/start', {
+//   method: 'POST',
+//   headers: { 'Content-Type': 'application/json' },
+//   body: JSON.stringify({ taskId: 123 })
+// });
 
 Work.init();
