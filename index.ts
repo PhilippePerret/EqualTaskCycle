@@ -1,6 +1,6 @@
 import express from 'express';
 import path from 'path';
-import { PORT } from './public/constants';
+import { PORT } from './public/js/constants';
 import { Dialog } from "./lib/Dialog";
 import { Work } from "./lib/work";
 

@@ -1,15 +1,22 @@
 import type { RecType, WorkType } from "../lib/types.js";
-import { PORT } from "./constants.js";
-import { ui } from "./ui.js";
+import { PORT } from "./js/constants";
+import { DGet } from "./js/dom";
+import { Flash } from "./js/flash";
+import { ui } from "./js/ui";
 
 const HOST = `http://localhost:${PORT}/`;
 
 class Work {
 
+  public static init(){
+    Work.getCurrent();
+    Flash.notice("L'application est prête.")
+  }
+
   private static currentWork: Work;
 
   private static get obj(){
-    return this._obj || (this._obj = document.body.querySelector('section#current-work-container')) as HTMLElement;
+    return this._obj || (this._obj = DGet('section#current-work-container')) as HTMLElement;
   }
   private static _obj: HTMLElement | null;
 
@@ -62,4 +69,4 @@ await fetch(HOST + 'api/task/start', {
   body: JSON.stringify({ taskId: 123 })
 });
 
-Work.getCurrent();
+Work.init();

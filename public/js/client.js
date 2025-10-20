@@ -1,7 +1,107 @@
-// public/constants.js
+// public/js/constants.js
 var PORT = 3002;
 
-// public/ui.js
+// public/js/dom.js
+function DGet(selector, container) {
+  if (container === undefined) {
+    container = document.body;
+  }
+  return container.querySelector(selector);
+}
+
+// public/js/flash.js
+class Flash {
+  static init() {}
+  static checkServerMessages() {
+    const divMsg = DGet("div#flash-group div#flash-info");
+    if (divMsg) {
+      const content = DGet("p.message", divMsg).innerHTML;
+      DGet("button", divMsg).remove();
+      this.temporize(divMsg, this.calcReadingTime(content));
+    }
+  }
+  static temporize(domMessage, readingTime) {
+    this.timer = setTimeout(this.removeServerMessage.bind(this, domMessage), 2000 + readingTime);
+  }
+  static removeServerMessage(domE, ev) {
+    domE.remove();
+    this.timer && clearTimeout(this.timer);
+    delete this.timer;
+  }
+  static calcReadingTime(str) {
+    return str.split(" ").length * 300 * 4;
+  }
+  static notice(message) {
+    this.buildMessage({ content: message, type: "notice" });
+  }
+  static info(message) {
+    return this.notice(message);
+  }
+  static success(message) {
+    this.buildMessage({ content: message, type: "success" });
+  }
+  static warning(message) {
+    this.buildMessage({ content: message, type: "warning" });
+  }
+  static error(message) {
+    this.buildMessage({ content: message, type: "error" });
+  }
+  static buildMessage(data) {
+    new FlashMessage(data);
+  }
+  static removeMessage(message) {
+    if (message.type != "error") {
+      clearTimeout(message.timer);
+      message.timer = null;
+    }
+    message.obj.remove();
+    message = undefined;
+  }
+  static get conteneur() {
+    return this._maincont || (this._maincont = DGet("#flash-group"));
+  }
+}
+
+class FlashMessage {
+  constructor(data) {
+    this.data = data;
+    this.build();
+    this.show();
+    if (this.type != "error")
+      this.temporize();
+    this.observe();
+  }
+  build() {
+    const msg = document.createElement("DIV");
+    msg.className = `flash-message ${this.type}`;
+    msg.innerHTML = this.content;
+    this.obj = msg;
+  }
+  show() {
+    Flash.conteneur.appendChild(this.obj);
+  }
+  observe() {
+    this.obj.addEventListener("click", this.onClick.bind(this));
+  }
+  onClick(ev) {
+    Flash.removeMessage(this);
+  }
+  temporize() {
+    this.timer = setTimeout(Flash.removeMessage.bind(Flash, this), 2000 + this.readingTime);
+  }
+  get readingTime() {
+    return Flash.calcReadingTime(this.content);
+  }
+  get content() {
+    return this.data.content;
+  }
+  get type() {
+    return this.data.type;
+  }
+}
+window.addEventListener("load", Flash.checkServerMessages.bind(Flash));
+
+// public/js/ui.js
 function stopEvent(ev) {
   ev.stopPropagation();
   ev.preventDefault();
@@ -145,9 +245,13 @@ var HOST = `http://localhost:${PORT}/`;
 
 class Work {
   data;
+  static init() {
+    Work.getCurrent();
+    Flash.notice("L'application est prête.");
+  }
   static currentWork;
   static get obj() {
-    return this._obj || (this._obj = document.body.querySelector("section#current-work-container"));
+    return this._obj || (this._obj = DGet("section#current-work-container"));
   }
   static _obj;
   static async getCurrent() {
@@ -187,4 +291,4 @@ await fetch(HOST + "api/task/start", {
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ taskId: 123 })
 });
-Work.getCurrent();
+Work.init();
