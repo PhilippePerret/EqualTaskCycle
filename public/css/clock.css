@@ -11,19 +11,22 @@ div#clock {
 }
 
 div#clock.big {
-  font-size: 40pt;
   position: absolute;
-  left: 0;
-  top: 100px;
+  left: 200px;
+  top: 150px;
   text-align: center;
-  font-size: 140pt;
+  font-size: 100pt;
 }
 
 div#clock.mediane {
-  position: relative;
-  font-size: 30pt;
+  position: absolute;
+  font-size: 40pt;
+  top: 7px;
+  left: 100px;
 }
+
 div#clock.mini {
-  position: relative;
+  position: absolute;
   font-size: 16pt;
+  top: 25px;
 }

@@ -19,7 +19,11 @@ export class Work {
   public static async addTimeToCurrentWork(time: number){
     console.log("Je dois apprendre à ajouter le temps", time, this.currentWork);
     if (time) {
-      this.currentWork.addTimeAndSave(time);
+      const ok = await this.currentWork.addTimeAndSave(time)
+      if (ok) {
+        // On passe à la tâche suivante
+        this.getCurrent();
+      }
     } else {
       Flash.error("Work time too short to save it.")
     }
@@ -45,7 +49,7 @@ export class Work {
   constructor(
     private data: WorkType & RunTimeInfosType
   ){
-    console.log("this.data", this.data);
+    // console.log("this.data", this.data);
   }
 
   public get id(){ return this.data.id; }
@@ -53,7 +57,7 @@ export class Work {
   /**
    * Méthode d'instance pour sauver le temps
    */
-  public async addTimeAndSave(time: number){
+  public async addTimeAndSave(time: number): Promise<boolean> {
     this.data.totalTime += time;
     this.data.cycleTime += time;
     this.data.restTime -= time;
@@ -72,6 +76,10 @@ export class Work {
     console.log("Retour save times: ", result);
     // On actualise l'affichage
     this.dispatchData();
+    // On le laisse affiché 2 secondes avant de passer à
+    // la tâche suivante.
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    return true;// Pour afficher la suivante
   }
 
   /**

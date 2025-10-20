@@ -261,7 +261,10 @@ class Work {
   static async addTimeToCurrentWork(time) {
     console.log("Je dois apprendre à ajouter le temps", time, this.currentWork);
     if (time) {
-      this.currentWork.addTimeAndSave(time);
+      const ok = await this.currentWork.addTimeAndSave(time);
+      if (ok) {
+        this.getCurrent();
+      }
     } else {
       Flash.error("Work time too short to save it.");
     }
@@ -280,7 +283,6 @@ class Work {
   }
   constructor(data) {
     this.data = data;
-    console.log("this.data", this.data);
   }
   get id() {
     return this.data.id;
@@ -305,6 +307,8 @@ class Work {
     }).then((r) => r.json);
     console.log("Retour save times: ", result);
     this.dispatchData();
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    return true;
   }
   display(options) {
     this.dispatchData();

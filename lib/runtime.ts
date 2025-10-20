@@ -39,21 +39,33 @@ export class RunTime {
     const request = 'SELECT * FROM works WHERE id = ? LIMIT 1';
     const query = this.db.prepare(request);
     const result = query.get(workId);
-    console.log("Result de getTemporalInfos", result);
+    // console.log("Result de getTemporalInfos", result);
     return result as RecType;
   }
 
   /**
    * @api
    * 
-   * On retourne toutes les tâches qui peuvent être travaillées
+   * On retourne toutes les tâches qui peuvent être travaillées.
+   * C'est forcément une tâche qui est active, qui a du temps de
+   * travail restant et qui n'a pas encore été travaillée 
+   * aujourd'hui.
+   * 
    */
   public getCandidateWorks(){
-    const request = `SELECT id FROM works WHERE active = 1 AND restTime > 0`;
+    const request = `SELECT id FROM works WHERE active = 1 AND restTime > 0 AND (lastWorkedAt IS NULL OR lastWorkedAt <= ${this.startOfToday})`;
     const activeIds = this.db.query(request).all().map((row: any) => row.id);
-    console.log("active ids :", activeIds);
-    // TODO Si aucune tâche => recommencer un cycle
+    console.log("Candidats ids :", activeIds);
+    if ( activeIds.length === 0 ) {
+      // TODO Si aucune tâche => recommencer un cycle
+      // TODO S'assurer qu'il y a bien des tâches ?
+    }
     return activeIds;
+  }
+  private get startOfToday(): number {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    return today.getTime();
   }
 
 
@@ -70,9 +82,9 @@ export class RunTime {
       cycleCount INTEGER,
       startedAt INTEGER,
       lastWorkedAt INTEGER,
-      active INTEGER
+      active INTEGER,
+      defaultRestTime INTEGER
     )`.trim().replace(/\n\s+/m,' ');
-    console.log("Request:", request);
     this.db.run(request);
   }
 
@@ -102,6 +114,51 @@ export class RunTime {
       dw.id
     ];
     this.db.run(request, data);
+    this.checkIfCycleIsComplete();
+  }
+
+  /**
+   * Fonction qui regarde si un cycle est terminé et s'il faut en
+   * recommencer un autre.
+   * 
+   * Un cycle est terminé lorsque toutes les tâches ont un temps
+   * restant (restTime) à zéro.
+   */
+  private checkIfCycleIsComplete(): boolean {
+    const request = `
+      SELECT id 
+      FROM works
+      WHERE
+        active = 1
+        AND 
+        restTime > 0
+      LIMIT 1
+      `;
+    if ( this.db.query(request).all().length ) {
+      // On a pu trouver au moins une tâche avec du temps
+      // restant, on peut donc s'arrêter là
+      return true;
+    }
+    // On a trouvé aucune tâche avec un tempsn restant, donc
+    // on va commencer un nouveau cycle.
+    return this.startNewCycle();
+  }
+
+  /**
+   * Fonction pour commencer un nouveau cycle.
+   */
+  startNewCycle(): boolean {
+    const request = `
+    UPDATE 
+      works
+    SET
+      cycleCount = cycleCount + 1,
+      restTime = defaultRestTime
+    WHERE
+      active = 1
+    `
+    const result = this.db.run(request);
+    return result.changes > 0;
   }
   /**
    * On fait les enregistrements pour les travaux courants
@@ -130,8 +187,16 @@ export class RunTime {
     this.db.run(reqActivate, allIdsON);
   }
 
-  private initRuntimeForWork(work: Work, defaultDuration: number){
-    this.db.run("INSERT INTO works VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [work.id, 0, 0, defaultDuration, 0, new Date().getTime(), null, 1])
+  private initRuntimeForWork(work: WorkType, defaultDuration: number){
+    const duration = work.duration || defaultDuration
+    const request = `
+    INSERT 
+    INTO 
+      works
+    VALUES
+      (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `
+    this.db.run(request, [work.id, 0, 0, duration, 0, new Date().getTime(), null, 1, duration])
   }
 
   private get dbPath(){
