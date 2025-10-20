@@ -22,32 +22,37 @@ export class Clock {
     this.clockObj.classList.add(style);
   }
 
+  private static timer: NodeJS.Timeout;
+  private static startTime: number;
+  private static timeLeft?: number;
+
   /**
    * Démarrage de l'horloge
    */
   public static start(){
     // console.log("Démarrage de l'horloge");
     this.clockObj.classList.remove('hidden');
-    this.clockObj.innerHTML = '0:00:00';
+    if ( undefined === this.timeLeft ) {
+      // La toute toute première fois
+      this.timeLeft = 0;
+      this.clockObj.innerHTML = '0:00:00';
+    }
     this.startTime = new Date().getTime();
-    this.timeLeft = 0;
     this.timer = setInterval(this.run.bind(this), 1000);
   }
-  private static timer: NodeJS.Timeout;
-  private static startTime: number;
-  private static timeLeft: number;
 
   public static pause(){
     clearInterval(this.timer);
-    this.timeLeft += this.lapsFromStart()
+    (this.timeLeft as number) += this.lapsFromStart()
   }
   public static stop(){
     clearInterval(this.timer);
+    this.timeLeft = undefined;
     this.clockObj.classList.add('hidden');
   }
 
   private static run(){
-    this.clockObj.innerHTML = this.s2h(this.timeLeft + this.lapsFromStart() );
+    this.clockObj.innerHTML = this.s2h((this.timeLeft as number) + this.lapsFromStart() );
   }
 
   private static lapsFromStart(){

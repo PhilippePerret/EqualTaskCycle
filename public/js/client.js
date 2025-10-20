@@ -28,22 +28,25 @@ class Clock {
   static setClockStyle(style) {
     this.clockObj.classList.add(style);
   }
-  static start() {
-    this.clockObj.classList.remove("hidden");
-    this.clockObj.innerHTML = "0:00:00";
-    this.startTime = new Date().getTime();
-    this.timeLeft = 0;
-    this.timer = setInterval(this.run.bind(this), 1000);
-  }
   static timer;
   static startTime;
   static timeLeft;
+  static start() {
+    this.clockObj.classList.remove("hidden");
+    if (this.timeLeft === undefined) {
+      this.timeLeft = 0;
+      this.clockObj.innerHTML = "0:00:00";
+    }
+    this.startTime = new Date().getTime();
+    this.timer = setInterval(this.run.bind(this), 1000);
+  }
   static pause() {
     clearInterval(this.timer);
     this.timeLeft += this.lapsFromStart();
   }
   static stop() {
     clearInterval(this.timer);
+    this.timeLeft = undefined;
     this.clockObj.classList.add("hidden");
   }
   static run() {
@@ -186,22 +189,25 @@ class Clock2 {
   static setClockStyle(style) {
     this.clockObj.classList.add(style);
   }
-  static start() {
-    this.clockObj.classList.remove("hidden");
-    this.clockObj.innerHTML = "0:00:00";
-    this.startTime = new Date().getTime();
-    this.timeLeft = 0;
-    this.timer = setInterval(this.run.bind(this), 1000);
-  }
   static timer;
   static startTime;
   static timeLeft;
+  static start() {
+    this.clockObj.classList.remove("hidden");
+    if (this.timeLeft === undefined) {
+      this.timeLeft = 0;
+      this.clockObj.innerHTML = "0:00:00";
+    }
+    this.startTime = new Date().getTime();
+    this.timer = setInterval(this.run.bind(this), 1000);
+  }
   static pause() {
     clearInterval(this.timer);
     this.timeLeft += this.lapsFromStart();
   }
   static stop() {
     clearInterval(this.timer);
+    this.timeLeft = undefined;
     this.clockObj.classList.add("hidden");
   }
   static run() {
@@ -236,6 +242,18 @@ class UI {
   static getInstance() {
     return UI.instance || (UI.instance = new UI);
   }
+  hide(eList) {
+    eList.forEach((e) => e.obj.classList.add("hidden"));
+  }
+  show(eList) {
+    eList.forEach((e) => e.obj.classList.remove("hidden"));
+  }
+  mask(eList) {
+    eList.forEach((e) => e.obj.classList.add("invisible"));
+  }
+  reveal(eList) {
+    eList.forEach((e) => e.obj.classList.remove("invisible"));
+  }
   showButtons(states) {
     this.buttons.forEach((bouton) => bouton.setState(states[bouton.id]));
   }
@@ -249,15 +267,18 @@ class UI {
   stopDate;
   pauseDate;
   onStart(ev) {
-    this.startDate = new Date;
+    this.mask([this.btnStart]);
+    this.reveal([this.btnStop, this.btnPause]);
     Clock2.start();
   }
   onStop(ev) {
-    this.stopDate = new Date;
+    this.mask([this.btnStop, this.btnPause]);
+    this.reveal([this.btnStart]);
     Clock2.stop();
   }
   onPause(ev) {
-    this.pauseDate = new Date;
+    this.mask([this.btnPause]);
+    this.reveal([this.btnStart]);
     Clock2.pause();
   }
   onChange(ev) {}
@@ -308,20 +329,20 @@ class UI {
       "Pour changer de tâche (mais attention : une seule fois par session !"
     ],
     [
-      "Pause",
-      "PAUSE",
-      this.onPause.bind(this),
-      false,
-      1,
-      "Pour mettre le travail en pause."
-    ],
-    [
       "Stop",
       "STOP",
       this.onStop.bind(this),
       true,
       1,
       "Pour arrêter la tâche et passer à la suivante (éviter…)"
+    ],
+    [
+      "Pause",
+      "PAUSE",
+      this.onPause.bind(this),
+      false,
+      1,
+      "Pour mettre le travail en pause."
     ],
     [
       "Start",
@@ -348,7 +369,6 @@ class Button {
     this[state ? "show" : "hide"]();
   }
   onClick(ev) {
-    console.log("Click sur le bouton", this);
     this.data.onclick();
     return stopEvent2(ev);
   }
@@ -395,6 +415,18 @@ class UI2 {
   static getInstance() {
     return UI2.instance || (UI2.instance = new UI2);
   }
+  hide(eList) {
+    eList.forEach((e) => e.obj.classList.add("hidden"));
+  }
+  show(eList) {
+    eList.forEach((e) => e.obj.classList.remove("hidden"));
+  }
+  mask(eList) {
+    eList.forEach((e) => e.obj.classList.add("invisible"));
+  }
+  reveal(eList) {
+    eList.forEach((e) => e.obj.classList.remove("invisible"));
+  }
   showButtons(states) {
     this.buttons.forEach((bouton) => bouton.setState(states[bouton.id]));
   }
@@ -408,15 +440,18 @@ class UI2 {
   stopDate;
   pauseDate;
   onStart(ev) {
-    this.startDate = new Date;
+    this.mask([this.btnStart]);
+    this.reveal([this.btnStop, this.btnPause]);
     Clock.start();
   }
   onStop(ev) {
-    this.stopDate = new Date;
+    this.mask([this.btnStop, this.btnPause]);
+    this.reveal([this.btnStart]);
     Clock.stop();
   }
   onPause(ev) {
-    this.pauseDate = new Date;
+    this.mask([this.btnPause]);
+    this.reveal([this.btnStart]);
     Clock.pause();
   }
   onChange(ev) {}
@@ -467,20 +502,20 @@ class UI2 {
       "Pour changer de tâche (mais attention : une seule fois par session !"
     ],
     [
-      "Pause",
-      "PAUSE",
-      this.onPause.bind(this),
-      false,
-      1,
-      "Pour mettre le travail en pause."
-    ],
-    [
       "Stop",
       "STOP",
       this.onStop.bind(this),
       true,
       1,
       "Pour arrêter la tâche et passer à la suivante (éviter…)"
+    ],
+    [
+      "Pause",
+      "PAUSE",
+      this.onPause.bind(this),
+      false,
+      1,
+      "Pour mettre le travail en pause."
     ],
     [
       "Start",
@@ -507,7 +542,6 @@ class Button2 {
     this[state ? "show" : "hide"]();
   }
   onClick(ev) {
-    console.log("Click sur le bouton", this);
     this.data.onclick();
     return stopEvent3(ev);
   }

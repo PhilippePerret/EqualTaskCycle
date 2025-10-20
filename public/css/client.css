@@ -56,7 +56,7 @@ button {
 
 
 .invisible { visibility: hidden; }
-.hidden {display: none;}
+.hidden { display: none !important; }
 
 
 section#preferences {

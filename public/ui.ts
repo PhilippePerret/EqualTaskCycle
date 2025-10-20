@@ -24,6 +24,20 @@ class UI {
     return UI.instance || (UI.instance = new UI());
   }
 
+  public hide(eList: any[]) {
+    eList.forEach(e => e.obj.classList.add('hidden'));
+  }
+  public show(eList: any[]) {
+    eList.forEach(e => e.obj.classList.remove('hidden'));
+  }
+
+  public mask(eList: any[]){
+    eList.forEach(e => e.obj.classList.add('invisible'));
+  }
+  public reveal(eList: any[]){
+    eList.forEach(e => e.obj.classList.remove('invisible'));
+  }
+
   public showButtons(states: {[x: string]: boolean}):void {
     this.buttons.forEach((bouton: Button) => bouton.setState(states[bouton.id] as boolean));
   };
@@ -40,15 +54,18 @@ class UI {
   private pauseDate!: Date;
 
   private onStart(ev: Event){
-    this.startDate = new Date();
+    this.mask([this.btnStart]);
+    this.reveal([this.btnStop, this.btnPause]);
     Clock.start();
   }
   private onStop(ev: Event){
-    this.stopDate = new Date();
+    this.mask([this.btnStop, this.btnPause]);
+    this.reveal([this.btnStart]);
     Clock.stop();
   }
   private onPause(ev: Event){
-    this.pauseDate = new Date();
+    this.mask([this.btnPause]);
+    this.reveal([this.btnStart]);
     Clock.pause();
   }
   private onChange(ev: Event){}
@@ -83,10 +100,10 @@ class UI {
       "Pour ouvrir le dossier défini dans les données"],
     ['Change', 'CHANGE', this.onChange.bind(this), false, 2,
       "Pour changer de tâche (mais attention : une seule fois par session !"],
-    ['Pause', 'PAUSE', this.onPause.bind(this), false, 1,
-      "Pour mettre le travail en pause."],
     ['Stop', 'STOP', this.onStop.bind(this), true, 1, 
-      "Pour arrêter la tâche et passer à la suivante (éviter…)"],
+        "Pour arrêter la tâche et passer à la suivante (éviter…)"],
+    ['Pause', 'PAUSE', this.onPause.bind(this), false, 1,
+          "Pour mettre le travail en pause."],
     ['Start', 'START', this.onStart.bind(this), false, 1,
       "Pour démarrer le travail sur cette tâche."],
   ];
@@ -109,7 +126,6 @@ class Button {
   }
 
   onClick(ev: MouseEvent){
-    console.log("Click sur le bouton", this);
     this.data.onclick();
     return stopEvent(ev);
   }
