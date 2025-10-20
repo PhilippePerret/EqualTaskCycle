@@ -125,7 +125,7 @@ class UI {
   closeSectionWork() {
     DGet("section#work").classList.add("hidden");
   }
-  openSectionWord() {
+  openSectionWork() {
     DGet("section#work").classList.remove("hidden");
   }
   onStart(ev) {}
@@ -272,31 +272,29 @@ class Prefs {
         works_file_path: DGet("input#works-file-path").value
       })
     }).then((r) => r.json());
-    console.log("result = ", result);
     if (result.ok) {
       this.close();
-      Flash.notice("Preferences saved.");
+      Flash.success("Preferences saved.");
     } else {
-      Flash.error(result.error);
+      Flash.error(result.errors);
     }
     return false;
   }
   onOpen(ev) {
-    ui.closeSectionWork();
     this.open();
-    this.section.classList.remove("hidden");
     return stopEvent(ev);
   }
   onClose(ev) {
     this.close();
-    ui.openSectionWord();
     return stopEvent(ev);
   }
   close() {
+    ui.openSectionWork();
     this.section.classList.add("hidden");
   }
   open() {
     this.section.classList.remove("hidden");
+    ui.closeSectionWork();
   }
   get section() {
     return DGet("section#preferences");

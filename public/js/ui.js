@@ -25,7 +25,7 @@ class UI {
   closeSectionWork() {
     DGet("section#work").classList.add("hidden");
   }
-  openSectionWord() {
+  openSectionWork() {
     DGet("section#work").classList.remove("hidden");
   }
   onStart(ev) {}

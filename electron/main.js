@@ -2,6 +2,7 @@ const { existsSync } = require('fs');
 const { app, BrowserWindow } = require('electron');
 const { spawn } = require('child_process');
 const { HOST } = require('../public/js/constants');
+const userDataPath = app.getPath('userData');
 
 let server = null;
 
@@ -21,7 +22,8 @@ app.whenReady().then(() => {
   app.dock.setIcon(ICON_PATH);
   const serverPath = path.join(__dirname, '..', 'server.ts');
   server = spawn('bun', ['run', serverPath], {
-    cwd: path.join(__dirname, '..')
+    cwd: path.join(__dirname, '..'),
+    env: { ...process.env, USER_DATA_PATH: userDataPath }
   });
   
   if (server) {

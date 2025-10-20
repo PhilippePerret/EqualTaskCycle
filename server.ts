@@ -3,7 +3,9 @@ import path from 'path';
 import { HOST, PORT } from './public/js/constants';
 import { Dialog } from "./lib/Dialog";
 import { Work } from "./lib/work";
+import { prefs } from './lib/prefs_server';
 
+const userDataPath = process.env.USER_DATA_PATH
 
 const app = express();
 
@@ -32,12 +34,8 @@ app.get('/task/current', (req, res) => {
 });
 
 app.post('/prefs/save', (req, res) => {
-  const prefs = req.body;
-  // console.log("prefs", prefs);
-  res.json({
-    ok: false, // ou pas…
-    error: 'Une erreur est survenue'
-  })
+  const report = prefs.save(req.body);
+  res.json(report);
 });
 
 

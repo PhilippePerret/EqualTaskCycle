@@ -30,7 +30,7 @@ class UI {
   public closeSectionWork(){
     DGet('section#work').classList.add('hidden')
   }
-  public openSectionWord(){
+  public openSectionWork(){
     DGet('section#work').classList.remove('hidden')
   }
 

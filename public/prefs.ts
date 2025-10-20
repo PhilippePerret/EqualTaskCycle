@@ -28,31 +28,33 @@ export class Prefs {
         works_file_path: DGet('input#works-file-path').value 
       })
     }).then(r => r.json());
-    console.log("result = ", result);
+    // console.log("result = ", result);
     if (result.ok) {
       this.close();
-      Flash.notice("Preferences saved.")
+      Flash.success("Preferences saved.")
     } else {
-      Flash.error(result.error);
+      Flash.error(result.errors);
     }
     return false;
   }
 
   onOpen(ev: MouseEvent){
-    ui.closeSectionWork()
-    this.open();
-    this.section.classList.remove('hidden')
-    
+    this.open();    
     return stopEvent(ev);
   }
   onClose(ev: MouseEvent){
     this.close();
-    ui.openSectionWord();
     return stopEvent(ev);
   }
 
-  private close(){ this.section.classList.add('hidden') }
-  private open(){ this.section.classList.remove('hidden')}
+  private close(){ 
+    ui.openSectionWork();
+    this.section.classList.add('hidden');
+  }
+  private open(){ 
+    this.section.classList.remove('hidden');
+    ui.closeSectionWork();
+  }
 
   private get section(){
     return DGet('section#preferences');
