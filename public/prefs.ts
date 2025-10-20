@@ -1,9 +1,14 @@
+import type { PrefsDataType } from "../lib/types";
 import { HOST } from "./js/constants";
 import { DGet, stopEvent } from "./js/dom";
 import { Flash } from "./js/flash";
 import { ui } from "./ui";
 
 export class Prefs {
+  private data!: PrefsDataType;
+
+
+
   private static instance: Prefs;
   private constructor(){}
   public static getInstance(){
@@ -24,9 +29,7 @@ export class Prefs {
     const result = await fetch(HOST + 'prefs/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        works_file_path: DGet('input#works-file-path').value 
-      })
+      body: JSON.stringify(this.getData())
     }).then(r => r.json());
     // console.log("result = ", result);
     if (result.ok) {
@@ -45,6 +48,37 @@ export class Prefs {
   onClose(ev: MouseEvent){
     this.close();
     return stopEvent(ev);
+  }
+
+
+  public setData(data: PrefsDataType){
+    console.log("Data prefs", data);
+    this.data = data;
+    Object.entries(this.data).forEach(([k , v]) => {
+      switch(k) {
+        case 'random':
+          this.field(k).checked = v;
+          break;
+        default:
+          this.field(k).value = v;
+      }
+    });
+  }
+  private getData(){
+    Object.entries(this.data).forEach(([k , v]) => {
+      switch(k) {
+        case 'random':
+          Object.assign(this.data, {[k]: this.field(k).checked});
+          break;
+        default:
+          Object.assign(this.data, {[k]: this.field(k).value});
+      }
+    });
+    return this.data;
+  }
+
+  private field(key: string){
+    return DGet(`#prefs-${key}`, this.section) || console.error("Le champ 'prefs-%s' est introuvable", key);
   }
 
   private close(){ 

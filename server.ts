@@ -3,9 +3,9 @@ import path from 'path';
 import { HOST, PORT } from './public/js/constants';
 import { Dialog } from "./lib/Dialog";
 import { Work } from "./lib/work";
-import { prefs } from './lib/prefs_server';
+import { prefs } from './lib/prefs_server_side';
 
-const userDataPath = process.env.USER_DATA_PATH
+// const userDataPath = process.env.USER_DATA_PATH
 
 const app = express();
 
@@ -24,12 +24,12 @@ app.post('/api/task/start', (req, res) => {
 });
 
 app.get('/task/current', (req, res) => {
-  // TODO Envoyer la tâche courante et ses options
   // TODO Il faut donc implémenter l'algorithme de choix de
   // la tâche
   res.json({
     task: {project: "Son nom", id: "Son id etc.", content: "Le contenu exact de la tâche, du travail."},
-    options: {canChange: true /* TODO À RÉGLER */}
+    options: {canChange: true /* TODO À RÉGLER */},
+    prefs: prefs.load()
   });
 });
 

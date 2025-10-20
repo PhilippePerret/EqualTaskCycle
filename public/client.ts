@@ -3,7 +3,7 @@ import { HOST } from "./js/constants";
 import { DGet } from "./js/dom";
 import { Flash } from "./js/flash";
 import { ui } from "./js/ui";
-import { prefs } from "./prefs.js";
+import { prefs } from "./prefs";
 
 class Work {
 
@@ -27,6 +27,7 @@ class Work {
     // console.log("Current Task", currentWork);
     this.currentWork = new Work(dataCurrentWork);
     this.currentWork.display(retour.options);
+    prefs.setData(retour.prefs);
   }
 
   constructor(

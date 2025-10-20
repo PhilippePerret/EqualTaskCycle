@@ -1,6 +1,7 @@
 import path from "path";
-import type { RecType } from "./types";
-import { existsSync, writeFileSync } from "fs";
+import type { PrefsDataType, RecType } from "./types";
+import { existsSync, readFileSync, writeFileSync } from "fs";
+import type { file } from "bun";
 
 const userDataPath = process.env.USER_DATA_PATH
 
@@ -10,28 +11,39 @@ type ReportType = {
   errors: string[] | string;
 }
 
+
 class Prefs {
+
+  private DEFAULT_DATA:PrefsDataType = {
+    file:   '', // not undefined
+    clock:  'big',
+    theme:  'dark',
+    random: true
+  }
+
   private static instance: Prefs;
   private constructor(){}
   public static getInstance(){
     return this.instance || (this.instance = new Prefs());
   }
 
+  load(){
+    const data: PrefsDataType = Object.assign({}, this.DEFAULT_DATA);
+    if (existsSync(this.fpath)) {
+      return Object.assign(data, JSON.parse(readFileSync(this.fpath,'utf8')));
+    } else {
+      return data;
+    }
+  }
+
   save(data: RecType){
     // Sauvegarde du fichier de données des tâches
-    const works_file_path = data.works_file_path;
+    console.log("data prefs à save", data);
     const report: ReportType = {ok: true, errors: []};
-    const data2save: RecType = {};
-    this.checkWorksFileValidity(works_file_path, report, data2save);
+    this.checkWorksFileValidity(data.file, report, data);
     // Todo Faire ici les autres checks nécessaires
 
-    // S'il y a des données à sauver
-    if (Object.keys(data2save).length) {
-      console.log("path preférences : ", this.fpath);
-      writeFileSync(this.fpath, JSON.stringify(data2save));
-    } else {
-      console.log("Aucune préférence à enregistrer");
-    }
+    writeFileSync(this.fpath, JSON.stringify(data));
 
     // Rapport de retour
     const errorCount = report.errors.length;
@@ -41,13 +53,12 @@ class Prefs {
     return report;
   }
 
-  private checkWorksFileValidity(pth: string, report: ReportType, data2save: RecType){
+  private checkWorksFileValidity(pth: string, report: ReportType, data: RecType){
     if (!existsSync(pth)) {
+      Object.assign(data, {file: undefined});
       (report.errors as string[]).push("Unfound works file at " + pth);
     } else {
-      // Todo vérifier s'il est bien formé
-
-      Object.assign(data2save, {works_file_path: pth});
+      // Todo vérifier si le fichier est bien formé ?
     }
 
   }

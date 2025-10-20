@@ -64,8 +64,22 @@ label + input,
 label + select {
   margin-left: 1em;
 }
+input + span {
+  margin-left: 1em;
+}
 
 div.buttons {
   margin-top: 1em;
   text-align: right;
+}
+
+.flex {
+  display: flex;
+}
+.row-flex {
+  display: flex;
+  margin-bottom: 0.5em;
+}
+.row-flex label {
+  flex: 0 0 100px;
 }

@@ -404,6 +404,7 @@ var ui2 = UI2.getInstance();
 
 // public/prefs.ts
 class Prefs {
+  data;
   static instance;
   constructor() {}
   static getInstance() {
@@ -419,9 +420,7 @@ class Prefs {
     const result = await fetch(HOST + "prefs/save", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        works_file_path: DGet("input#works-file-path").value
-      })
+      body: JSON.stringify(this.getData())
     }).then((r) => r.json());
     if (result.ok) {
       this.close();
@@ -438,6 +437,34 @@ class Prefs {
   onClose(ev) {
     this.close();
     return stopEvent(ev);
+  }
+  setData(data) {
+    console.log("Data prefs", data);
+    this.data = data;
+    Object.entries(this.data).forEach(([k, v]) => {
+      switch (k) {
+        case "random":
+          this.field(k).checked = v;
+          break;
+        default:
+          this.field(k).value = v;
+      }
+    });
+  }
+  getData() {
+    Object.entries(this.data).forEach(([k, v]) => {
+      switch (k) {
+        case "random":
+          Object.assign(this.data, { [k]: this.field(k).checked });
+          break;
+        default:
+          Object.assign(this.data, { [k]: this.field(k).value });
+      }
+    });
+    return this.data;
+  }
+  field(key) {
+    return DGet(`#prefs-${key}`, this.section) || console.error("Le champ 'prefs-%s' est introuvable", key);
   }
   close() {
     ui2.openSectionWork();
@@ -471,6 +498,7 @@ class Work {
     const dataCurrentWork = retour.task;
     this.currentWork = new Work(dataCurrentWork);
     this.currentWork.display(retour.options);
+    prefs.setData(retour.prefs);
   }
   constructor(data) {
     this.data = data;
