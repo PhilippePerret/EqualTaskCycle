@@ -26,6 +26,13 @@ export class UI {
   }
 
   /**
+   * Pour affecter le thème
+   */
+  public setUITheme(theme: string) {
+    document.body.className = theme;
+  }
+
+  /**
    * Quatre fonctions pour masquer ou montrer des objets
    * 
    * ATTENTION : eList n'est pas une liste d'HTMLElements mais une

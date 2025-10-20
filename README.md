@@ -46,24 +46,25 @@ duration: 120 # nombre de minutes par défaut pour chaque tâche
 
 works:
   - id: pss
-    name: "Passé sous Silence"
+    project: "Passé sous Silence"
     content: "Travailler sur le deuxième Tome"
     duration: 180 # Possibilité de mettre un durée propre, pour travail + ou - une tâche
     folder: '/Users/philippeperret/ICARE_EDITIONS/_LIVRES_/Fictions/Passé sous silence'
   - id: dico
-    name: "Grand Dictionnaire du Scénario"
+    project: "Grand Dictionnaire du Scénario"
     content: "Développer les exemples et l'interface"
     folder: /Users/philippeperret/ICARE_EDITIONS/_LIVRES_/Narration/Dictionnaire
+    startupScript: path/to/startud-script
   - id: idml
-    name: "IDML-Générateur"
+    project: "IDML-Générateur"
     content: "Poursuivre le développement"
     folder: "/Users/philippeperret/Programmes/IDML-APGenerator"
   - id: pmail
-    name: "Perfect-Mail"
+    project: "Perfect-Mail"
     content: "Poursuivre le développement"
     folder: '/Users/philippeperret/Programmes/Perfect-Mail'
   - id: preludes
-    name: "Préludes de Bach"
+    project: "Préludes de Bach"
     content: "Poursuivre la com"
     folder: '/Users/philippeperret/ICARE_EDITIONS/_LIVRES_/Musique/Partitions/Recueils/Les plus beaux préludes de Bach'
   - id: oubliettes
@@ -77,6 +78,17 @@ works:
 ### Ajout d’une tâche
 
 Pour qu’une tâche devienne « prioritaire » (juste être exécutée avant les autres), quand on n’est pas en mode aléatoire, il faut la mettre le plus au-dessus des autres possible.
+
+#### Détail des paramètres
+
+| Nom     | description                                                  | notes                                                        |
+| ------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| id      | Identifiant de la tâche                                      | Très important car sert à identifier la tâches/le travail partout dans le programme. |
+| project | Nom du projet auquel appartient la tâche                     |                                                              |
+| content | Le contenu proprement dit de la tâche, donc ce qu’il faut faire. | Le texte peut être assez long et suffisamment informatif pour |
+|         |                                                              |                                                              |
+
+
 
 ### Mode aléatoire
 

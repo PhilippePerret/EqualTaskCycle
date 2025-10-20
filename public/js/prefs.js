@@ -181,7 +181,6 @@ class Work {
   }
   static currentWork;
   static async addTimeToCurrentWork(time) {
-    console.log("Je dois apprendre à ajouter le temps", time, this.currentWork);
     if (time) {
       const ok = await this.currentWork.addTimeAndSave(time);
       if (ok) {
@@ -202,6 +201,7 @@ class Work {
     this.currentWork.display(retour.options);
     prefs.setData(retour.prefs);
     Clock.setClockStyle(retour.prefs.clock);
+    ui.setUITheme(retour.prefs.theme);
   }
   constructor(data) {
     this.data = data;
@@ -279,6 +279,9 @@ class UI {
   constructor() {}
   static getInstance() {
     return UI.instance || (UI.instance = new UI);
+  }
+  setUITheme(theme) {
+    document.body.className = theme;
   }
   hide(eList) {
     eList.forEach((e) => e.obj.classList.add("hidden"));

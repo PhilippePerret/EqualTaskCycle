@@ -17,7 +17,6 @@ export class Work {
   private static currentWork: Work;
 
   public static async addTimeToCurrentWork(time: number){
-    console.log("Je dois apprendre à ajouter le temps", time, this.currentWork);
     if (time) {
       const ok = await this.currentWork.addTimeAndSave(time)
       if (ok) {
@@ -44,6 +43,7 @@ export class Work {
     this.currentWork.display(retour.options);
     prefs.setData(retour.prefs);
     Clock.setClockStyle(retour.prefs.clock);
+    ui.setUITheme(retour.prefs.theme);
   }
 
   constructor(

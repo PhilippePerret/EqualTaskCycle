@@ -5,17 +5,23 @@ div#current-work-id {
   float: right;
   font-size: 13pt;
   font-style: italic;
-  color: #DDDDDD;
+  color: #d5d8e3;
 }
 
 /* section#work  */
 section#current-work-container {
   position:relative;
   min-height: 200px;
-  background: #464747;
   padding: 1.5em;
   border-radius: 1.2em;
 }
+body.dark section#current-work-container {
+  background: #464747;
+}
+body.light section#current-work-container {
+  background: #b1b6c6;
+}
+
 
 section#current-work-container div#current-work-content {
   font-size: 18pt;
