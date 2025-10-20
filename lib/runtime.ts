@@ -9,6 +9,7 @@ import type { RecType, RunTimeInfosType } from './types';
 import { Database } from "bun:sqlite"
 import type { Work } from './work';
 import { userDataPath } from './constants_server';
+import type { Rectangle } from 'electron';
 
 
 export class RunTime {
@@ -28,6 +29,19 @@ export class RunTime {
       this.buildDatabase();
     }
     this.insertNewWorks(works, defaultDuration);
+  }
+
+  /**
+   * @return les infos temporelles du travail d'identifiant workId
+   * 
+   * @param workId Identifiant du travail
+   */
+  public getTemporalInfos(workId: string): RecType {
+    const request = 'SELECT * FROM works WHERE id = ? LIMIT 1';
+    const query = this.db.prepare(request);
+    const result = query.get(workId);
+    console.log("Result de getTemporalInfos", result);
+    return result as RecType;
   }
 
   /**

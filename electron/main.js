@@ -41,6 +41,6 @@ app.whenReady().then(() => {
   });
 
 
-  setTimeout(() => win.loadURL(HOST), 500);
+  setTimeout(() => win.loadURL(HOST), 2000);
 });
 

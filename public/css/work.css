@@ -7,3 +7,37 @@ div#current-work-id {
   font-style: italic;
   color: #DDDDDD;
 }
+
+/* section#work  */
+section#current-work-container {
+  position:relative;
+  min-height: 200px;
+  background: #464747;
+  padding: 1.5em;
+  border-radius: 1.2em;
+}
+
+section#current-work-container div#current-work-content {
+  font-size: 18pt;
+  margin-top: 0.5em;
+}
+section#current-work-container div#current-work-times {
+  position: absolute;
+  left: 0px;
+  bottom: 4px;
+  width: 100%;
+  text-align: center!important;
+  font-size: 15pt;
+}
+
+section#current-work-container div#current-work-times span {
+  margin-left: 8px;
+  margin-right: 8px;
+  display: inline-block;
+  width: 80px;
+  text-align: center;
+  /* border: 1px solid green; */
+}
+section#current-work-container div#current-work-times div.libelles span {
+  font-size: 9pt;
+}

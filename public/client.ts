@@ -8,7 +8,7 @@ import { prefs } from "./prefs";
 class Work {
 
   public static init(){
-    Work.getCurrent();
+    this.getCurrent();
     prefs.init();
     Flash.notice("L'application est prête.")
   }
@@ -24,7 +24,7 @@ class Work {
     const retour: RecType = await fetch(HOST + 'task/current')
     .then(r => r.json() as RecType);
     const dataCurrentWork = retour.task;
-    // console.log("Current Task", currentWork);
+    // console.log("Current Task", dataCurrentWork);
     this.currentWork = new Work(dataCurrentWork);
     this.currentWork.display(retour.options);
     prefs.setData(retour.prefs);

@@ -484,7 +484,7 @@ var prefs = Prefs.getInstance();
 class Work {
   data;
   static init() {
-    Work.getCurrent();
+    this.getCurrent();
     prefs.init();
     Flash.notice("L'application est prête.");
   }

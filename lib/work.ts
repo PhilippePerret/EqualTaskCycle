@@ -31,9 +31,15 @@ export class Work {
    * Retourne le travail courant
    */
   public static getCurrentWork(){
+    console.log("-> getCurrentWork")
     const ids: string[] = runtime.getCandidateWorks();
-    const candidatId = ids[Math.floor(Math.random() * ids.length)]
-    return this.get(candidatId as string);
+    // TODO Seulement si random dans les préférences
+    console.log("candidats", ids)
+    const candidatId = ids[Math.floor(Math.random() * ids.length)];
+    console.log("candidat ID", candidatId);
+    const candidatData = this.get(candidatId as string).dataForClient;
+    console.log("Candidat :", candidatData);
+    return candidatData;
   }
 
   /**
@@ -54,21 +60,15 @@ export class Work {
     Work.add(this);
   }
 
-  public runtimeInfos!: RunTimeInfosType;
+  public get dataForClient(){
+    return Object.assign(
+      runtime.getTemporalInfos(this.id)
+    , this.data);
+  }
 
   // raccourcis
   public get id(){ return this.data.id; }
 
-
-  private startTime!: Date;
-  private stopTime!: Date;
-
-  public start(){
-    // Flash.notice("Début du travail sur « " + this.data.project + " »");
-    this.startTime = new Date();
-  }
-  public stop(){
-    this.stopTime = new Date();
-  }
-
 }
+
+Work.init();
