@@ -25,6 +25,7 @@ export class Clock {
   private static timer: NodeJS.Timeout;
   private static startTime: number;
   private static timeLeft?: number;
+  private static totalTime: number;
 
   /**
    * Démarrage de l'horloge
@@ -41,14 +42,18 @@ export class Clock {
     this.timer = setInterval(this.run.bind(this), 1000);
   }
 
+  public static getStartTime(){ return this.startTime; }
+
   public static pause(){
     clearInterval(this.timer);
     (this.timeLeft as number) += this.lapsFromStart()
   }
-  public static stop(){
+  public static stop(): number {
     clearInterval(this.timer);
+    this.totalTime = (this.timeLeft as number) + this.lapsFromStart();
     this.timeLeft = undefined;
     this.clockObj.classList.add('hidden');
+    return this.totalTime;
   }
 
   private static run(){

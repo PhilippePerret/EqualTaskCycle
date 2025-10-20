@@ -13,6 +13,7 @@ div#clock {
 div#clock.big {
   font-size: 40pt;
   position: absolute;
+  left: 0;
   top: 100px;
   text-align: center;
   font-size: 140pt;

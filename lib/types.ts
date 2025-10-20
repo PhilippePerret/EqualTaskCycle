@@ -9,7 +9,7 @@ export interface WorkType {
     duration?: number,
     folder?: string,
     startupScript?: string, // path du script de démarrage
-    
+
 }
 
 export interface RunTimeInfosType {
@@ -17,8 +17,8 @@ export interface RunTimeInfosType {
   cycleTime: number;  // Le nombre de minutes travaillées dans le cycle courant
   restTime: number;   // Nombre de minutes restant pour finir le cycle
   cycleCount: number; // Nombre de cycles
-  startedAt: Date;    // Date de démarrage du travail
-  lastWorkedAt: Date; // Date de dernier travail
+  startedAt: number;  // Date de démarrage du travail
+  lastWorkedAt: number; // Date de dernier travail
 }
 
 export interface PrefsDataType {

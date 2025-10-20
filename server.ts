@@ -3,6 +3,7 @@ import path from 'path';
 import { HOST, PORT } from './public/js/constants';
 import { Work } from "./lib/work";
 import { prefs } from './lib/prefs_server_side';
+import { runtime } from './lib/runtime';
 
 const app = express();
 
@@ -15,6 +16,12 @@ app.post('/api/task/start', (req, res) => {
   const { taskId } = req.body;
   // ... ton traitement
   res.json({ success: true, data: {ok: true} });
+});
+
+app.post('/work/save-times', (req, res) => {
+  const dwork = req.body;
+  console.log("Je dois apprendre à sauver les temps de : ", dwork);
+  runtime.updateWork(dwork);
 });
 
 app.get('/task/current', (req, res) => {

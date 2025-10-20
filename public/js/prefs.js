@@ -126,6 +126,7 @@ class Clock {
   static timer;
   static startTime;
   static timeLeft;
+  static totalTime;
   static start() {
     this.clockObj.classList.remove("hidden");
     if (this.timeLeft === undefined) {
@@ -135,14 +136,19 @@ class Clock {
     this.startTime = new Date().getTime();
     this.timer = setInterval(this.run.bind(this), 1000);
   }
+  static getStartTime() {
+    return this.startTime;
+  }
   static pause() {
     clearInterval(this.timer);
     this.timeLeft += this.lapsFromStart();
   }
   static stop() {
     clearInterval(this.timer);
+    this.totalTime = this.timeLeft + this.lapsFromStart();
     this.timeLeft = undefined;
     this.clockObj.classList.add("hidden");
+    return this.totalTime;
   }
   static run() {
     this.clockObj.innerHTML = this.s2h(this.timeLeft + this.lapsFromStart());
@@ -164,6 +170,98 @@ class Clock {
     return `${h}:${mstr}:${sstr}`;
   }
 }
+
+// public/client.ts
+class Work {
+  data;
+  static init() {
+    this.getCurrent();
+    prefs.init();
+    Flash.notice("L'application est prête.");
+  }
+  static currentWork;
+  static async addTimeToCurrentWork(time) {
+    console.log("Je dois apprendre à ajouter le temps", time, this.currentWork);
+    if (time) {
+      this.currentWork.addTimeAndSave(time);
+    } else {
+      Flash.error("Work time too short to save it.");
+    }
+  }
+  static get obj() {
+    return this._obj || (this._obj = DGet("section#current-work-container"));
+  }
+  static _obj;
+  static async getCurrent() {
+    const retour = await fetch(HOST + "task/current").then((r) => r.json());
+    const dataCurrentWork = retour.task;
+    this.currentWork = new Work(dataCurrentWork);
+    this.currentWork.display(retour.options);
+    prefs.setData(retour.prefs);
+    Clock.setClockStyle(retour.prefs.clock);
+  }
+  constructor(data) {
+    this.data = data;
+    console.log("this.data", this.data);
+  }
+  get id() {
+    return this.data.id;
+  }
+  async addTimeAndSave(time) {
+    this.data.totalTime += time;
+    this.data.cycleTime += time;
+    this.data.restTime -= time;
+    if (this.data.restTime < 0) {
+      this.data.restTime = 0;
+    }
+    if (this.data.cycleCount === 0) {
+      this.data.cycleCount = 1;
+      this.data.startedAt = Clock.getStartTime();
+    }
+    this.data.lastWorkedAt = Clock.getStartTime();
+    console.log("Enregistrement des temps");
+    const result = await fetch(HOST + "work/save-times", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(this.data)
+    }).then((r) => r.json);
+    console.log("Retour save times: ", result);
+    this.dispatchData();
+  }
+  display(options) {
+    this.dispatchData();
+    ui.showButtons({
+      Start: true,
+      Stop: false,
+      Pause: false,
+      Change: options.canChange,
+      runScript: !!this.data.startupScript,
+      openFolder: !!this.data.folder
+    });
+  }
+  dispatchData() {
+    Object.entries(this.data).forEach(([k, v]) => {
+      v = ((prop, v2) => {
+        switch (prop) {
+          case "totalTime":
+          case "cycleTime":
+          case "restTime":
+            return Clock.time2horloge(v2);
+          default:
+            return v2;
+        }
+      })(k, v);
+      const propField = this.field(k);
+      if (propField) {
+        propField.innerHTML = v;
+      }
+    });
+  }
+  field(prop) {
+    return Work.obj.querySelector(`#current-work-${prop}`);
+  }
+}
+Work.init();
 
 // public/ui.ts
 function stopEvent2(ev) {
@@ -210,7 +308,8 @@ class UI {
   onStop(ev) {
     this.mask([this.btnStop, this.btnPause]);
     this.reveal([this.btnStart]);
-    Clock.stop();
+    const workTime = Clock.stop();
+    Work.addTimeToCurrentWork(Math.round(workTime / 60));
   }
   onPause(ev) {
     this.mask([this.btnPause]);

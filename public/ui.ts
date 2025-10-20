@@ -1,4 +1,5 @@
 import { Clock } from "../lib/Clock";
+import { Work } from "./client";
 import { DGet } from "./js/dom";
 
 function stopEvent(ev: Event){
@@ -17,20 +18,25 @@ interface ButtonType {
 
 
 
-class UI {
+export class UI {
   private static instance: UI;
   private constructor(){}
   public static getInstance(){
     return UI.instance || (UI.instance = new UI());
   }
 
+  /**
+   * Quatre fonctions pour masquer ou montrer des objets
+   * 
+   * ATTENTION : eList n'est pas une liste d'HTMLElements mais une
+   * list d'instance possédant un obj.
+   */
   public hide(eList: any[]) {
     eList.forEach(e => e.obj.classList.add('hidden'));
   }
   public show(eList: any[]) {
     eList.forEach(e => e.obj.classList.remove('hidden'));
   }
-
   public mask(eList: any[]){
     eList.forEach(e => e.obj.classList.add('invisible'));
   }
@@ -58,10 +64,16 @@ class UI {
     this.reveal([this.btnStop, this.btnPause]);
     Clock.start();
   }
+
+  /**
+   * Pour stopper le travail. C'est cette méthode qui produit
+   * l'enregistrement du temps de travail.
+   */
   private onStop(ev: Event){
     this.mask([this.btnStop, this.btnPause]);
     this.reveal([this.btnStart]);
-    Clock.stop();
+    const workTime: number = Clock.stop();
+    Work.addTimeToCurrentWork(Math.round(workTime / 60));
   }
   private onPause(ev: Event){
     this.mask([this.btnPause]);

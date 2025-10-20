@@ -5,6 +5,11 @@ function DGet(selector, container) {
   }
   return container.querySelector(selector);
 }
+function stopEvent(ev) {
+  ev.stopPropagation();
+  ev.preventDefault();
+  return false;
+}
 
 // lib/Clock.ts
 class Clock {
@@ -26,6 +31,7 @@ class Clock {
   static timer;
   static startTime;
   static timeLeft;
+  static totalTime;
   static start() {
     this.clockObj.classList.remove("hidden");
     if (this.timeLeft === undefined) {
@@ -35,14 +41,19 @@ class Clock {
     this.startTime = new Date().getTime();
     this.timer = setInterval(this.run.bind(this), 1000);
   }
+  static getStartTime() {
+    return this.startTime;
+  }
   static pause() {
     clearInterval(this.timer);
     this.timeLeft += this.lapsFromStart();
   }
   static stop() {
     clearInterval(this.timer);
+    this.totalTime = this.timeLeft + this.lapsFromStart();
     this.timeLeft = undefined;
     this.clockObj.classList.add("hidden");
+    return this.totalTime;
   }
   static run() {
     this.clockObj.innerHTML = this.s2h(this.timeLeft + this.lapsFromStart());
@@ -65,8 +76,273 @@ class Clock {
   }
 }
 
+// public/js/constants.js
+var PORT = 3002;
+var HOST = `http://localhost:${PORT}/`;
+
+// public/js/flash.js
+class Flash {
+  static init() {}
+  static checkServerMessages() {
+    const divMsg = DGet("div#flash-group div#flash-info");
+    if (divMsg) {
+      const content = DGet("p.message", divMsg).innerHTML;
+      DGet("button", divMsg).remove();
+      this.temporize(divMsg, this.calcReadingTime(content));
+    }
+  }
+  static temporize(domMessage, readingTime) {
+    this.timer = setTimeout(this.removeServerMessage.bind(this, domMessage), 2000 + readingTime);
+  }
+  static removeServerMessage(domE, ev) {
+    domE.remove();
+    this.timer && clearTimeout(this.timer);
+    delete this.timer;
+  }
+  static calcReadingTime(str) {
+    return str.split(" ").length * 300 * 4;
+  }
+  static notice(message) {
+    this.buildMessage({ content: message, type: "notice" });
+  }
+  static info(message) {
+    return this.notice(message);
+  }
+  static success(message) {
+    this.buildMessage({ content: message, type: "success" });
+  }
+  static warning(message) {
+    this.buildMessage({ content: message, type: "warning" });
+  }
+  static error(message) {
+    this.buildMessage({ content: message, type: "error" });
+  }
+  static buildMessage(data) {
+    new FlashMessage(data);
+  }
+  static removeMessage(message) {
+    if (message.type != "error") {
+      clearTimeout(message.timer);
+      message.timer = null;
+    }
+    message.obj.remove();
+    message = undefined;
+  }
+  static get conteneur() {
+    return this._maincont || (this._maincont = DGet("#flash-group"));
+  }
+}
+
+class FlashMessage {
+  constructor(data) {
+    this.data = data;
+    this.build();
+    this.show();
+    if (this.type != "error")
+      this.temporize();
+    this.observe();
+  }
+  build() {
+    const msg = document.createElement("DIV");
+    msg.className = `flash-message ${this.type}`;
+    msg.innerHTML = this.content;
+    this.obj = msg;
+  }
+  show() {
+    Flash.conteneur.appendChild(this.obj);
+  }
+  observe() {
+    this.obj.addEventListener("click", this.onClick.bind(this));
+  }
+  onClick(ev) {
+    Flash.removeMessage(this);
+  }
+  temporize() {
+    this.timer = setTimeout(Flash.removeMessage.bind(Flash, this), 2000 + this.readingTime);
+  }
+  get readingTime() {
+    return Flash.calcReadingTime(this.content);
+  }
+  get content() {
+    return this.data.content;
+  }
+  get type() {
+    return this.data.type;
+  }
+}
+
+// public/prefs.ts
+class Prefs {
+  data;
+  static instance;
+  constructor() {}
+  static getInstance() {
+    return this.instance || (this.instance = new Prefs);
+  }
+  init() {
+    DGet("button.btn-prefs").addEventListener("click", this.onOpen.bind(this));
+    DGet("button.btn-close-prefs").addEventListener("click", this.onClose.bind(this));
+    DGet("button.btn-save-prefs").addEventListener("click", this.onSave.bind(this));
+  }
+  async onSave(ev) {
+    stopEvent(ev);
+    const result = await fetch(HOST + "prefs/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(this.getData())
+    }).then((r) => r.json());
+    if (result.ok) {
+      this.close();
+      Flash.success("Preferences saved.");
+    } else {
+      Flash.error(result.errors);
+    }
+    return false;
+  }
+  onOpen(ev) {
+    this.open();
+    return stopEvent(ev);
+  }
+  onClose(ev) {
+    this.close();
+    return stopEvent(ev);
+  }
+  setData(data) {
+    console.log("Data prefs", data);
+    this.data = data;
+    Object.entries(this.data).forEach(([k, v]) => {
+      switch (k) {
+        case "random":
+          this.field(k).checked = v;
+          break;
+        default:
+          this.field(k).value = v;
+      }
+    });
+  }
+  getData() {
+    Object.entries(this.data).forEach(([k, v]) => {
+      switch (k) {
+        case "random":
+          Object.assign(this.data, { [k]: this.field(k).checked });
+          break;
+        default:
+          Object.assign(this.data, { [k]: this.field(k).value });
+      }
+    });
+    return this.data;
+  }
+  field(key) {
+    return DGet(`#prefs-${key}`, this.section) || console.error("Le champ 'prefs-%s' est introuvable", key);
+  }
+  close() {
+    ui.openSectionWork();
+    this.section.classList.add("hidden");
+  }
+  open() {
+    this.section.classList.remove("hidden");
+    ui.closeSectionWork();
+  }
+  get section() {
+    return DGet("section#preferences");
+  }
+}
+var prefs = Prefs.getInstance();
+
+// public/client.ts
+class Work {
+  data;
+  static init() {
+    this.getCurrent();
+    prefs.init();
+    Flash.notice("L'application est prête.");
+  }
+  static currentWork;
+  static async addTimeToCurrentWork(time) {
+    console.log("Je dois apprendre à ajouter le temps", time, this.currentWork);
+    if (time) {
+      this.currentWork.addTimeAndSave(time);
+    } else {
+      Flash.error("Work time too short to save it.");
+    }
+  }
+  static get obj() {
+    return this._obj || (this._obj = DGet("section#current-work-container"));
+  }
+  static _obj;
+  static async getCurrent() {
+    const retour = await fetch(HOST + "task/current").then((r) => r.json());
+    const dataCurrentWork = retour.task;
+    this.currentWork = new Work(dataCurrentWork);
+    this.currentWork.display(retour.options);
+    prefs.setData(retour.prefs);
+    Clock.setClockStyle(retour.prefs.clock);
+  }
+  constructor(data) {
+    this.data = data;
+    console.log("this.data", this.data);
+  }
+  get id() {
+    return this.data.id;
+  }
+  async addTimeAndSave(time) {
+    this.data.totalTime += time;
+    this.data.cycleTime += time;
+    this.data.restTime -= time;
+    if (this.data.restTime < 0) {
+      this.data.restTime = 0;
+    }
+    if (this.data.cycleCount === 0) {
+      this.data.cycleCount = 1;
+      this.data.startedAt = Clock.getStartTime();
+    }
+    this.data.lastWorkedAt = Clock.getStartTime();
+    console.log("Enregistrement des temps");
+    const result = await fetch(HOST + "work/save-times", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(this.data)
+    }).then((r) => r.json);
+    console.log("Retour save times: ", result);
+    this.dispatchData();
+  }
+  display(options) {
+    this.dispatchData();
+    ui.showButtons({
+      Start: true,
+      Stop: false,
+      Pause: false,
+      Change: options.canChange,
+      runScript: !!this.data.startupScript,
+      openFolder: !!this.data.folder
+    });
+  }
+  dispatchData() {
+    Object.entries(this.data).forEach(([k, v]) => {
+      v = ((prop, v2) => {
+        switch (prop) {
+          case "totalTime":
+          case "cycleTime":
+          case "restTime":
+            return Clock.time2horloge(v2);
+          default:
+            return v2;
+        }
+      })(k, v);
+      const propField = this.field(k);
+      if (propField) {
+        propField.innerHTML = v;
+      }
+    });
+  }
+  field(prop) {
+    return Work.obj.querySelector(`#current-work-${prop}`);
+  }
+}
+Work.init();
+
 // public/ui.ts
-function stopEvent(ev) {
+function stopEvent2(ev) {
   ev.stopPropagation();
   ev.preventDefault();
   return false;
@@ -110,7 +386,8 @@ class UI {
   onStop(ev) {
     this.mask([this.btnStop, this.btnPause]);
     this.reveal([this.btnStart]);
-    Clock.stop();
+    const workTime = Clock.stop();
+    Work.addTimeToCurrentWork(Math.round(workTime / 60));
   }
   onPause(ev) {
     this.mask([this.btnPause]);
@@ -206,7 +483,7 @@ class Button {
   }
   onClick(ev) {
     this.data.onclick();
-    return stopEvent(ev);
+    return stopEvent2(ev);
   }
   build() {
     const o = document.createElement("BUTTON");
@@ -238,5 +515,6 @@ class Button {
 }
 var ui = UI.getInstance();
 export {
-  ui
+  ui,
+  UI
 };

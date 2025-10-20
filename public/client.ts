@@ -1,12 +1,12 @@
 import { Clock } from "../lib/Clock.js";
-import type { RecType, WorkType } from "../lib/types.js";
+import type { RecType, RunTimeInfosType, WorkType } from "../lib/types.js";
 import { HOST } from "./js/constants";
 import { DGet } from "./js/dom";
 import { Flash } from "./js/flash";
-import { ui } from "./js/ui";
+import { ui } from "./ui";
 import { prefs } from "./prefs";
 
-class Work {
+export class Work {
 
   public static init(){
     this.getCurrent();
@@ -15,6 +15,16 @@ class Work {
   }
 
   private static currentWork: Work;
+
+  public static async addTimeToCurrentWork(time: number){
+    console.log("Je dois apprendre à ajouter le temps", time, this.currentWork);
+    if (time) {
+      this.currentWork.addTimeAndSave(time);
+    } else {
+      Flash.error("Work time too short to save it.")
+    }
+  }
+
 
   private static get obj(){
     return this._obj || (this._obj = DGet('section#current-work-container')) as HTMLElement;
@@ -33,8 +43,36 @@ class Work {
   }
 
   constructor(
-    private data: WorkType
-  ){}
+    private data: WorkType & RunTimeInfosType
+  ){
+    console.log("this.data", this.data);
+  }
+
+  public get id(){ return this.data.id; }
+
+  /**
+   * Méthode d'instance pour sauver le temps
+   */
+  public async addTimeAndSave(time: number){
+    this.data.totalTime += time;
+    this.data.cycleTime += time;
+    this.data.restTime -= time;
+    if (this.data.restTime < 0) { this.data.restTime = 0; }
+    if ( this.data.cycleCount === 0 ) {
+      this.data.cycleCount = 1;
+      this.data.startedAt = Clock.getStartTime();
+    }
+    this.data.lastWorkedAt = Clock.getStartTime();
+    console.log("Enregistrement des temps")
+    const result = await fetch(HOST+'work/save-times', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(this.data)
+    }).then( r => r.json );
+    console.log("Retour save times: ", result);
+    // On actualise l'affichage
+    this.dispatchData();
+  }
 
   /**
    * Fonction appelée pour afficher le travail (courant)

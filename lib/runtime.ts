@@ -5,7 +5,7 @@
  */
 import { existsSync } from 'fs';
 import path from 'path';
-import type { RecType, RunTimeInfosType } from './types';
+import type { RecType, RunTimeInfosType, WorkType } from './types';
 import { Database } from "bun:sqlite"
 import type { Work } from './work';
 import { userDataPath } from './constants_server';
@@ -76,6 +76,33 @@ export class RunTime {
     this.db.run(request);
   }
 
+  /**
+   * Actualisation des données d'exécution du travail
+   */
+  updateWork(dw: WorkType & RunTimeInfosType){
+    const request: string = `
+      UPDATE works
+      SET
+        startedAt = ?,
+        totalTime = ?,
+        cycleTime = ?,
+        restTime = ?,
+        cycleCount = ?,
+        lastWorkedAt = ?
+      WHERE
+        id = ?
+    `;
+    const data = [
+      dw.startedAt,
+      dw.totalTime,
+      dw.cycleTime,
+      dw.restTime,
+      dw.cycleCount,
+      dw.lastWorkedAt,
+      dw.id
+    ];
+    this.db.run(request, data);
+  }
   /**
    * On fait les enregistrements pour les travaux courants
    * (seulement lorsque la base n'existe pas ou plus)
