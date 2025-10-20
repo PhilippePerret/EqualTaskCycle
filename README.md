@@ -73,3 +73,11 @@ works:
 
 
 ~~~
+
+### Ajout d’une tâche
+
+Pour qu’une tâche devienne « prioritaire » (juste être exécutée avant les autres), quand on n’est pas en mode aléatoire, il faut la mettre le plus au-dessus des autres possible.
+
+### Mode aléatoire
+
+Par défaut, les tâches sont proposées dans un ordre aléatoire (pour épicer les journées). On peut désactiver ce comportement dans les préférences, en décochant la case « ordre aléatoire » (ou similaire).

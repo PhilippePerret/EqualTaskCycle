@@ -12,8 +12,12 @@ export interface WorkType {
 }
 
 export interface RunTimeInfosType {
-  workedTime: number; // nombre de secondes de travail
-  lastTime?: Date; //
+  totalTime: number;  // Le nombre total de minutes de travail
+  cycleTime: number;  // Le nombre de minutes travaillées dans le cycle courant
+  restTime: number;   // Nombre de minutes restant pour finir le cycle
+  cycleCount: number; // Nombre de cycles
+  startedAt: Date;    // Date de démarrage du travail
+  lastWorkedAt: Date; // Date de dernier travail
 }
 
 export interface PrefsDataType {

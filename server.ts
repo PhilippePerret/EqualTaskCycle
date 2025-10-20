@@ -5,8 +5,6 @@ import { Dialog } from "./lib/Dialog";
 import { Work } from "./lib/work";
 import { prefs } from './lib/prefs_server_side';
 
-// const userDataPath = process.env.USER_DATA_PATH
-
 const app = express();
 
 app.use(express.static(__dirname));
@@ -24,10 +22,8 @@ app.post('/api/task/start', (req, res) => {
 });
 
 app.get('/task/current', (req, res) => {
-  // TODO Il faut donc implémenter l'algorithme de choix de
-  // la tâche
   res.json({
-    task: {project: "Son nom", id: "Son id etc.", content: "Le contenu exact de la tâche, du travail."},
+    task: Work.getCurrentWork(),
     options: {canChange: true /* TODO À RÉGLER */},
     prefs: prefs.load()
   });
@@ -45,46 +41,46 @@ app.listen(PORT, () => {
 
 
 
-/**
- * Ici on doit amorcer une boucle de travail
- */
-class DayWork {
-  private currentWork?: Work;
+// /**
+//  * Ici on doit amorcer une boucle de travail
+//  */
+// class DayWork {
+//   private currentWork?: Work;
 
-  constructor(){}
-  start() {
-    Work.init();
-    this.chooseAndStartWork()
-  }
-  chooseAndStartWork(){
-    this.currentWork = Work.random();
-    if (this.currentWork) {
-      this.startCurrentWork();
-    } else {
-      this.showDialogNoTask();
-    }
-  }
+//   constructor(){}
+//   start() {
+//     Work.init();
+//     this.chooseAndStartWork()
+//   }
+//   chooseAndStartWork(){
+//     this.currentWork = Work.random();
+//     if (this.currentWork) {
+//       this.startCurrentWork();
+//     } else {
+//       this.showDialogNoTask();
+//     }
+//   }
 
-  startCurrentWork(){
-    if (this.currentWork) {
-      this.currentWork.start();
-    }
-  }
+//   startCurrentWork(){
+//     if (this.currentWork) {
+//       this.currentWork.start();
+//     }
+//   }
 
-  showDialogNoTask(){
-    if ( undefined === this.dialogNoTask) {
-      this.dialogNoTask = new Dialog({
-        title: "Aucune tâche",
-        message: "Aucune tâche à travailler n'a été trouvée.",
-        buttons: [{text: "OK", onclick: ()=>{}}],
-        icon: 'caution',
-        timeout: 60
-      })
-    }
-    this.dialogNoTask.show();
-  }
-  private dialogNoTask?: Dialog;
-}
+//   showDialogNoTask(){
+//     if ( undefined === this.dialogNoTask) {
+//       this.dialogNoTask = new Dialog({
+//         title: "Aucune tâche",
+//         message: "Aucune tâche à travailler n'a été trouvée.",
+//         buttons: [{text: "OK", onclick: ()=>{}}],
+//         icon: 'caution',
+//         timeout: 60
+//       })
+//     }
+//     this.dialogNoTask.show();
+//   }
+//   private dialogNoTask?: Dialog;
+// }
 
-const daywork = new DayWork();
-daywork.start();
+// const daywork = new DayWork();
+// daywork.start();

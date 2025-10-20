@@ -1,9 +1,7 @@
 import path from "path";
 import type { PrefsDataType, RecType } from "./types";
 import { existsSync, readFileSync, writeFileSync } from "fs";
-import type { file } from "bun";
-
-const userDataPath = process.env.USER_DATA_PATH
+import { userDataPath } from "./constants_server";
 
 
 type ReportType = {

@@ -11,7 +11,7 @@ const path = require('path');
 const ICON_PATH = path.join(path.resolve(__dirname, 'icon.png'));
 // const ICON_PATH = path.join(path.resolve(__dirname, 'icon.icns'));
 if (existsSync(ICON_PATH)) {
-  console.log("Icon path: ", ICON_PATH);
+  // console.log("Icon path: ", ICON_PATH);
 } else {
   throw new Error("Unfound icon");
 }

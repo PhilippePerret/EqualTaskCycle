@@ -1,10 +1,8 @@
-import { Flash } from "../public/js/flash";
 import { DataManager } from "./data_manager";
-import { RunTime } from "./runtime";
-import type { RecType, RunTimeInfosType, WorkType } from "./types";
+import { runtime } from "./runtime";
+import type { RunTimeInfosType, WorkType } from "./types";
 
 export class Work {
-  private static runtimer: RunTime;
   public static defaultDuration: number = 120;
 
   private static works: Work[] = [];
@@ -14,24 +12,28 @@ export class Work {
    * Initialisation de l'application (au niveau des travaux)
    */
   public static init() {
-    this.runtimer = new RunTime();
-    this.runtimer.init();
     const dataManager = new DataManager();
     const works = dataManager.getData().works;
     this.defaultDuration = dataManager.getDefaultDuration();
-    works.forEach((wdata: WorkType) => new Work(wdata));
+    this.table = {};
+    works.forEach((wdata: WorkType) => {
+      const w = new Work(wdata)
+      Object.assign(this.table, {[w.id]: w});
+    });
+    runtime.init(works, this.defaultDuration);
   }
+
+  public static get(workId: string): Work {
+    return this.table[workId] as Work;
+  }
+
   /**
-   * Retourne un travail choisi au hasard
+   * Retourne le travail courant
    */
-  public static random(): Work | undefined {
-    let ary = this.works.filter((work: Work) => {
-      return work.hasTimeLeft();
-    })
-    if ( ary.length === 0 ) {
-      ary = structuredClone(this.works) as Work[];
-    }
-    return ary[Math.floor(Math.random() * ary.length)]
+  public static getCurrentWork(){
+    const ids: string[] = runtime.getCandidateWorks();
+    const candidatId = ids[Math.floor(Math.random() * ids.length)]
+    return this.get(candidatId as string);
   }
 
   /**
@@ -43,14 +45,8 @@ export class Work {
    * @param work Le travail à ajouter
   */
  public static add(work: Work) {
-    work.runtimeInfos = this.runtimer.getInfosOn(work.id);
-    this.works.push(work);
-    Object.assign(this.table, {[work.id]: work});
-  }
 
-  public static get(workId: string): Work | undefined {
-    return this.table[workId];
-  }
+}
 
   constructor(
     private data: WorkType
@@ -63,10 +59,6 @@ export class Work {
   // raccourcis
   public get id(){ return this.data.id; }
 
-  // @return Le temps qui a déjà été consacré à cette tâche
-  private get workedDuration(): number {
-    return this.runtimeInfos.workedTime;
-  }
 
   private startTime!: Date;
   private stopTime!: Date;
@@ -79,28 +71,4 @@ export class Work {
     this.stopTime = new Date();
   }
 
-  /**
-   * Le temps restant à travailler. C'est le temps de travail sur
-   * la tâche moins le temps déjà travaillé.
-   */
-  private get timeLeft(){
-    return this.workDuration - this.workedDuration;
-  }
-
-  /**
-   * @return True s'il reste du temps de travail sur cette
-   * tâche.
-   */
-  public hasTimeLeft(): boolean {
-    return this.timeLeft > 0;
-  }
-
-  /**
-   * Retourne le temps nécessaire de travail sur la tâche
-   * C'est soit le temps défini explicitement, soit le
-   * temps par défaut
-   */
-  private get workDuration(): number {
-    return this.data.duration || Work.defaultDuration;
-  }
 }
