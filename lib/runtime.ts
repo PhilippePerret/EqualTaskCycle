@@ -7,7 +7,6 @@ import { existsSync } from 'fs';
 import path from 'path';
 import type { RecType, RunTimeInfosType, WorkType } from './types';
 import { Database } from "bun:sqlite"
-import type { Work } from './work';
 import { userDataPath } from './constants_server';
 
 
@@ -23,7 +22,7 @@ export class RunTime {
   }; private _db!: Database;
 
 
-  public init(works: Work[], defaultDuration: number){
+  public init(works: WorkType[], defaultDuration: number){
     if (false === existsSync(this.dbPath)) {
       this.buildDatabase();
     }
@@ -167,7 +166,7 @@ export class RunTime {
    * Cette fonction est appelée à chaque lancement de 
    * l'application.
    */
-  private insertNewWorks(works: Work[], defaultDuration: number){
+  private insertNewWorks(works: WorkType[], defaultDuration: number){
     const allIds = this.db.query('SELECT id FROM works').all().map((row: any) => row.id);
     console.log("retour", allIds);
     works.forEach(work => {
