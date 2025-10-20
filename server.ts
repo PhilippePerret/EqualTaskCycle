@@ -59,8 +59,6 @@ class DayWork {
     }
   }
 
-
-
   showDialogNoTask(){
     if ( undefined === this.dialogNoTask) {
       this.dialogNoTask = new Dialog({
@@ -74,17 +72,6 @@ class DayWork {
     this.dialogNoTask.show();
   }
   private dialogNoTask?: Dialog;
-}
-
-
-class Flash {
-  static async notice(message: string){
-    fetch(HOST +'flash', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json' },
-      body: JSON.stringify({type: 'notice', message: message})
-    })
-  }
 }
 
 const daywork = new DayWork();

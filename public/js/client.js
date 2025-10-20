@@ -268,8 +268,8 @@ class Work {
       Stop: false,
       Pause: false,
       Change: true,
-      runScript: true,
-      openFolder: true
+      runScript: !!this.data.startupScript,
+      openFolder: !!this.data.folder
     });
   }
   dispatchData() {

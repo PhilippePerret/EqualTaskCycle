@@ -1,5 +1,5 @@
 import type { RecType, WorkType } from "../lib/types.js";
-import { PORT, HOST } from "./js/constants";
+import { HOST } from "./js/constants";
 import { DGet } from "./js/dom";
 import { Flash } from "./js/flash";
 import { ui } from "./js/ui";
@@ -41,8 +41,8 @@ class Work {
       Stop: false,
       Pause: false,
       Change: true,
-      runScript: true, // TODO À DÉFINIR
-      openFolder: true, // TODO à définir
+      runScript: !!this.data.startupScript,
+      openFolder: !!this.data.folder,
     });
   }
 

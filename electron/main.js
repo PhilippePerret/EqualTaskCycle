@@ -1,7 +1,7 @@
 const { existsSync } = require('fs');
 const { app, BrowserWindow } = require('electron');
 const { spawn } = require('child_process');
-const { PORT } = require('../common/constants');
+const { HOST } = require('../public/js/constants');
 
 let server = null;
 
@@ -33,12 +33,12 @@ app.whenReady().then(() => {
     x: 10,
     y: 800,
     width: 800,
-    // width: 2000,
+    // width: 2000, // Pour console
     height: 600,
     icon: ICON_PATH
   });
 
 
-  setTimeout(() => win.loadURL(`http://localhost:${PORT}`), 1000);
+  setTimeout(() => win.loadURL(HOST), 500);
 });
 
