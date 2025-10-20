@@ -1,3 +1,4 @@
+import { Flash } from "../public/js/flash";
 import { DataManager } from "./data_manager";
 import { RunTime } from "./runtime";
 import type { RecType, RunTimeInfosType, WorkType } from "./types";
@@ -71,7 +72,7 @@ export class Work {
   private stopTime!: Date;
 
   public start(){
-    console.log("Je commence le travail " + this.data.name);
+    // Flash.notice("Début du travail sur « " + this.data.project + " »");
     this.startTime = new Date();
   }
   public stop(){

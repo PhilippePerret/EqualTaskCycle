@@ -16,7 +16,7 @@ export class DataManager {
         duration: 120,
         works: [{
           id: 'init',
-          name: "Init the app",
+          project: "Init the app",
           content: "Build a _TASKS_.yaml file with data.",
           folder: path.resolve('.')
         } as WorkType]

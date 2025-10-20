@@ -19,7 +19,7 @@ app.name = "Equal Task Cycle";
 
 app.whenReady().then(() => {
   app.dock.setIcon(ICON_PATH);
-  const serverPath = path.join(__dirname, '..', 'index.ts');
+  const serverPath = path.join(__dirname, '..', 'server.ts');
   server = spawn('bun', ['run', serverPath], {
     cwd: path.join(__dirname, '..')
   });

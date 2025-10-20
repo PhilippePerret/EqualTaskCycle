@@ -1,0 +1,9 @@
+div#current-work-project {
+  font-weight: bold;
+}
+div#current-work-id {
+  float: right;
+  font-size: 13pt;
+  font-style: italic;
+  color: #DDDDDD;
+}

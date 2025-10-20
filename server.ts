@@ -1,6 +1,6 @@
 import express from 'express';
 import path from 'path';
-import { PORT } from './public/js/constants';
+import { HOST, PORT } from './public/js/constants';
 import { Dialog } from "./lib/Dialog";
 import { Work } from "./lib/work";
 
@@ -23,12 +23,12 @@ app.post('/api/task/start', (req, res) => {
 
 app.get('/task/current', (req, res) => {
   // TODO Envoyer la tâche courante
-  res.json({task: {name: "Son nom", id: "Son id etc.", content: "Le contenu exact de la tâche, du travail."}});
+  res.json({task: {project: "Son nom", id: "Son id etc.", content: "Le contenu exact de la tâche, du travail."}});
 });
 
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on ${HOST}`);
 });
 
 
@@ -74,6 +74,17 @@ class DayWork {
     this.dialogNoTask.show();
   }
   private dialogNoTask?: Dialog;
+}
+
+
+class Flash {
+  static async notice(message: string){
+    fetch(HOST +'flash', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json' },
+      body: JSON.stringify({type: 'notice', message: message})
+    })
+  }
 }
 
 const daywork = new DayWork();

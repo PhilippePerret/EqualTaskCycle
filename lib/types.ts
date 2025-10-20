@@ -4,7 +4,7 @@ export type RecType = {[x: string]: any};
 
 export interface WorkType {
     id: string,
-    name: string,
+    project: string,
     content: string,
     duration?: number,
     folder?: string,

@@ -1,5 +1,6 @@
 // public/js/constants.js
 var PORT = 3002;
+var HOST = `http://localhost:${PORT}/`;
 
 // public/js/dom.js
 function DGet(selector, container) {
@@ -99,7 +100,6 @@ class FlashMessage {
     return this.data.type;
   }
 }
-window.addEventListener("load", Flash.checkServerMessages.bind(Flash));
 
 // public/js/ui.js
 function stopEvent(ev) {
@@ -241,8 +241,6 @@ class Button {
 var ui = UI.getInstance();
 
 // public/client.ts
-var HOST = `http://localhost:${PORT}/`;
-
 class Work {
   data;
   static init() {

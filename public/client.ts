@@ -1,10 +1,8 @@
 import type { RecType, WorkType } from "../lib/types.js";
-import { PORT } from "./js/constants";
+import { PORT, HOST } from "./js/constants";
 import { DGet } from "./js/dom";
 import { Flash } from "./js/flash";
 import { ui } from "./js/ui";
-
-const HOST = `http://localhost:${PORT}/`;
 
 class Work {
 

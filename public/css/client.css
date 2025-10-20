@@ -8,7 +8,6 @@ body {
 div#buttons-container {
   max-width: 680px;
   margin-top: 2em;
-  padding: 0 2em;
 }
 div#buttons-container button {
   margin-left: 0.5em;

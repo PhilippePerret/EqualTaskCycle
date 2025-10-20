@@ -121,6 +121,3 @@ class FlashMessage {
   get content(){return this.data.content}
   get type(){return this.data.type}
 }
-
-window.addEventListener('load', Flash.checkServerMessages.bind(Flash))
-
