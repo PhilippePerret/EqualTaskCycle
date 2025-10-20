@@ -9,7 +9,6 @@ import type { RecType, RunTimeInfosType } from './types';
 import { Database } from "bun:sqlite"
 import type { Work } from './work';
 import { userDataPath } from './constants_server';
-import type { Rectangle } from 'electron';
 
 
 export class RunTime {

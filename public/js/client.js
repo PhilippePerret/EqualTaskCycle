@@ -1,3 +1,19 @@
+// lib/Clock.ts
+class Clock {
+  static time2horloge(mn) {
+    let hrs = Math.floor(mn / 60);
+    let mns = mn % 60;
+    let horloge = [];
+    mns > 0 && horloge.push(`${mns} mns`);
+    hrs > 0 && horloge.push(`${hrs} hrs`);
+    if (horloge.length) {
+      return horloge.join(" ");
+    } else {
+      return "---";
+    }
+  }
+}
+
 // public/js/constants.js
 var PORT = 3002;
 var HOST = `http://localhost:${PORT}/`;
@@ -516,6 +532,16 @@ class Work {
   }
   dispatchData() {
     Object.entries(this.data).forEach(([k, v]) => {
+      v = ((prop, v2) => {
+        switch (prop) {
+          case "totalTime":
+          case "cycleTime":
+          case "restTime":
+            return Clock.time2horloge(v2);
+          default:
+            return v2;
+        }
+      })(k, v);
       const propField = this.field(k);
       if (propField) {
         propField.innerHTML = v;

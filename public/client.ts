@@ -1,3 +1,4 @@
+import { Clock } from "../lib/Clock.js";
 import type { RecType, WorkType } from "../lib/types.js";
 import { HOST } from "./js/constants";
 import { DGet } from "./js/dom";
@@ -51,6 +52,16 @@ class Work {
 
   dispatchData(){
     Object.entries(this.data).forEach(([k, v]) => {
+      v = ((prop: string, v: any) => {
+        switch(prop){
+          case 'totalTime': 
+          case 'cycleTime':
+          case 'restTime':
+            return Clock.time2horloge(v);
+          default: 
+            return v;
+        }
+      })(k, v);
       const propField = this.field(k);
       if ( propField ) {
         propField.innerHTML = v;

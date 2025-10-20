@@ -9,6 +9,7 @@ export interface WorkType {
     duration?: number,
     folder?: string,
     startupScript?: string, // path du script de démarrage
+    
 }
 
 export interface RunTimeInfosType {
