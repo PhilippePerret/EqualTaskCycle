@@ -10,15 +10,17 @@
     "@types/js-yaml": "^4.0.9"
   },
   "scripts": {
-    "watch_ts": "bun build ./public/client.ts --outfile=./public/js/client.js --target=browser --watch & bun build ./public/ui.ts --outfile=./public/js/ui.js --target=browser --watch & bun build ./public/prefs.ts --outfile=./public/js/prefs.js --target=browser --watch",
+    "watch_ts": "bun build ./public/client.ts --outfile=./public/js/client.js --target=browser --watch & bun build ./public/ui.ts --outfile=./public/js/ui.js --target=browser --watch & bun build ./public/prefs.ts --outfile=./public/js/prefs.js --target=browser --watch & bun build ./public/help.ts --outfile=./public/js/help.js --target=browser --watch",
     "start": "bun pm cache rm && npx electron ."
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
+    "@types/marked": "^6.0.0",
     "better-sqlite3": "^12.4.1",
     "express": "^5.1.0",
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.0",
+    "marked": "^16.4.1"
   }
 }

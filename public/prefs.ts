@@ -95,16 +95,16 @@ export class Prefs {
   }
 
   private field(key: string){
-    return DGet(`#prefs-${key}`, this.section) || console.error("Le champ 'prefs-%s' est introuvable", key);
+    return DGet(`#prefs-${key}`) || console.error("Le champ 'prefs-%s' est introuvable", key);
   }
 
   private close(){ 
-    ui.openSectionWork();
-    this.section.classList.add('hidden');
+    ui.openSection('work');
+    ui.closeSection('prefs');
   }
   private open(){ 
-    this.section.classList.remove('hidden');
-    ui.closeSectionWork();
+    ui.openSection('prefs');
+    ui.closeSection('work');
   }
 
   private observeButtons(){
@@ -117,10 +117,6 @@ export class Prefs {
       this.field(prop).addEventListener('change', this.onChangePref.bind(this, prop));
     });
     this.fieldsReady = true;
-  } 
-
-  private get section(){
-    return DGet('section#preferences');
   }
 
 }

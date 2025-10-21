@@ -11,269 +11,6 @@ function stopEvent(ev) {
   return false;
 }
 
-// lib/Clock.ts
-class Clock {
-  static time2horloge(mn) {
-    let hrs = Math.floor(mn / 60);
-    let mns = mn % 60;
-    let horloge = [];
-    hrs > 0 && horloge.push(`${hrs}`);
-    mns > 0 && horloge.push(`${mns}`);
-    if (horloge.length) {
-      horloge.push("00");
-      return horloge.join(":");
-    } else {
-      return "---";
-    }
-  }
-  static setClockStyle(style) {
-    this.clockObj.classList.add(style);
-  }
-  static timer;
-  static startTime;
-  static timeLeft;
-  static totalTime;
-  static start() {
-    this.clockObj.classList.remove("hidden");
-    if (this.timeLeft === undefined) {
-      this.timeLeft = 0;
-      this.clockObj.innerHTML = "0:00:00";
-    }
-    this.startTime = new Date().getTime();
-    this.timer = setInterval(this.run.bind(this), 1000);
-  }
-  static getStartTime() {
-    return this.startTime;
-  }
-  static pause() {
-    clearInterval(this.timer);
-    this.timeLeft += this.lapsFromStart();
-  }
-  static stop() {
-    clearInterval(this.timer);
-    this.totalTime = this.timeLeft + this.lapsFromStart();
-    this.timeLeft = undefined;
-    this.clockObj.classList.add("hidden");
-    return this.totalTime;
-  }
-  static run() {
-    this.clockObj.innerHTML = this.s2h(this.timeLeft + this.lapsFromStart());
-  }
-  static lapsFromStart() {
-    return Math.round((new Date().getTime() - this.startTime) / 1000);
-  }
-  static get clockObj() {
-    return this._clockobj || (this._clockobj = DGet("#clock"));
-  }
-  static _clockobj;
-  static s2h(s) {
-    let h = Math.floor(s / 3600);
-    s = s % 3600;
-    let m = Math.floor(s / 60);
-    const mstr = m < 10 ? `0${m}` : String(m);
-    s = s % 60;
-    const sstr = s < 10 ? `0${s}` : String(s);
-    return `${h}:${mstr}:${sstr}`;
-  }
-}
-
-// public/js/constants.js
-var PORT = 3002;
-var HOST = `http://localhost:${PORT}/`;
-
-// public/js/flash.js
-class Flash {
-  static init() {}
-  static checkServerMessages() {
-    const divMsg = DGet("div#flash-group div#flash-info");
-    if (divMsg) {
-      const content = DGet("p.message", divMsg).innerHTML;
-      DGet("button", divMsg).remove();
-      this.temporize(divMsg, this.calcReadingTime(content));
-    }
-  }
-  static temporize(domMessage, readingTime) {
-    this.timer = setTimeout(this.removeServerMessage.bind(this, domMessage), 2000 + readingTime);
-  }
-  static removeServerMessage(domE, ev) {
-    domE.remove();
-    this.timer && clearTimeout(this.timer);
-    delete this.timer;
-  }
-  static calcReadingTime(str) {
-    return str.split(" ").length * 300 * 4;
-  }
-  static notice(message) {
-    this.buildMessage({ content: message, type: "notice" });
-  }
-  static info(message) {
-    return this.notice(message);
-  }
-  static success(message) {
-    this.buildMessage({ content: message, type: "success" });
-  }
-  static warning(message) {
-    this.buildMessage({ content: message, type: "warning" });
-  }
-  static error(message) {
-    this.buildMessage({ content: message, type: "error" });
-  }
-  static buildMessage(data) {
-    new FlashMessage(data);
-  }
-  static removeMessage(message) {
-    if (message.type != "error") {
-      clearTimeout(message.timer);
-      message.timer = null;
-    }
-    message.obj.remove();
-    message = undefined;
-  }
-  static get conteneur() {
-    return this._maincont || (this._maincont = DGet("#flash-group"));
-  }
-}
-
-class FlashMessage {
-  constructor(data) {
-    this.data = data;
-    this.build();
-    this.show();
-    if (this.type != "error")
-      this.temporize();
-    this.observe();
-  }
-  build() {
-    const msg = document.createElement("DIV");
-    msg.className = `flash-message ${this.type}`;
-    msg.innerHTML = this.content;
-    this.obj = msg;
-  }
-  show() {
-    Flash.conteneur.appendChild(this.obj);
-  }
-  observe() {
-    this.obj.addEventListener("click", this.onClick.bind(this));
-  }
-  onClick(ev) {
-    Flash.removeMessage(this);
-  }
-  temporize() {
-    this.timer = setTimeout(Flash.removeMessage.bind(Flash, this), 2000 + this.readingTime);
-  }
-  get readingTime() {
-    return Flash.calcReadingTime(this.content);
-  }
-  get content() {
-    return this.data.content;
-  }
-  get type() {
-    return this.data.type;
-  }
-}
-
-// public/prefs.ts
-class Prefs {
-  data;
-  fieldsReady = false;
-  static instance;
-  constructor() {}
-  static getInstance() {
-    return this.instance || (this.instance = new Prefs);
-  }
-  init() {
-    this.observeButtons();
-  }
-  async onSave(ev) {
-    stopEvent(ev);
-    const result = await fetch(HOST + "prefs/save", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(this.getData())
-    }).then((r) => r.json());
-    if (result.ok) {
-      this.close();
-      Flash.success("Preferences saved.");
-    } else {
-      Flash.error(result.errors);
-    }
-    return false;
-  }
-  onChangePref(prop, ev) {
-    const value = this.getValue(prop);
-    switch (prop) {
-      case "clock":
-        Clock.setClockStyle(value);
-        break;
-      case "theme":
-        ui.setUITheme(value);
-        break;
-      default:
-    }
-  }
-  onOpen(ev) {
-    this.open();
-    return stopEvent(ev);
-  }
-  onClose(ev) {
-    this.close();
-    return stopEvent(ev);
-  }
-  setData(data) {
-    this.data = data;
-    this.fieldsReady || this.observeFields();
-    Object.entries(this.data).forEach(([k, v]) => {
-      this.setValue(k, v);
-    });
-  }
-  getData() {
-    Object.entries(this.data).forEach(([k, _v]) => {
-      Object.assign(this.data, { [k]: this.getValue(k) });
-    });
-    return this.data;
-  }
-  getValue(prop) {
-    switch (prop) {
-      case "random":
-        return this.field("random").checked;
-      default:
-        return this.field(prop).value;
-    }
-  }
-  setValue(prop, value) {
-    switch (prop) {
-      case "random":
-        this.field("random").checked = value;
-        break;
-      default:
-        this.field(prop).value = value;
-    }
-  }
-  field(key) {
-    return DGet(`#prefs-${key}`) || console.error("Le champ 'prefs-%s' est introuvable", key);
-  }
-  close() {
-    ui.openSection("work");
-    ui.closeSection("prefs");
-  }
-  open() {
-    ui.openSection("prefs");
-    ui.closeSection("work");
-  }
-  observeButtons() {
-    DGet("button.btn-prefs").addEventListener("click", this.onOpen.bind(this));
-    DGet("button.btn-close-prefs").addEventListener("click", this.onClose.bind(this));
-    DGet("button.btn-save-prefs").addEventListener("click", this.onSave.bind(this));
-  }
-  observeFields() {
-    Object.keys(this.data).forEach((prop) => {
-      this.field(prop).addEventListener("change", this.onChangePref.bind(this, prop));
-    });
-    this.fieldsReady = true;
-  }
-}
-var prefs = Prefs.getInstance();
-
 // node_modules/marked/lib/marked.esm.js
 function L() {
   return { async: false, breaks: false, extensions: null, gfm: true, hooks: null, pedantic: false, renderer: null, silent: false, tokenizer: null, walkTokens: null };
@@ -1512,79 +1249,268 @@ var Ft = k.parseInline;
 var Qt = b.parse;
 var Ut = x.lex;
 
-// public/help.ts
-var HELP_TEXTS = {
-  introduction: `
-### Introduction
-
-Bienvenue dans l'aide modulaire de l'application ETC (Etcétéra) qui vous permet de travailler parallèlement plusieurs tâches.
-`,
-  tasks_file: `
-### Création d'un fichier de tâches
-
-Pour fonctionner, vous avez besoin d'un fichier de tâches. Ce fichier doit être défini conformément au format décrit dans la section [Format du fichier des tâches](#tasks_file_format).
-`,
-  tasks_file_format: `
-### Format du fichier des tâches
-
-Le fichier des tâches est un fichier YAML composé de cette manière simple :
-
-    ---
-    works:
-      - id: travail1
-        project: Le projet du travail
-        content: Le contenu du travail à faire
-      - id: travail2
-        project: L'autre projet de l'autre travail
-        content: Le contenu de son travail, ce qu'il y a à faire
-      # etc.
-`
-};
-
-class Help {
-  static getInstance() {
-    return this.inst || (this.inst = new Help);
-  }
-  static inst;
-  texts;
-  async show(helpIds) {
-    ui.toggleHelp();
-    this.texts = helpIds.map((helpId) => {
-      return `<a name="${helpId}"></a>
-
-` + HELP_TEXTS[helpId].trim().concat(`
-
----`);
-    });
-    this.timer = setInterval(this.writeText.bind(this), 500);
-  }
-  timer;
-  writeText() {
-    var text;
-    if (text = this.texts.shift()) {
-      this.write(k.parse(text));
+// lib/Clock.ts
+class Clock {
+  static time2horloge(mn) {
+    let hrs = Math.floor(mn / 60);
+    let mns = mn % 60;
+    let horloge = [];
+    hrs > 0 && horloge.push(`${hrs}`);
+    mns > 0 && horloge.push(`${mns}`);
+    if (horloge.length) {
+      horloge.push("00");
+      return horloge.join(":");
     } else {
-      clearInterval(this.timer);
-      delete this.timer;
+      return "---";
     }
   }
-  close() {
-    ui.toggleHelp();
+  static setClockStyle(style) {
+    this.clockObj.classList.add(style);
   }
-  write(text) {
-    this.content.insertAdjacentHTML("beforeend", text);
-    return true;
+  static timer;
+  static startTime;
+  static timeLeft;
+  static totalTime;
+  static start() {
+    this.clockObj.classList.remove("hidden");
+    if (this.timeLeft === undefined) {
+      this.timeLeft = 0;
+      this.clockObj.innerHTML = "0:00:00";
+    }
+    this.startTime = new Date().getTime();
+    this.timer = setInterval(this.run.bind(this), 1000);
   }
-  get content() {
-    return this._content || (this._content = DGet("div#help-content", DGet("section#help")));
+  static getStartTime() {
+    return this.startTime;
   }
-  _content;
-  init() {
-    DGet("button.btn-close-help").addEventListener("click", this.close.bind(this));
+  static pause() {
+    clearInterval(this.timer);
+    this.timeLeft += this.lapsFromStart();
+  }
+  static stop() {
+    clearInterval(this.timer);
+    this.totalTime = this.timeLeft + this.lapsFromStart();
+    this.timeLeft = undefined;
+    this.clockObj.classList.add("hidden");
+    return this.totalTime;
+  }
+  static run() {
+    this.clockObj.innerHTML = this.s2h(this.timeLeft + this.lapsFromStart());
+  }
+  static lapsFromStart() {
+    return Math.round((new Date().getTime() - this.startTime) / 1000);
+  }
+  static get clockObj() {
+    return this._clockobj || (this._clockobj = DGet("#clock"));
+  }
+  static _clockobj;
+  static s2h(s) {
+    let h2 = Math.floor(s / 3600);
+    s = s % 3600;
+    let m2 = Math.floor(s / 60);
+    const mstr = m2 < 10 ? `0${m2}` : String(m2);
+    s = s % 60;
+    const sstr = s < 10 ? `0${s}` : String(s);
+    return `${h2}:${mstr}:${sstr}`;
   }
 }
-var help = Help.getInstance();
-help.init();
+
+// public/js/constants.js
+var PORT = 3002;
+var HOST = `http://localhost:${PORT}/`;
+
+// public/js/flash.js
+class Flash {
+  static init() {}
+  static checkServerMessages() {
+    const divMsg = DGet("div#flash-group div#flash-info");
+    if (divMsg) {
+      const content = DGet("p.message", divMsg).innerHTML;
+      DGet("button", divMsg).remove();
+      this.temporize(divMsg, this.calcReadingTime(content));
+    }
+  }
+  static temporize(domMessage, readingTime) {
+    this.timer = setTimeout(this.removeServerMessage.bind(this, domMessage), 2000 + readingTime);
+  }
+  static removeServerMessage(domE, ev) {
+    domE.remove();
+    this.timer && clearTimeout(this.timer);
+    delete this.timer;
+  }
+  static calcReadingTime(str) {
+    return str.split(" ").length * 300 * 4;
+  }
+  static notice(message) {
+    this.buildMessage({ content: message, type: "notice" });
+  }
+  static info(message) {
+    return this.notice(message);
+  }
+  static success(message) {
+    this.buildMessage({ content: message, type: "success" });
+  }
+  static warning(message) {
+    this.buildMessage({ content: message, type: "warning" });
+  }
+  static error(message) {
+    this.buildMessage({ content: message, type: "error" });
+  }
+  static buildMessage(data) {
+    new FlashMessage(data);
+  }
+  static removeMessage(message) {
+    if (message.type != "error") {
+      clearTimeout(message.timer);
+      message.timer = null;
+    }
+    message.obj.remove();
+    message = undefined;
+  }
+  static get conteneur() {
+    return this._maincont || (this._maincont = DGet("#flash-group"));
+  }
+}
+
+class FlashMessage {
+  constructor(data) {
+    this.data = data;
+    this.build();
+    this.show();
+    if (this.type != "error")
+      this.temporize();
+    this.observe();
+  }
+  build() {
+    const msg = document.createElement("DIV");
+    msg.className = `flash-message ${this.type}`;
+    msg.innerHTML = this.content;
+    this.obj = msg;
+  }
+  show() {
+    Flash.conteneur.appendChild(this.obj);
+  }
+  observe() {
+    this.obj.addEventListener("click", this.onClick.bind(this));
+  }
+  onClick(ev) {
+    Flash.removeMessage(this);
+  }
+  temporize() {
+    this.timer = setTimeout(Flash.removeMessage.bind(Flash, this), 2000 + this.readingTime);
+  }
+  get readingTime() {
+    return Flash.calcReadingTime(this.content);
+  }
+  get content() {
+    return this.data.content;
+  }
+  get type() {
+    return this.data.type;
+  }
+}
+
+// public/prefs.ts
+class Prefs {
+  data;
+  fieldsReady = false;
+  static instance;
+  constructor() {}
+  static getInstance() {
+    return this.instance || (this.instance = new Prefs);
+  }
+  init() {
+    this.observeButtons();
+  }
+  async onSave(ev) {
+    stopEvent(ev);
+    const result = await fetch(HOST + "prefs/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(this.getData())
+    }).then((r) => r.json());
+    if (result.ok) {
+      this.close();
+      Flash.success("Preferences saved.");
+    } else {
+      Flash.error(result.errors);
+    }
+    return false;
+  }
+  onChangePref(prop, ev) {
+    const value = this.getValue(prop);
+    switch (prop) {
+      case "clock":
+        Clock.setClockStyle(value);
+        break;
+      case "theme":
+        ui.setUITheme(value);
+        break;
+      default:
+    }
+  }
+  onOpen(ev) {
+    this.open();
+    return stopEvent(ev);
+  }
+  onClose(ev) {
+    this.close();
+    return stopEvent(ev);
+  }
+  setData(data) {
+    this.data = data;
+    this.fieldsReady || this.observeFields();
+    Object.entries(this.data).forEach(([k2, v2]) => {
+      this.setValue(k2, v2);
+    });
+  }
+  getData() {
+    Object.entries(this.data).forEach(([k2, _v]) => {
+      Object.assign(this.data, { [k2]: this.getValue(k2) });
+    });
+    return this.data;
+  }
+  getValue(prop) {
+    switch (prop) {
+      case "random":
+        return this.field("random").checked;
+      default:
+        return this.field(prop).value;
+    }
+  }
+  setValue(prop, value) {
+    switch (prop) {
+      case "random":
+        this.field("random").checked = value;
+        break;
+      default:
+        this.field(prop).value = value;
+    }
+  }
+  field(key) {
+    return DGet(`#prefs-${key}`) || console.error("Le champ 'prefs-%s' est introuvable", key);
+  }
+  close() {
+    ui.openSection("work");
+    ui.closeSection("prefs");
+  }
+  open() {
+    ui.openSection("prefs");
+    ui.closeSection("work");
+  }
+  observeButtons() {
+    DGet("button.btn-prefs").addEventListener("click", this.onOpen.bind(this));
+    DGet("button.btn-close-prefs").addEventListener("click", this.onClose.bind(this));
+    DGet("button.btn-save-prefs").addEventListener("click", this.onSave.bind(this));
+  }
+  observeFields() {
+    Object.keys(this.data).forEach((prop) => {
+      this.field(prop).addEventListener("change", this.onChangePref.bind(this, prop));
+    });
+    this.fieldsReady = true;
+  }
+}
+var prefs = Prefs.getInstance();
 
 // public/client.ts
 class Work {
@@ -1884,7 +1810,80 @@ class Button {
   }
 }
 var ui = UI.getInstance();
+
+// public/help.ts
+var HELP_TEXTS = {
+  introduction: `
+### Introduction
+
+Bienvenue dans l'aide modulaire de l'application ETC (Etcétéra) qui vous permet de travailler parallèlement plusieurs tâches.
+`,
+  tasks_file: `
+### Création d'un fichier de tâches
+
+Pour fonctionner, vous avez besoin d'un fichier de tâches. Ce fichier doit être défini conformément au format décrit dans la section [Format du fichier des tâches](#tasks_file_format).
+`,
+  tasks_file_format: `
+### Format du fichier des tâches
+
+Le fichier des tâches est un fichier YAML composé de cette manière simple :
+
+    ---
+    works:
+      - id: travail1
+        project: Le projet du travail
+        content: Le contenu du travail à faire
+      - id: travail2
+        project: L'autre projet de l'autre travail
+        content: Le contenu de son travail, ce qu'il y a à faire
+      # etc.
+`
+};
+
+class Help {
+  static getInstance() {
+    return this.inst || (this.inst = new Help);
+  }
+  static inst;
+  texts;
+  async show(helpIds) {
+    ui.toggleHelp();
+    this.texts = helpIds.map((helpId) => {
+      return `<a name="${helpId}"></a>
+
+` + HELP_TEXTS[helpId].trim().concat(`
+
+---`);
+    });
+    this.timer = setInterval(this.writeText.bind(this), 500);
+  }
+  timer;
+  writeText() {
+    var text;
+    if (text = this.texts.shift()) {
+      this.write(k.parse(text));
+    } else {
+      clearInterval(this.timer);
+      delete this.timer;
+    }
+  }
+  close() {
+    ui.toggleHelp();
+  }
+  write(text) {
+    this.content.insertAdjacentHTML("beforeend", text);
+    return true;
+  }
+  get content() {
+    return this._content || (this._content = DGet("div#help-content", DGet("section#help")));
+  }
+  _content;
+  init() {
+    DGet("button.btn-close-help").addEventListener("click", this.close.bind(this));
+  }
+}
+var help = Help.getInstance();
+help.init();
 export {
-  ui,
-  UI
+  help
 };

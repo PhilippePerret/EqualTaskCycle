@@ -20,3 +20,9 @@
 ### Solution
 - Tuer les processus : `pkill -f "bun.*server"`
 - Attention : `pkill -f "Electron"` ferme aussi VSCode (app Electron)
+
+## Problème marked
+- Installation de `marked` pour traitement markdown
+- Problème : texte traité comme code au lieu de paragraphes
+- Cause : indentation dans les template literals (backticks)
+- Solution : retirer l'indentation du markdown

@@ -33,6 +33,23 @@ export class UI {
   }
 
   /**
+   * Pour basculer sur l'aide
+   */
+  public toggleHelp(){
+    if (this.isSectionOpen('help')) {
+      this.closeSection('help');
+      this.openSection('work');
+    } else {
+      this.closeSection('work');
+      this.closeSection('prefs');
+      this.openSection('help');
+    }
+  }
+
+  private isSectionOpen(name: string): boolean {
+    return !DGet('section#'+name).classList.contains('hidden')
+  }
+  /**
    * Quatre fonctions pour masquer ou montrer des objets
    * 
    * ATTENTION : eList n'est pas une liste d'HTMLElements mais une
@@ -54,12 +71,12 @@ export class UI {
   public showButtons(states: {[x: string]: boolean}):void {
     this.buttons.forEach((bouton: Button) => bouton.setState(states[bouton.id] as boolean));
   };
-
-  public closeSectionWork(){
-    DGet('section#work').classList.add('hidden')
+  
+  public closeSection(name: string){
+    DGet('section#'+name).classList.add('hidden');
   }
-  public openSectionWork(){
-    DGet('section#work').classList.remove('hidden')
+  public openSection(name: string){
+    DGet('section#'+name).classList.remove('hidden');
   }
 
   private startDate!: Date;

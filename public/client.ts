@@ -5,6 +5,7 @@ import { DGet } from "./js/dom";
 import { Flash } from "./js/flash";
 import { ui } from "./ui";
 import { prefs } from "./prefs";
+import { help } from "./help.js";
 
 export class Work {
 
@@ -12,7 +13,10 @@ export class Work {
     const res = await this.getCurrent();
     if (res === true) {
       prefs.init();
-      Flash.notice("App is ready.")
+      Flash.notice(`App is ready. <span id="mes123">(Help)</span>`)
+      DGet('span#mes123').addEventListener('click', 
+        help.show.bind(help, ['introduction', 'tasks_file', 'tasks_file_format'])
+      )
     }
   }
 

@@ -238,7 +238,7 @@ export class RunTime {
    */
   private insertNewWorks(works: WorkType[], defaultDuration: number){
     const allIds = this.db.query('SELECT id FROM works').all().map((row: any) => row.id);
-    console.log("retour", allIds);
+    // console.log("retour", allIds);
     works.forEach(work => {
       if (allIds.find((id) => id === work.id)) { return ; }
       // Nouveau travail
