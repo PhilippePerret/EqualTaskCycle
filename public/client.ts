@@ -11,7 +11,7 @@ export class Work {
   public static init(){
     this.getCurrent();
     prefs.init();
-    Flash.notice("L'application est prête.")
+    Flash.notice("App is ready.")
   }
 
   private static currentWork: Work;
