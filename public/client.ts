@@ -76,6 +76,7 @@ export class Work {
 
   public get id(){ return this.data.id; }
   public get script(): string | undefined {return this.data.script}
+  public get folder(): string | undefined {return this.data.folder}
 
   /**
    * Méthode d'instance pour sauver le temps

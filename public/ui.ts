@@ -108,7 +108,10 @@ export class UI {
     Clock.pause();
   }
   private onChange(ev: Event){}
+
+  // Pour lancer le script de démarrage
   private async onRunScript(ev: Event){
+    ev && stopEvent(ev);
     const curwork: Work = Work.currentWork;
     const result = await fetch(HOST+'task/run-script', {
       method: 'POST',
@@ -121,9 +124,26 @@ export class UI {
     } else {
       Flash.error('An error occurred: ' + result.error);
     }
-    return stopEvent(ev);
+    return false;
   }
-  private onOpenFolder(ev: Event){}
+
+  // Pour ouvrir le dossier défini
+  private async onOpenFolder(ev: Event){
+    ev && stopEvent(ev);
+    const curwork: Work = Work.currentWork;
+    const result = await fetch(HOST+'task/open-folder', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({workId: curwork.id, folder: curwork.folder})
+    })
+    .then(res => res.json());
+    if ( result.ok ) {
+      Flash.success('Folder opened in Finder.')
+    } else {
+      Flash.error('An error occurred: ' + result.error);
+    }
+    return false;
+  }
   
   private btnStart?: Button;
   private btnPause?: Button;

@@ -1563,6 +1563,9 @@ class Work {
   get script() {
     return this.data.script;
   }
+  get folder() {
+    return this.data.folder;
+  }
   async addTimeAndSave(time) {
     this.data.totalTime += time;
     this.data.cycleTime += time;
@@ -1697,6 +1700,7 @@ class UI {
   }
   onChange(ev) {}
   async onRunScript(ev) {
+    ev && stopEvent2(ev);
     const curwork = Work.currentWork;
     const result = await fetch(HOST + "task/run-script", {
       method: "POST",
@@ -1708,9 +1712,23 @@ class UI {
     } else {
       Flash.error("An error occurred: " + result.error);
     }
-    return stopEvent2(ev);
+    return false;
   }
-  onOpenFolder(ev) {}
+  async onOpenFolder(ev) {
+    ev && stopEvent2(ev);
+    const curwork = Work.currentWork;
+    const result = await fetch(HOST + "task/open-folder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ workId: curwork.id, folder: curwork.folder })
+    }).then((res) => res.json());
+    if (result.ok) {
+      Flash.success("Folder opened in Finder.");
+    } else {
+      Flash.error("An error occurred: " + result.error);
+    }
+    return false;
+  }
   btnStart;
   btnPause;
   btnStop;

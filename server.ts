@@ -5,7 +5,7 @@ import { Work } from "./lib/work";
 import { prefs } from './lib/prefs_server_side';
 import { runtime } from './lib/runtime';
 import { existsSync } from 'fs';
-import { execFileSync } from 'child_process';
+import { execFileSync, execSync } from 'child_process';
 
 const app = express();
 
@@ -40,6 +40,22 @@ app.get('/task/current', (req, res) => {
     options: {canChange: true /* TODO À RÉGLER */},
     prefs: prefs.load()
   });
+});
+
+app.post('/task/open-folder', (req, res) => {
+  const dreq = req.body;
+  let result = {ok: true, error: ''};
+  if (existsSync(path.resolve(dreq.folder))) {
+    try {
+      execSync(`open -a Finder "${dreq.folder}"`);
+    } catch(err: any) {
+      console.error("ERREUR OUVERTURE FOLDER: ", err);
+      result = {ok: false, error: String(err.stderr)}
+    }
+  } else {
+    result = {ok: false, error: 'Unfound folder ' + dreq.folder};
+  }
+  res.json(result);
 });
 
 app.post('/task/run-script', (req, res) => {
