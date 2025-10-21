@@ -6,6 +6,8 @@ import { prefs } from './lib/prefs_server_side';
 import { runtime } from './lib/runtime';
 import { existsSync } from 'fs';
 import { execFileSync, execSync } from 'child_process';
+import { Clock } from './lib/Clock';
+import type { RecType, WorkType } from './lib/types';
 
 const app = express();
 
@@ -37,7 +39,9 @@ app.get('/task/current', (req, res) => {
   log("-> /task/current");
   res.json({
     task: Work.getCurrentWork(),
-    options: {canChange: true /* TODO À RÉGLER */},
+    options: {
+      canChange: runtime.lastChangeIsFarEnough()
+    },
     prefs: prefs.load()
   });
 });
@@ -75,6 +79,34 @@ app.post('/task/run-script', (req, res) => {
   }
   res.json(result);
 })
+app.post('/task/change', (req, res) => {
+  const dreq = req.body;
+  let result: {
+    ok: boolean,
+    error: string,
+    task?: RecType & WorkType
+  } = {ok: true, error: '', task: undefined};
+
+  // Est-ce qu'on peut changer la tâche ?
+  if (runtime.lastChangeIsFarEnough()) {
+    const retour = Work.getCurrentWork({but: dreq.taskId});
+    // choisir une autre
+    if (retour.ok === false) {
+      result = {
+        ok: false, 
+        error: 'No other tasks found. You must complete that one.',
+        task: Work.get(dreq.taskId).dataForClient
+      }
+    } else {
+      Object.assign(result, {task: retour as RecType & WorkType})
+    }
+    // Enregistrer la transaction
+    runtime.setLastChange();
+  } else {
+    result = {ok: false, error: 'Task has been already changed today.'}
+  }
+  res.json(result);
+});
 
 app.post('/prefs/save', (req, res) => {
   const report = prefs.save(req.body);

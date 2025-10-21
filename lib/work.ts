@@ -1,7 +1,7 @@
 import { DataManager } from "./data_manager";
 import { prefs } from "./prefs_server_side";
 import { runtime } from "./runtime";
-import type { WorkType } from "./types";
+import type { RecType, WorkType } from "./types";
 
 export class Work {
   public static defaultDuration: number = 120;
@@ -31,9 +31,12 @@ export class Work {
   /**
    * Retourne le travail courant
    */
-  public static getCurrentWork(){
+  public static getCurrentWork(options: RecType | undefined = {}){
     console.log("-> getCurrentWork")
-    const ids: string[] = runtime.getCandidateWorks();
+    let ids: string[] = runtime.getCandidateWorks();
+    if (options.but) {
+      ids = ids.filter(id => id != options.but)
+    }
     console.log("candidats", ids)
     let candidatId: string;
     if (ids.length) {

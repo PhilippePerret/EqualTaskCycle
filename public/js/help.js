@@ -1698,7 +1698,19 @@ class UI {
     this.reveal([this.btnStart]);
     Clock.pause();
   }
-  onChange(ev) {}
+  async onChange(ev) {
+    ev && stopEvent2(ev);
+    const curwork = Work.currentWork;
+    const result = await fetch(HOST + "task/change", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ workId: curwork.id })
+    }).then((res) => res.json());
+    if (result.ok === false) {
+      Flash.error("An error occurred: " + result.error);
+    }
+    return false;
+  }
   async onRunScript(ev) {
     ev && stopEvent2(ev);
     const curwork = Work.currentWork;

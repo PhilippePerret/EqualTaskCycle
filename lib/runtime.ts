@@ -106,6 +106,37 @@ export class RunTime {
     return activeIds;
   }
 
+  // Return true if last change is far from today
+  public lastChangeIsFarEnough(){
+    const request = `
+    SELECT
+      v
+    FROM
+      keypairs
+    WHERE
+      k = "lastChangedAt"
+    `
+    const result = this.db.query(request).all();
+    console.log("result sqlite = ", result);
+    if (result.length) {
+      return Number((result as any)[0]['val']) < this.startOfToday;
+    } else {
+      return true;
+    }
+  }
+
+  public setLastChange(){
+    const request = `
+    REPLACE INTO 
+      keypairs
+      (k, v) 
+    VALUES 
+      (?, ?)
+    `
+    const query = this.db.prepare(request);
+    query.run('lastChangedAt', new Date().getTime());
+  }
+
   private aucuneTacheActive(): boolean {
     return this.count('active = 1') === 0
   }
@@ -155,7 +186,12 @@ export class RunTime {
       lastWorkedAt INTEGER,
       active INTEGER,
       defaultRestTime INTEGER
-    )`.trim().replace(/\n\s+/m,' ');
+    );
+    CREATE TABLE IF NOT EXISTS keypairs (
+      k TEXT PRIMARY KEY,
+      v TEXT
+    )
+    `.trim().replace(/\n\s+/m,' ');
     this.db.run(request);
   }
 

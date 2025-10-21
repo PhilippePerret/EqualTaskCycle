@@ -107,7 +107,22 @@ export class UI {
     this.reveal([this.btnStart]);
     Clock.pause();
   }
-  private onChange(ev: Event){}
+
+  // Méthode appelée pour changer de tâche courante
+  private async onChange(ev: Event){
+    ev && stopEvent(ev);
+    const curwork: Work = Work.currentWork;
+    const result = await fetch(HOST+'task/change', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({workId: curwork.id})
+    })
+    .then(res => res.json());
+    if ( result.ok === false ) {
+      Flash.error('An error occurred: ' + result.error);
+    }
+    return false;
+  }
 
   // Pour lancer le script de démarrage
   private async onRunScript(ev: Event){
