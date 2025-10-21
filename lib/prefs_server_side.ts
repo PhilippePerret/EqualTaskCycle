@@ -16,7 +16,8 @@ class Prefs {
     file:   '', // not undefined
     clock:  'big',
     theme:  'dark',
-    random: true
+    random: true,
+    shortest: false // => les plus longues d'abord
   }
 
   private static instance: Prefs;
@@ -24,6 +25,10 @@ class Prefs {
   public static getInstance(){
     return this.instance || (this.instance = new Prefs());
   }
+
+  public get data(): PrefsDataType {
+    return this._data || (this._data = this.load())
+  }; private _data!: PrefsDataType;
 
   load(){
     const data: PrefsDataType = Object.assign({}, this.DEFAULT_DATA);

@@ -25,4 +25,5 @@ export interface PrefsDataType {
   clock: 'mini' | 'mediane' | 'big';
   theme: 'dark' | 'light';
   random: boolean;
+  shortest: boolean; 
 }

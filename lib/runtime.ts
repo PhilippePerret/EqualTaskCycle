@@ -76,6 +76,8 @@ export class RunTime {
       works 
     WHERE 
       ${condition}
+    ORDER BY 
+      restTime DESC
     `;
     const activeIds = this.db.query(request).all().map((row: any) => row.id);
     console.log("Candidats ids :", activeIds);

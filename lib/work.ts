@@ -1,4 +1,5 @@
 import { DataManager } from "./data_manager";
+import { prefs } from "./prefs_server_side";
 import { runtime } from "./runtime";
 import type { WorkType } from "./types";
 
@@ -34,9 +35,17 @@ export class Work {
     console.log("-> getCurrentWork")
     const ids: string[] = runtime.getCandidateWorks();
     console.log("candidats", ids)
+    let candidatId: string;
     if (ids.length) {
-      // TODO Seulement si random dans les préférences
-      const candidatId = ids[Math.floor(Math.random() * ids.length)];
+      if (ids.length === 1) {
+        candidatId = ids[0] as string;
+      } else if (prefs.data.random) {
+        candidatId = ids[Math.floor(Math.random() * ids.length)] as string;
+      } else if (prefs.data.shortest) {
+        candidatId = ids[0] as string;
+      } else {
+        candidatId = ids[ids.length - 1] as string;
+      }
       console.log("candidat ID", candidatId);
       const candidatData = this.get(candidatId as string).dataForClient;
       console.log("Candidat :", candidatData);
