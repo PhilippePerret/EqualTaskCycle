@@ -80,7 +80,7 @@ export class Work {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(this.data)
       })
-      .then( r => r.json );
+      .then( r => r.json() );
     console.log("Retour save times: ", result);
     // On actualise l'affichage pour apercevoir les nouveaux temps
     // pendant 2 secondes puis on passe à la tâche suivante, qui a
@@ -88,6 +88,7 @@ export class Work {
     this.dispatchData();
     await new Promise(resolve => setTimeout(resolve, 2000));
     Work.displayWork(result.next, result.options);
+    if (result.ok) { Flash.success("New times saved.");}
     return true;
   }
 

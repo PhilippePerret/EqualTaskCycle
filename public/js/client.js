@@ -507,11 +507,14 @@ class Work {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(this.data)
-    }).then((r) => r.json);
+    }).then((r) => r.json());
     console.log("Retour save times: ", result);
     this.dispatchData();
     await new Promise((resolve) => setTimeout(resolve, 2000));
     Work.displayWork(result.next, result.options);
+    if (result.ok) {
+      Flash.success("New times saved.");
+    }
     return true;
   }
   display(options) {
