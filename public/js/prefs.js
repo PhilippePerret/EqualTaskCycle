@@ -174,10 +174,12 @@ class FlashMessage {
 // public/client.ts
 class Work {
   data;
-  static init() {
-    this.getCurrent();
-    prefs.init();
-    Flash.notice("App is ready.");
+  static async init() {
+    const res = await this.getCurrent();
+    if (res === true) {
+      prefs.init();
+      Flash.notice("App is ready.");
+    }
   }
   static currentWork;
   static async addTimeToCurrentWork(time) {
@@ -193,10 +195,17 @@ class Work {
   static _obj;
   static async getCurrent() {
     const retour = await fetch(HOST + "task/current").then((r) => r.json());
+    console.log("retour:", retour);
     prefs.setData(retour.prefs);
     Clock.setClockStyle(retour.prefs.clock);
     ui.setUITheme(retour.prefs.theme);
-    this.displayWork(retour.task, retour.options);
+    if (retour.task.ok === false) {
+      Flash.error("No active task. Set the task list.");
+      return false;
+    } else {
+      this.displayWork(retour.task, retour.options);
+      return true;
+    }
   }
   static displayWork(wdata, options) {
     this.currentWork = new Work(wdata);

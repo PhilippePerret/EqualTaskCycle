@@ -8,10 +8,12 @@ import { prefs } from "./prefs";
 
 export class Work {
 
-  public static init(){
-    this.getCurrent();
-    prefs.init();
-    Flash.notice("App is ready.")
+  public static async init(){
+    const res = await this.getCurrent();
+    if (res === true) {
+      prefs.init();
+      Flash.notice("App is ready.")
+    }
   }
 
   private static currentWork: Work;
@@ -35,14 +37,23 @@ export class Work {
    * (récupère aussi les préférences et les options et les
    *  applique)
    */
-  public static async getCurrent(){
+  public static async getCurrent(): Promise<boolean> {
     const retour: RecType = await fetch(HOST + 'task/current')
     .then(r => r.json() as RecType);
+    console.log("retour:", retour);
     prefs.setData(retour.prefs);
     Clock.setClockStyle(retour.prefs.clock);
     ui.setUITheme(retour.prefs.theme);
-    this.displayWork(retour.task, retour.options);
+    if (retour.task.ok === false) {
+      // <= il n'y aucune tâche active
+      Flash.error('No active task. Set the task list.');
+      return false;
+    } else {
+      this.displayWork(retour.task, retour.options);
+      return true;
+    }
   }
+
   private static displayWork(
     wdata: WorkType & RunTimeInfosType,
     options: RecType

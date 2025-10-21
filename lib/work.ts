@@ -35,11 +35,17 @@ export class Work {
     const ids: string[] = runtime.getCandidateWorks();
     // TODO Seulement si random dans les préférences
     console.log("candidats", ids)
-    const candidatId = ids[Math.floor(Math.random() * ids.length)];
-    console.log("candidat ID", candidatId);
-    const candidatData = this.get(candidatId as string).dataForClient;
-    console.log("Candidat :", candidatData);
-    return candidatData;
+    if (ids.length) {
+      const candidatId = ids[Math.floor(Math.random() * ids.length)];
+      console.log("candidat ID", candidatId);
+      const candidatData = this.get(candidatId as string).dataForClient;
+      console.log("Candidat :", candidatData);
+      return candidatData;
+    } else {
+      // Pas de candidats. Ça ne peut arriver que si aucune
+      // tâche active n'est défini.
+      return {ok: false, error: "No task."}
+    }
   }
 
   /**

@@ -35,7 +35,16 @@ export class RunTime {
    * @param workId Identifiant du travail
    */
   public getTemporalInfos(workId: string): RecType {
-    const request = 'SELECT * FROM works WHERE id = ? LIMIT 1';
+    const request = `
+    SELECT 
+      * 
+    FROM 
+      works 
+    WHERE 
+      id = ? 
+    LIMIT 
+      1
+    `;
     const query = this.db.prepare(request);
     const result = query.get(workId);
     // console.log("Result de getTemporalInfos", result);
@@ -51,16 +60,77 @@ export class RunTime {
    * aujourd'hui.
    * 
    */
-  public getCandidateWorks(){
-    const request = `SELECT id FROM works WHERE active = 1 AND restTime > 0 AND (lastWorkedAt IS NULL OR lastWorkedAt <= ${this.startOfToday})`;
+  public getCandidateWorks(options: RecType | undefined = {}): string[] {
+    let condition: string[] | string = []
+    condition.push('active = 1');
+    condition.push('restTime > 0');
+    if (options.no_time_constraint !== true) {
+      condition.push(`(lastWorkedAt IS NULL OR lastWorkedAt <= ${this.startOfToday})`)
+    }
+    condition = condition.join(' AND ')
+    console.log("condition = %s", condition);
+    const request = `
+    SELECT 
+      id 
+    FROM 
+      works 
+    WHERE 
+      ${condition}
+    `;
     const activeIds = this.db.query(request).all().map((row: any) => row.id);
     console.log("Candidats ids :", activeIds);
     if ( activeIds.length === 0 ) {
-      // TODO Si aucune tâche => recommencer un cycle
-      // TODO S'assurer qu'il y a bien des tâches ?
+      /**
+       * L'absence de candidats trouvés peut avoir plusieurs causes :
+       * 1) il n'y a aucune tâche active
+       *    => Alerte à l'utilisateur
+       * 2) il n'y plus de tâches avec du temps restant 
+       *    => Il faut actualiser un nouveau cycle
+       * 3) toutes les tâches actives ont été jouées (brièvement) aujourd'hui
+       *    => On choisit les tâches sans la contrainte du temps
+       */
+      if ( this.aucuneTacheActive() ) { // #1
+        console.log("=> Aucune tâche active");
+        return [];
+      } else if ( this.aucuneTacheWithRestTime() ) { // #2
+        console.log("=> Nouveau cycle à initialiser");
+        this.startNewCycle();
+        return this.getCandidateWorks();
+      } else { // #3
+        console.log("=> Toutes les tâches ont été jouées aujourd'hui.")
+        return this.getCandidateWorks({no_time_constraint: true});
+      }
     }
     return activeIds;
   }
+
+  private aucuneTacheActive(): boolean {
+    return this.count('active = 1') === 0
+  }
+  private aucuneTacheWithRestTime(): boolean {
+    return this.count('active = 1 AND restTime > 0') === 0
+  }
+
+  /**
+   * @return Le nombre d'éléments remplissant la condition 
+   * +condition+
+   * 
+   * @param condition La condition qui doit être remplie
+   */
+  private count(condition: string): number {
+  const request = `
+    SELECT 
+      COUNT(id)
+    FROM
+      works
+    WHERE
+      ${condition}
+    `;
+    const res: RecType = this.db.query(request).get() as RecType;
+    return res["COUNT(id)"];
+  }
+
+
   private get startOfToday(): number {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
