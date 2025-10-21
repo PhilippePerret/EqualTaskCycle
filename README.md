@@ -54,7 +54,7 @@ works:
     project: "Grand Dictionnaire du Scénario"
     content: "Développer les exemples et l'interface"
     folder: /Users/philippeperret/ICARE_EDITIONS/_LIVRES_/Narration/Dictionnaire
-    startupScript: path/to/startud-script
+    script: path/to/startud-script
   - id: idml
     project: "IDML-Générateur"
     content: "Poursuivre le développement"
@@ -88,7 +88,7 @@ Pour qu’une tâche devienne « prioritaire » (juste être exécutée avant 
 | content       | Le contenu proprement dit de la tâche, donc ce qu’il faut faire. | Le texte peut être assez long et suffisamment informatif pour |
 | duration      | Optionnellement, la durée de travail par cycle               | Par essence, chaque tâche devrait se voir affecter le même temps de travail. Mais cette donnée permet de donner plus d’importance à certaines tâches. |
 | folder        | Dossier du projet                                            | Ce dossier peut être ouvert à l’aide du bouton « Folder » de l’interface. |
-| startupScript | Script de démarrage du projet                                | Permet de lancer un script de démarrage (par exemple pour créer automatiquement une nouvelle version d’un fichier, simplement en cliquant sur le bouton « Script » de l’interface. |
+| script | Script de démarrage du projet                                | Permet de lancer un script de démarrage (par exemple pour créer automatiquement une nouvelle version d’un fichier, simplement en cliquant sur le bouton « Script » de l’interface.<br />Il faut penser à le rendre exécutable en jouant la commande `chmod +x path/to/script`. |
 | active        | [Optionnel] true si la tâche est active                      | Par défaut, c’est true, mais permet de désactiver un travail sans le retirer du fichier |
 |               |                                                              |                                                              |
 
@@ -97,3 +97,12 @@ Pour qu’une tâche devienne « prioritaire » (juste être exécutée avant 
 ### Mode aléatoire
 
 Par défaut, les tâches sont proposées dans un ordre aléatoire (pour épicer les journées). On peut désactiver ce comportement dans les préférences, en décochant la case « ordre aléatoire » (ou similaire).
+
+## Annexe
+
+En développement, il faut parfois détruire les processus :
+
+~~~shell
+sudo pkill -f "bun.*server"
+~~~
+

@@ -7,7 +7,7 @@ import path from 'path';
 export class DataManager {
   private _data!: RecType;
 
-  // TODO Vérifier que le fichier existe
+  // Relever les données du fichier ou des données par défaut
   public getData(){
     if (existsSync('_TASKS_.yaml')) {
       this._data = yaml.load(readFileSync('_TASKS_.yaml', 'utf8')) as RecType;
@@ -18,7 +18,7 @@ export class DataManager {
           id: 'init',
           project: "Init the app",
           content: "Build a _TASKS_.yaml file with data.",
-          folder: path.resolve('.')
+          folder: path.resolve('.'),
         } as WorkType]
       }
     }

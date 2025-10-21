@@ -3,13 +3,12 @@
 export type RecType = {[x: string]: any};
 
 export interface WorkType {
-    id: string,
-    project: string,
-    content: string,
-    duration?: number,
-    folder?: string,
-    startupScript?: string, // path du script de démarrage
-
+    id: string;
+    project: string;
+    content: string;
+    duration?: number;
+    folder?: string;
+    script?: string; // path du script de démarrage
 }
 
 export interface RunTimeInfosType {

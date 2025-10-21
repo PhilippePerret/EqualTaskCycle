@@ -1,6 +1,8 @@
 import { Clock } from "../lib/Clock";
 import { Work } from "./client";
+import { HOST } from "./js/constants";
 import { DGet } from "./js/dom";
+import { Flash } from "./js/flash";
 
 function stopEvent(ev: Event){
   ev.stopPropagation();
@@ -69,6 +71,7 @@ export class UI {
   }
 
   public showButtons(states: {[x: string]: boolean}):void {
+    console.log("states", states);
     this.buttons.forEach((bouton: Button) => bouton.setState(states[bouton.id] as boolean));
   };
   
@@ -105,7 +108,21 @@ export class UI {
     Clock.pause();
   }
   private onChange(ev: Event){}
-  private onRunScript(ev: Event){}
+  private async onRunScript(ev: Event){
+    const curwork: Work = Work.currentWork;
+    const result = await fetch(HOST+'task/run-script', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({workId: curwork.id, script: curwork.script})
+    })
+    .then(res => res.json());
+    if ( result.ok ) {
+      Flash.success('Script played with success.')
+    } else {
+      Flash.error('An error occurred: ' + result.error);
+    }
+    return stopEvent(ev);
+  }
   private onOpenFolder(ev: Event){}
   
   private btnStart?: Button;

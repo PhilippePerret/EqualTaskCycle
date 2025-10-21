@@ -214,6 +214,7 @@ class UI {
     eList.forEach((e) => e.obj.classList.remove("invisible"));
   }
   showButtons(states) {
+    console.log("states", states);
     this.buttons.forEach((bouton) => bouton.setState(states[bouton.id]));
   }
   closeSection(name) {
@@ -242,7 +243,20 @@ class UI {
     Clock.pause();
   }
   onChange(ev) {}
-  onRunScript(ev) {}
+  async onRunScript(ev) {
+    const curwork = Work.currentWork;
+    const result = await fetch(HOST + "task/run-script", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ workId: curwork.id, script: curwork.script })
+    }).then((res) => res.json());
+    if (result.ok) {
+      Flash.success("Script played with success.");
+    } else {
+      Flash.error("An error occurred: " + result.error);
+    }
+    return stopEvent2(ev);
+  }
   onOpenFolder(ev) {}
   btnStart;
   btnPause;
@@ -1783,8 +1797,8 @@ class Work {
     const res = await this.getCurrent();
     if (res === true) {
       prefs.init();
-      Flash.notice(`App is ready. <span id="mes123">(Help)</span>`);
-      DGet("span#mes123").addEventListener("click", help.show.bind(help, ["introduction", "tasks_file", "tasks_file_format"]));
+      Flash.notice(`App is ready. <span id="mes123">(Show help)</span>`);
+      DGet("span#mes123").addEventListener("click", help.show.bind(help, ["introduction", "tasks_file", "tasks_file_format"]), { once: true, capture: true });
     }
   }
   static currentWork;
@@ -1819,9 +1833,13 @@ class Work {
   }
   constructor(data) {
     this.data = data;
+    console.log("this.data", this.data);
   }
   get id() {
     return this.data.id;
+  }
+  get script() {
+    return this.data.script;
   }
   async addTimeAndSave(time) {
     this.data.totalTime += time;
@@ -1857,7 +1875,7 @@ class Work {
       Stop: false,
       Pause: false,
       Change: options.canChange,
-      runScript: !!this.data.startupScript,
+      runScript: !!this.data.script,
       openFolder: !!this.data.folder
     });
   }

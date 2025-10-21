@@ -4,6 +4,8 @@ import { HOST, PORT } from './public/js/constants';
 import { Work } from "./lib/work";
 import { prefs } from './lib/prefs_server_side';
 import { runtime } from './lib/runtime';
+import { existsSync } from 'fs';
+import { execFileSync } from 'child_process';
 
 const app = express();
 
@@ -39,6 +41,24 @@ app.get('/task/current', (req, res) => {
     prefs: prefs.load()
   });
 });
+
+app.post('/task/run-script', (req, res) => {
+  const dreq = req.body;
+  let result = {ok: true, error: ''};
+  dreq.script = path.resolve(dreq.script);
+  // console.log("Je dois jouer le script", dreq.script);
+  if (existsSync(dreq.script)) {
+    try {
+      const res = execFileSync(dreq.script, {encoding: 'utf8'});
+      console.log("Résultat du script", res);
+    } catch(err: any) {
+      result = {ok: false, error: err.stderr}
+    }
+  } else {
+    result = {ok: false, error: 'Script "'+dreq.script+'"unfound.'}
+  }
+  res.json(result);
+})
 
 app.post('/prefs/save', (req, res) => {
   const report = prefs.save(req.body);

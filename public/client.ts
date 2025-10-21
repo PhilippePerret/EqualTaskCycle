@@ -13,14 +13,15 @@ export class Work {
     const res = await this.getCurrent();
     if (res === true) {
       prefs.init();
-      Flash.notice(`App is ready. <span id="mes123">(Help)</span>`)
+      Flash.notice(`App is ready. <span id="mes123">(Show help)</span>`)
       DGet('span#mes123').addEventListener('click', 
-        help.show.bind(help, ['introduction', 'tasks_file', 'tasks_file_format'])
+        help.show.bind(help, ['introduction', 'tasks_file', 'tasks_file_format']),
+        {once: true, capture: true}
       )
     }
   }
 
-  private static currentWork: Work;
+  public static currentWork: Work;
 
   public static async addTimeToCurrentWork(time: number){
     if (time) {
@@ -70,10 +71,11 @@ export class Work {
   constructor(
     private data: WorkType & RunTimeInfosType
   ){
-    // console.log("this.data", this.data);
+    console.log("this.data", this.data);
   }
 
   public get id(){ return this.data.id; }
+  public get script(): string | undefined {return this.data.script}
 
   /**
    * Méthode d'instance pour sauver le temps
@@ -117,7 +119,7 @@ export class Work {
       Stop: false,
       Pause: false,
       Change: options.canChange,
-      runScript: !!this.data.startupScript,
+      runScript: !!this.data.script,
       openFolder: !!this.data.folder,
     });
   }
