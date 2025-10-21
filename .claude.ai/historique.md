@@ -26,3 +26,10 @@
 - Problème : texte traité comme code au lieu de paragraphes
 - Cause : indentation dans les template literals (backticks)
 - Solution : retirer l'indentation du markdown
+
+## Mise en place IPC pour bringToFront
+- Objectif : mettre la fenêtre Electron au premier plan depuis le client
+- Création de `electron/preload.js` avec contextBridge
+- Modification de `main.js` : ajout webPreferences et listener IPC
+- Exposition de `window.electronAPI.bringToFront()` côté client
+- Test réussi avec setTimeout

@@ -11,85 +11,6 @@ function stopEvent(ev) {
   return false;
 }
 
-// lib/Clock.ts
-class Clock {
-  static time2horloge(mn) {
-    let hrs = Math.floor(mn / 60);
-    let mns = mn % 60;
-    let horloge = [];
-    horloge.push(`${hrs}`);
-    horloge.push(`${mns > 9 ? "" : "0"}${mns}’`);
-    return horloge.join(" h ");
-  }
-  static setClockStyle(style) {
-    this.clockObj.classList.add(style);
-  }
-  static currentWork;
-  static timer;
-  static startTime;
-  static timeLeft;
-  static totalTime;
-  static start(currentWork) {
-    this.currentWork = currentWork;
-    this.clockObj.classList.remove("hidden");
-    if (this.timeLeft === undefined) {
-      this.timeLeft = 0;
-      this.clockObj.innerHTML = "0:00:00";
-    }
-    this.startTime = new Date().getTime();
-    this.timer = setInterval(this.run.bind(this), 1000);
-  }
-  static getStartTime() {
-    return this.startTime;
-  }
-  static pause() {
-    clearInterval(this.timer);
-    this.timeLeft += this.lapsFromStart();
-  }
-  static stop() {
-    clearInterval(this.timer);
-    this.totalTime = this.timeLeft + this.lapsFromStart();
-    this.timeLeft = undefined;
-    this.clockObj.classList.add("hidden");
-    return this.totalTime;
-  }
-  static run() {
-    const secondesOfWork = this.timeLeft + this.lapsFromStart();
-    this.clockObj.innerHTML = this.s2h(secondesOfWork);
-    if (this.taskRestTime(secondesOfWork / 60) < 10 && this.alerte10minsDone === false) {
-      this.donneAlerte10mins();
-      this.alerte10minsDone = true;
-    }
-  }
-  static alerte10minsDone = false;
-  static donneAlerte10mins() {
-    ui.setBackgroundColorAt("orange");
-  }
-  static taskRestTime(minutesOfWork) {
-    return this.currentWork.restTime - minutesOfWork;
-  }
-  static lapsFromStart() {
-    return Math.round((new Date().getTime() - this.startTime) / 1000);
-  }
-  static get clockObj() {
-    return this._clockobj || (this._clockobj = DGet("#clock"));
-  }
-  static _clockobj;
-  static s2h(s) {
-    let h = Math.floor(s / 3600);
-    s = s % 3600;
-    let m = Math.floor(s / 60);
-    const mstr = m < 10 ? `0${m}` : String(m);
-    s = s % 60;
-    const sstr = s < 10 ? `0${s}` : String(s);
-    return `${h}:${mstr}:${sstr}`;
-  }
-}
-
-// public/js/constants.js
-var PORT = 3002;
-var HOST = `http://localhost:${PORT}/`;
-
 // public/js/flash.js
 class Flash {
   static init() {}
@@ -180,6 +101,101 @@ class FlashMessage {
     return this.data.type;
   }
 }
+
+// lib/Clock.ts
+class Clock {
+  static time2horloge(mn) {
+    let hrs = Math.floor(mn / 60);
+    let mns = mn % 60;
+    let horloge = [];
+    horloge.push(`${hrs}`);
+    horloge.push(`${mns > 9 ? "" : "0"}${mns}’`);
+    return horloge.join(" h ");
+  }
+  static setClockStyle(style) {
+    this.clockObj.classList.add(style);
+  }
+  static currentWork;
+  static timer;
+  static startTime;
+  static timeLeft;
+  static totalTime;
+  static start(currentWork) {
+    this.currentWork = currentWork;
+    this.clockObj.classList.remove("hidden");
+    if (this.timeLeft === undefined) {
+      this.timeLeft = 0;
+      this.clockObj.innerHTML = "0:00:00";
+    }
+    this.startTime = new Date().getTime();
+    this.timer = setInterval(this.run.bind(this), 1000);
+  }
+  static getStartTime() {
+    return this.startTime;
+  }
+  static pause() {
+    clearInterval(this.timer);
+    this.timeLeft += this.lapsFromStart();
+  }
+  static stop() {
+    clearInterval(this.timer);
+    this.totalTime = this.timeLeft + this.lapsFromStart();
+    this.timeLeft = undefined;
+    this.clockObj.classList.add("hidden");
+    return this.totalTime;
+  }
+  static run() {
+    const secondesOfWork = this.timeLeft + this.lapsFromStart();
+    this.clockObj.innerHTML = this.s2h(secondesOfWork);
+    if (this.taskRestTime(secondesOfWork) < 10 && this.alerte10minsDone === false) {
+      this.donneAlerte10mins();
+    } else if (this.alerte10minsDone) {
+      if (this.alerteWorkDone === false && this.taskRestTime(secondesOfWork) < 0) {
+        this.donneAlerteWorkDone();
+      }
+    }
+  }
+  static alerte10minsDone = false;
+  static alerteWorkDone = false;
+  static donneAlerte10mins() {
+    ui.setBackgroundColorAt("orange");
+    this.bringAppToFront();
+    Flash.notice("10 minutes of work remaining");
+    this.alerte10minsDone = true;
+  }
+  static donneAlerteWorkDone() {
+    this.bringAppToFront();
+    Flash.notice("Work time is over. Please move on to the next task.");
+    this.alerteWorkDone = true;
+  }
+  static taskRestTime(minutesOfWork) {
+    minutesOfWork = minutesOfWork / 60;
+    return this.currentWork.restTime - minutesOfWork;
+  }
+  static lapsFromStart() {
+    return Math.round((new Date().getTime() - this.startTime) / 1000);
+  }
+  static get clockObj() {
+    return this._clockobj || (this._clockobj = DGet("#clock"));
+  }
+  static _clockobj;
+  static s2h(s) {
+    let h = Math.floor(s / 3600);
+    s = s % 3600;
+    let m = Math.floor(s / 60);
+    const mstr = m < 10 ? `0${m}` : String(m);
+    s = s % 60;
+    const sstr = s < 10 ? `0${s}` : String(s);
+    return `${h}:${mstr}:${sstr}`;
+  }
+  static bringAppToFront() {
+    window.electronAPI.bringToFront();
+  }
+}
+
+// public/js/constants.js
+var PORT = 3002;
+var HOST = `http://localhost:${PORT}/`;
 
 // public/prefs.ts
 class Prefs {

@@ -1820,16 +1820,29 @@ class Clock {
   static run() {
     const secondesOfWork = this.timeLeft + this.lapsFromStart();
     this.clockObj.innerHTML = this.s2h(secondesOfWork);
-    if (this.taskRestTime(secondesOfWork / 60) < 10 && this.alerte10minsDone === false) {
+    if (this.taskRestTime(secondesOfWork) < 10 && this.alerte10minsDone === false) {
       this.donneAlerte10mins();
-      this.alerte10minsDone = true;
+    } else if (this.alerte10minsDone) {
+      if (this.alerteWorkDone === false && this.taskRestTime(secondesOfWork) < 0) {
+        this.donneAlerteWorkDone();
+      }
     }
   }
   static alerte10minsDone = false;
+  static alerteWorkDone = false;
   static donneAlerte10mins() {
     ui.setBackgroundColorAt("orange");
+    this.bringAppToFront();
+    Flash.notice("10 minutes of work remaining");
+    this.alerte10minsDone = true;
+  }
+  static donneAlerteWorkDone() {
+    this.bringAppToFront();
+    Flash.notice("Work time is over. Please move on to the next task.");
+    this.alerteWorkDone = true;
   }
   static taskRestTime(minutesOfWork) {
+    minutesOfWork = minutesOfWork / 60;
     return this.currentWork.restTime - minutesOfWork;
   }
   static lapsFromStart() {
@@ -1847,6 +1860,9 @@ class Clock {
     s = s % 60;
     const sstr = s < 10 ? `0${s}` : String(s);
     return `${h2}:${mstr}:${sstr}`;
+  }
+  static bringAppToFront() {
+    window.electronAPI.bringToFront();
   }
 }
 

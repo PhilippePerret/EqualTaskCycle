@@ -37,9 +37,32 @@ app.whenReady().then(() => {
     width: 800,
     // width: 2000, // Pour console
     height: 600,
-    icon: ICON_PATH
+    icon: ICON_PATH,
+    /** Pour le preload qui doit permettre la communication
+     *  entre les éléments pour mettre la fenêtre au premier
+     *  plan
+     */
+    webPreferences: {
+        preload: path.join(__dirname, 'preload.js'),
+        contextIsolation: true
+      }    
   });
 
+  // Pour mettre au premier plan (communication IPC)
+  const { ipcMain } = require('electron');
+  ipcMain.on('bring-to-front', () => {
+    bringToFront();
+  });
+
+  function bringToFront() {
+    app.focus({ steal: true });
+    win.show();
+    win.focus();
+  }
+
   setTimeout(() => win.loadURL(HOST), 1000);
+
+  // setTimeout(() => bringToFront(), 5000);
+
 });
 

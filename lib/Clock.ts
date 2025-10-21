@@ -1,6 +1,7 @@
 import { DGet } from "../public/js/dom";
 import { ui } from "../public/ui";
 import type { Work } from "../public/client";
+import { Flash } from "../public/js/flash";
 
 export class Clock {
 
@@ -61,18 +62,30 @@ export class Clock {
   private static run(){
     const secondesOfWork: number = (this.timeLeft as number) + this.lapsFromStart()
     this.clockObj.innerHTML = this.s2h(secondesOfWork);
-    // Si le temps restant est inférieur à 10 minutes et que
-    // l'alerte n'a pas été donnée, on signale la fin imminente
-    // par un changement de couleur
-    if ( this.taskRestTime(secondesOfWork / 60) < 10 && this.alerte10minsDone === false) {
+    if ( this.taskRestTime(secondesOfWork) < 10 && this.alerte10minsDone === false) {
+      // 10 minutes restantes sur ce travail
       this.donneAlerte10mins();
-      this.alerte10minsDone = true;
+    } else if (this.alerte10minsDone) {
+      // L'alerte des 10 minutes a été donnée
+      if (this.alerteWorkDone === false && this.taskRestTime(secondesOfWork) < 0) {
+        // Temps de travail atteint, alerte pour avertir l'user
+        this.donneAlerteWorkDone()
+      }
     }
   }; 
   private static alerte10minsDone: boolean = false;
+  private static alerteWorkDone: boolean = false;
 
   private static donneAlerte10mins(){
     ui.setBackgroundColorAt('orange');
+    this.bringAppToFront();
+    Flash.notice("10 minutes of work remaining");
+    this.alerte10minsDone = true;
+  }
+  private static donneAlerteWorkDone(){
+    this.bringAppToFront();
+    Flash.notice('Work time is over. Please move on to the next task.');
+    this.alerteWorkDone = true;
   }
 
   /**
@@ -80,6 +93,7 @@ export class Clock {
    * Attention, la méthode est appelée toutes les demi-secondes.
    */
   private static taskRestTime(minutesOfWork: number): number {
+    minutesOfWork = minutesOfWork / 60;
     return this.currentWork.restTime - minutesOfWork;
   }
 
@@ -100,6 +114,10 @@ export class Clock {
     s = s % 60
     const sstr: string = s < 10 ? `0${s}` : String(s) ;
     return `${h}:${mstr}:${sstr}`
+  }
+
+  private static bringAppToFront(){
+    (window as any).electronAPI.bringToFront();
   }
 
 }
