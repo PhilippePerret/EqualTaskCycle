@@ -18,13 +18,9 @@ export class Work {
 
   public static async addTimeToCurrentWork(time: number){
     if (time) {
-      const ok = await this.currentWork.addTimeAndSave(time)
-      if (ok) {
-        // On passe à la tâche suivante
-        this.getCurrent();
-      }
+      await this.currentWork.addTimeAndSave(time)
     } else {
-      Flash.error("Work time too short to save it.")
+      Flash.error("Work time too short to save.")
     }
   }
 
@@ -34,16 +30,26 @@ export class Work {
   }
   private static _obj: HTMLElement | null;
 
+  /**
+   * Récupère la tâche courante côté serveur et l'affiche
+   * (récupère aussi les préférences et les options et les
+   *  applique)
+   */
   public static async getCurrent(){
     const retour: RecType = await fetch(HOST + 'task/current')
     .then(r => r.json() as RecType);
-    const dataCurrentWork = retour.task;
-    // console.log("Current Task", dataCurrentWork);
-    this.currentWork = new Work(dataCurrentWork);
-    this.currentWork.display(retour.options);
     prefs.setData(retour.prefs);
     Clock.setClockStyle(retour.prefs.clock);
     ui.setUITheme(retour.prefs.theme);
+    this.displayWork(retour.task, retour.options);
+  }
+  private static displayWork(
+    wdata: WorkType & RunTimeInfosType,
+    options: RecType
+  ) {
+    // console.log("Current Task", dataCurrentWork);
+    this.currentWork = new Work(wdata);
+    this.currentWork.display(options);
   }
 
   constructor(
@@ -67,19 +73,22 @@ export class Work {
       this.data.startedAt = Clock.getStartTime();
     }
     this.data.lastWorkedAt = Clock.getStartTime();
-    console.log("Enregistrement des temps")
-    const result = await fetch(HOST+'work/save-times', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(this.data)
-    }).then( r => r.json );
+    console.log("[addTimeAndSave] Enregistrement des temps")
+    const result: RecType = 
+      await fetch(HOST+'work/save-times', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(this.data)
+      })
+      .then( r => r.json );
     console.log("Retour save times: ", result);
-    // On actualise l'affichage
+    // On actualise l'affichage pour apercevoir les nouveaux temps
+    // pendant 2 secondes puis on passe à la tâche suivante, qui a
+    // été remontée.
     this.dispatchData();
-    // On le laisse affiché 2 secondes avant de passer à
-    // la tâche suivante.
     await new Promise(resolve => setTimeout(resolve, 2000));
-    return true;// Pour afficher la suivante
+    Work.displayWork(result.next, result.options);
+    return true;
   }
 
   /**

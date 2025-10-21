@@ -11,21 +11,28 @@ app.use(express.static(__dirname));
 app.use(express.json());
 app.use(express.static('public'));
 
-
-app.post('/api/task/start', (req, res) => {
-  const { taskId } = req.body;
-  // ... ton traitement
-  res.json({ success: true, data: {ok: true} });
-});
+function log(msg: string, data: any = undefined) {
+  if (data) {
+    console.log(msg, data);
+  } else {
+    console.log(msg);
+  }
+}
 
 app.post('/work/save-times', (req, res) => {
+  log("-> /work/save-times");
   const dwork = req.body;
-  console.log("Je dois apprendre à sauver les temps de : ", dwork);
+  log("Sauvegarde des temps : ", dwork);
   runtime.updateWork(dwork);
+  res.json({
+    ok: true, 
+    next: Work.getCurrentWork(),
+    options: {canChange: true /* TODO: À régler */}
+  });
 });
 
 app.get('/task/current', (req, res) => {
-  console.log("-> /task/current")
+  log("-> /task/current");
   res.json({
     task: Work.getCurrentWork(),
     options: {canChange: true /* TODO À RÉGLER */},

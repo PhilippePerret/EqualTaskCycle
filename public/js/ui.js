@@ -287,12 +287,9 @@ class Work {
   static currentWork;
   static async addTimeToCurrentWork(time) {
     if (time) {
-      const ok = await this.currentWork.addTimeAndSave(time);
-      if (ok) {
-        this.getCurrent();
-      }
+      await this.currentWork.addTimeAndSave(time);
     } else {
-      Flash.error("Work time too short to save it.");
+      Flash.error("Work time too short to save.");
     }
   }
   static get obj() {
@@ -301,12 +298,14 @@ class Work {
   static _obj;
   static async getCurrent() {
     const retour = await fetch(HOST + "task/current").then((r) => r.json());
-    const dataCurrentWork = retour.task;
-    this.currentWork = new Work(dataCurrentWork);
-    this.currentWork.display(retour.options);
     prefs.setData(retour.prefs);
     Clock.setClockStyle(retour.prefs.clock);
     ui.setUITheme(retour.prefs.theme);
+    this.displayWork(retour.task, retour.options);
+  }
+  static displayWork(wdata, options) {
+    this.currentWork = new Work(wdata);
+    this.currentWork.display(options);
   }
   constructor(data) {
     this.data = data;
@@ -326,7 +325,7 @@ class Work {
       this.data.startedAt = Clock.getStartTime();
     }
     this.data.lastWorkedAt = Clock.getStartTime();
-    console.log("Enregistrement des temps");
+    console.log("[addTimeAndSave] Enregistrement des temps");
     const result = await fetch(HOST + "work/save-times", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -335,6 +334,7 @@ class Work {
     console.log("Retour save times: ", result);
     this.dispatchData();
     await new Promise((resolve) => setTimeout(resolve, 2000));
+    Work.displayWork(result.next, result.options);
     return true;
   }
   display(options) {

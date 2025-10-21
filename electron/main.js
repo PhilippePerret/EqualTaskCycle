@@ -40,7 +40,6 @@ app.whenReady().then(() => {
     icon: ICON_PATH
   });
 
-
-  setTimeout(() => win.loadURL(HOST), 2000);
+  setTimeout(() => win.loadURL(HOST), 1000);
 });
 
