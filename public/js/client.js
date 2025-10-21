@@ -20,7 +20,8 @@ class Clock {
     hrs > 0 && horloge.push(`${hrs}`);
     mns > 0 && horloge.push(`${mns}`);
     if (horloge.length) {
-      return horloge.join(":") + "00";
+      horloge.push("00");
+      return horloge.join(":");
     } else {
       return "---";
     }

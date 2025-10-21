@@ -1,11 +1,11 @@
 import { DataManager } from "./data_manager";
 import { runtime } from "./runtime";
-import type { RunTimeInfosType, WorkType } from "./types";
+import type { WorkType } from "./types";
 
 export class Work {
   public static defaultDuration: number = 120;
 
-  private static works: Work[] = [];
+  // private static works: Work[] = [];
   private static table: {[x:string]: Work} = {};
 
   /**
@@ -33,9 +33,9 @@ export class Work {
   public static getCurrentWork(){
     console.log("-> getCurrentWork")
     const ids: string[] = runtime.getCandidateWorks();
-    // TODO Seulement si random dans les préférences
     console.log("candidats", ids)
     if (ids.length) {
+      // TODO Seulement si random dans les préférences
       const candidatId = ids[Math.floor(Math.random() * ids.length)];
       console.log("candidat ID", candidatId);
       const candidatData = this.get(candidatId as string).dataForClient;
