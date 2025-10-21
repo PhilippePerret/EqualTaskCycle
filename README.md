@@ -14,7 +14,7 @@ Voici un petit rappel :
 | ---------------------------- | :----------------------------------------------------------: | ------------------------ |
 | **`bun run watch_ts`**       | Pour surveiller les fichiers `ts`<br />du dossier `./public` |                          |
 |                              |       Pour lancer l’application en mode développement.       | **`bun run start`**      |
-|                              |                   Pour produire la release                   | **`bun run build`**      |
+|                              |   Pour produire la release<br />(ne fonctionne pas encore)   | **`bun run build`**      |
 |                              |                                                              |                          |
 
 

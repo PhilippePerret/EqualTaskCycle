@@ -131,11 +131,4 @@ export class Work {
   }
 }
 
-// // POST
-// await fetch(HOST + 'api/task/start', {
-//   method: 'POST',
-//   headers: { 'Content-Type': 'application/json' },
-//   body: JSON.stringify({ taskId: 123 })
-// });
-
 Work.init();

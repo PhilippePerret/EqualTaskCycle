@@ -6,10 +6,10 @@ export class Clock {
     let hrs = Math.floor(mn / 60);
     let mns = mn % 60;
     let horloge: string | string[] = [];
-    mns > 0 && horloge.push(`${mns} mns`);
-    hrs > 0 && horloge.push(`${hrs} hrs`);
+    hrs > 0 && horloge.push(`${hrs}`);
+    mns > 0 && horloge.push(`${mns}`);
     if ( horloge.length ) {
-      return horloge.join(' ');
+      return horloge.join(':') + '00';
     } else {
       return '---';
     }
