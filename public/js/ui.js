@@ -174,15 +174,14 @@ class FlashMessage {
 // public/prefs.ts
 class Prefs {
   data;
+  fieldsReady = false;
   static instance;
   constructor() {}
   static getInstance() {
     return this.instance || (this.instance = new Prefs);
   }
   init() {
-    DGet("button.btn-prefs").addEventListener("click", this.onOpen.bind(this));
-    DGet("button.btn-close-prefs").addEventListener("click", this.onClose.bind(this));
-    DGet("button.btn-save-prefs").addEventListener("click", this.onSave.bind(this));
+    this.observeButtons();
   }
   async onSave(ev) {
     stopEvent(ev);
@@ -199,6 +198,18 @@ class Prefs {
     }
     return false;
   }
+  onChangePref(prop, ev) {
+    const value = this.getValue(prop);
+    switch (prop) {
+      case "clock":
+        Clock.setClockStyle(value);
+        break;
+      case "theme":
+        ui.setUITheme(value);
+        break;
+      default:
+    }
+  }
   onOpen(ev) {
     this.open();
     return stopEvent(ev);
@@ -208,29 +219,34 @@ class Prefs {
     return stopEvent(ev);
   }
   setData(data) {
-    console.log("Data prefs", data);
     this.data = data;
+    this.fieldsReady || this.observeFields();
     Object.entries(this.data).forEach(([k, v]) => {
-      switch (k) {
-        case "random":
-          this.field(k).checked = v;
-          break;
-        default:
-          this.field(k).value = v;
-      }
+      this.setValue(k, v);
     });
   }
   getData() {
-    Object.entries(this.data).forEach(([k, v]) => {
-      switch (k) {
-        case "random":
-          Object.assign(this.data, { [k]: this.field(k).checked });
-          break;
-        default:
-          Object.assign(this.data, { [k]: this.field(k).value });
-      }
+    Object.entries(this.data).forEach(([k, _v]) => {
+      Object.assign(this.data, { [k]: this.getValue(k) });
     });
     return this.data;
+  }
+  getValue(prop) {
+    switch (prop) {
+      case "random":
+        return this.field("random").checked;
+      default:
+        return this.field(prop).value;
+    }
+  }
+  setValue(prop, value) {
+    switch (prop) {
+      case "random":
+        this.field("random").checked = value;
+        break;
+      default:
+        this.field(prop).value = value;
+    }
   }
   field(key) {
     return DGet(`#prefs-${key}`, this.section) || console.error("Le champ 'prefs-%s' est introuvable", key);
@@ -242,6 +258,17 @@ class Prefs {
   open() {
     this.section.classList.remove("hidden");
     ui.closeSectionWork();
+  }
+  observeButtons() {
+    DGet("button.btn-prefs").addEventListener("click", this.onOpen.bind(this));
+    DGet("button.btn-close-prefs").addEventListener("click", this.onClose.bind(this));
+    DGet("button.btn-save-prefs").addEventListener("click", this.onSave.bind(this));
+  }
+  observeFields() {
+    Object.keys(this.data).forEach((prop) => {
+      this.field(prop).addEventListener("change", this.onChangePref.bind(this, prop));
+    });
+    this.fieldsReady = true;
   }
   get section() {
     return DGet("section#preferences");
@@ -255,7 +282,7 @@ class Work {
   static init() {
     this.getCurrent();
     prefs.init();
-    Flash.notice("L'application est prête.");
+    Flash.notice("App is ready.");
   }
   static currentWork;
   static async addTimeToCurrentWork(time) {

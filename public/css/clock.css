@@ -6,7 +6,6 @@ div#clock {
   text-align: center;
   width: 240px;
   background-color: inherit;
-  color: rgb(56, 207, 53);
   z-index: 100;
 }
 
@@ -18,7 +17,7 @@ div#clock.big {
   font-size: 100pt;
 }
 
-div#clock.mediane {
+div#clock.medium {
   position: absolute;
   font-size: 40pt;
   top: 7px;
@@ -29,4 +28,10 @@ div#clock.mini {
   position: absolute;
   font-size: 16pt;
   top: 25px;
+}
+body.dark div#clock {
+  color: rgb(56, 207, 53);
+}
+body.light div#clock {
+  color:rgb(63 90 202);
 }

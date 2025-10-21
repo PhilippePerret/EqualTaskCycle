@@ -1,13 +1,15 @@
+import { Clock } from "../lib/Clock";
 import type { PrefsDataType } from "../lib/types";
 import { HOST } from "./js/constants";
 import { DGet, stopEvent } from "./js/dom";
 import { Flash } from "./js/flash";
 import { ui } from "./ui";
 
+
 export class Prefs {
+
   private data!: PrefsDataType;
-
-
+  private fieldsReady: boolean = false;
 
   private static instance: Prefs;
   private constructor(){}
@@ -16,9 +18,7 @@ export class Prefs {
   }
 
   public init(){
-    DGet('button.btn-prefs').addEventListener('click', this.onOpen.bind(this));
-    DGet('button.btn-close-prefs').addEventListener('click', this.onClose.bind(this));
-    DGet('button.btn-save-prefs').addEventListener('click', this.onSave.bind(this));
+    this.observeButtons();
   }
 
   /**
@@ -41,6 +41,17 @@ export class Prefs {
     return false;
   }
 
+  onChangePref(prop: string, ev: Event){
+    const value = this.getValue(prop);
+    switch(prop) {
+      case 'clock':
+        Clock.setClockStyle(value); break;
+      case 'theme':
+        ui.setUITheme(value); break;
+      default:
+        // Nothing to do
+    }
+  }
   onOpen(ev: MouseEvent){
     this.open();    
     return stopEvent(ev);
@@ -52,29 +63,35 @@ export class Prefs {
 
 
   public setData(data: PrefsDataType){
-    console.log("Data prefs", data);
+    // console.log("Data prefs", data);
     this.data = data;
+    this.fieldsReady || this.observeFields();
     Object.entries(this.data).forEach(([k , v]) => {
-      switch(k) {
-        case 'random':
-          this.field(k).checked = v;
-          break;
-        default:
-          this.field(k).value = v;
-      }
+      this.setValue(k, v);
     });
   }
   private getData(){
-    Object.entries(this.data).forEach(([k , v]) => {
-      switch(k) {
-        case 'random':
-          Object.assign(this.data, {[k]: this.field(k).checked});
-          break;
-        default:
-          Object.assign(this.data, {[k]: this.field(k).value});
-      }
+    Object.entries(this.data).forEach(([k , _v]) => {
+      Object.assign(this.data, {[k]: this.getValue(k)});
     });
     return this.data;
+  }
+
+  private getValue(prop: string) {
+    switch(prop) {
+      case 'random':
+        return this.field('random').checked;
+      default:
+        return this.field(prop).value;
+    }
+  }
+  private setValue(prop: string, value: string | boolean){
+    switch(prop) {
+      case 'random':
+        this.field('random').checked = value; break;
+      default:
+        this.field(prop).value = value;
+    }
   }
 
   private field(key: string){
@@ -89,6 +106,18 @@ export class Prefs {
     this.section.classList.remove('hidden');
     ui.closeSectionWork();
   }
+
+  private observeButtons(){
+    DGet('button.btn-prefs').addEventListener('click', this.onOpen.bind(this));
+    DGet('button.btn-close-prefs').addEventListener('click', this.onClose.bind(this));
+    DGet('button.btn-save-prefs').addEventListener('click', this.onSave.bind(this));
+  }
+  private observeFields(){
+    Object.keys(this.data).forEach((prop: string) => {
+      this.field(prop).addEventListener('change', this.onChangePref.bind(this, prop));
+    });
+    this.fieldsReady = true;
+  } 
 
   private get section(){
     return DGet('section#preferences');

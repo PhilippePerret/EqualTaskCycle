@@ -1,7 +1,3 @@
-// public/js/constants.js
-var PORT = 3002;
-var HOST = `http://localhost:${PORT}/`;
-
 // public/js/dom.js
 function DGet(selector, container) {
   if (container === undefined) {
@@ -14,6 +10,75 @@ function stopEvent(ev) {
   ev.preventDefault();
   return false;
 }
+
+// lib/Clock.ts
+class Clock {
+  static time2horloge(mn) {
+    let hrs = Math.floor(mn / 60);
+    let mns = mn % 60;
+    let horloge = [];
+    mns > 0 && horloge.push(`${mns} mns`);
+    hrs > 0 && horloge.push(`${hrs} hrs`);
+    if (horloge.length) {
+      return horloge.join(" ");
+    } else {
+      return "---";
+    }
+  }
+  static setClockStyle(style) {
+    this.clockObj.classList.add(style);
+  }
+  static timer;
+  static startTime;
+  static timeLeft;
+  static totalTime;
+  static start() {
+    this.clockObj.classList.remove("hidden");
+    if (this.timeLeft === undefined) {
+      this.timeLeft = 0;
+      this.clockObj.innerHTML = "0:00:00";
+    }
+    this.startTime = new Date().getTime();
+    this.timer = setInterval(this.run.bind(this), 1000);
+  }
+  static getStartTime() {
+    return this.startTime;
+  }
+  static pause() {
+    clearInterval(this.timer);
+    this.timeLeft += this.lapsFromStart();
+  }
+  static stop() {
+    clearInterval(this.timer);
+    this.totalTime = this.timeLeft + this.lapsFromStart();
+    this.timeLeft = undefined;
+    this.clockObj.classList.add("hidden");
+    return this.totalTime;
+  }
+  static run() {
+    this.clockObj.innerHTML = this.s2h(this.timeLeft + this.lapsFromStart());
+  }
+  static lapsFromStart() {
+    return Math.round((new Date().getTime() - this.startTime) / 1000);
+  }
+  static get clockObj() {
+    return this._clockobj || (this._clockobj = DGet("#clock"));
+  }
+  static _clockobj;
+  static s2h(s) {
+    let h = Math.floor(s / 3600);
+    s = s % 3600;
+    let m = Math.floor(s / 60);
+    const mstr = m < 10 ? `0${m}` : String(m);
+    s = s % 60;
+    const sstr = s < 10 ? `0${s}` : String(s);
+    return `${h}:${mstr}:${sstr}`;
+  }
+}
+
+// public/js/constants.js
+var PORT = 3002;
+var HOST = `http://localhost:${PORT}/`;
 
 // public/js/flash.js
 class Flash {
@@ -106,78 +171,13 @@ class FlashMessage {
   }
 }
 
-// lib/Clock.ts
-class Clock {
-  static time2horloge(mn) {
-    let hrs = Math.floor(mn / 60);
-    let mns = mn % 60;
-    let horloge = [];
-    mns > 0 && horloge.push(`${mns} mns`);
-    hrs > 0 && horloge.push(`${hrs} hrs`);
-    if (horloge.length) {
-      return horloge.join(" ");
-    } else {
-      return "---";
-    }
-  }
-  static setClockStyle(style) {
-    this.clockObj.classList.add(style);
-  }
-  static timer;
-  static startTime;
-  static timeLeft;
-  static totalTime;
-  static start() {
-    this.clockObj.classList.remove("hidden");
-    if (this.timeLeft === undefined) {
-      this.timeLeft = 0;
-      this.clockObj.innerHTML = "0:00:00";
-    }
-    this.startTime = new Date().getTime();
-    this.timer = setInterval(this.run.bind(this), 1000);
-  }
-  static getStartTime() {
-    return this.startTime;
-  }
-  static pause() {
-    clearInterval(this.timer);
-    this.timeLeft += this.lapsFromStart();
-  }
-  static stop() {
-    clearInterval(this.timer);
-    this.totalTime = this.timeLeft + this.lapsFromStart();
-    this.timeLeft = undefined;
-    this.clockObj.classList.add("hidden");
-    return this.totalTime;
-  }
-  static run() {
-    this.clockObj.innerHTML = this.s2h(this.timeLeft + this.lapsFromStart());
-  }
-  static lapsFromStart() {
-    return Math.round((new Date().getTime() - this.startTime) / 1000);
-  }
-  static get clockObj() {
-    return this._clockobj || (this._clockobj = DGet("#clock"));
-  }
-  static _clockobj;
-  static s2h(s) {
-    let h = Math.floor(s / 3600);
-    s = s % 3600;
-    let m = Math.floor(s / 60);
-    const mstr = m < 10 ? `0${m}` : String(m);
-    s = s % 60;
-    const sstr = s < 10 ? `0${s}` : String(s);
-    return `${h}:${mstr}:${sstr}`;
-  }
-}
-
 // public/client.ts
 class Work {
   data;
   static init() {
     this.getCurrent();
     prefs.init();
-    Flash.notice("L'application est prête.");
+    Flash.notice("App is ready.");
   }
   static currentWork;
   static async addTimeToCurrentWork(time) {
@@ -447,15 +447,14 @@ var ui = UI.getInstance();
 // public/prefs.ts
 class Prefs {
   data;
+  fieldsReady = false;
   static instance;
   constructor() {}
   static getInstance() {
     return this.instance || (this.instance = new Prefs);
   }
   init() {
-    DGet("button.btn-prefs").addEventListener("click", this.onOpen.bind(this));
-    DGet("button.btn-close-prefs").addEventListener("click", this.onClose.bind(this));
-    DGet("button.btn-save-prefs").addEventListener("click", this.onSave.bind(this));
+    this.observeButtons();
   }
   async onSave(ev) {
     stopEvent(ev);
@@ -472,6 +471,18 @@ class Prefs {
     }
     return false;
   }
+  onChangePref(prop, ev) {
+    const value = this.getValue(prop);
+    switch (prop) {
+      case "clock":
+        Clock.setClockStyle(value);
+        break;
+      case "theme":
+        ui.setUITheme(value);
+        break;
+      default:
+    }
+  }
   onOpen(ev) {
     this.open();
     return stopEvent(ev);
@@ -481,29 +492,34 @@ class Prefs {
     return stopEvent(ev);
   }
   setData(data) {
-    console.log("Data prefs", data);
     this.data = data;
+    this.fieldsReady || this.observeFields();
     Object.entries(this.data).forEach(([k, v]) => {
-      switch (k) {
-        case "random":
-          this.field(k).checked = v;
-          break;
-        default:
-          this.field(k).value = v;
-      }
+      this.setValue(k, v);
     });
   }
   getData() {
-    Object.entries(this.data).forEach(([k, v]) => {
-      switch (k) {
-        case "random":
-          Object.assign(this.data, { [k]: this.field(k).checked });
-          break;
-        default:
-          Object.assign(this.data, { [k]: this.field(k).value });
-      }
+    Object.entries(this.data).forEach(([k, _v]) => {
+      Object.assign(this.data, { [k]: this.getValue(k) });
     });
     return this.data;
+  }
+  getValue(prop) {
+    switch (prop) {
+      case "random":
+        return this.field("random").checked;
+      default:
+        return this.field(prop).value;
+    }
+  }
+  setValue(prop, value) {
+    switch (prop) {
+      case "random":
+        this.field("random").checked = value;
+        break;
+      default:
+        this.field(prop).value = value;
+    }
   }
   field(key) {
     return DGet(`#prefs-${key}`, this.section) || console.error("Le champ 'prefs-%s' est introuvable", key);
@@ -515,6 +531,17 @@ class Prefs {
   open() {
     this.section.classList.remove("hidden");
     ui.closeSectionWork();
+  }
+  observeButtons() {
+    DGet("button.btn-prefs").addEventListener("click", this.onOpen.bind(this));
+    DGet("button.btn-close-prefs").addEventListener("click", this.onClose.bind(this));
+    DGet("button.btn-save-prefs").addEventListener("click", this.onSave.bind(this));
+  }
+  observeFields() {
+    Object.keys(this.data).forEach((prop) => {
+      this.field(prop).addEventListener("change", this.onChangePref.bind(this, prop));
+    });
+    this.fieldsReady = true;
   }
   get section() {
     return DGet("section#preferences");
