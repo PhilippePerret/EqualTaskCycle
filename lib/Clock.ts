@@ -1,4 +1,6 @@
 import { DGet } from "../public/js/dom";
+import { ui } from "../public/ui";
+import type { Work } from "../public/client";
 
 export class Clock {
 
@@ -6,23 +8,21 @@ export class Clock {
     let hrs = Math.floor(mn / 60);
     let mns = mn % 60;
     let horloge: string | string[] = [];
-    hrs > 0 && horloge.push(`${hrs}`);
-    mns > 0 && horloge.push(`${mns}`);
-    if ( horloge.length ) {
-      horloge.push('00');
-      return horloge.join(':');
-    } else {
-      return '---';
-    }
+    horloge.push(`${hrs}`);
+    horloge.push(`${mns>9?'':'0'}${mns}’`);
+    // horloge.push('00');
+    return horloge.join(' h ');
   }
 
   /**
-   * Affectation du style
+   * Affectation du style de l'horloge
+   * (3 tailles, de très gros à petit)
    */
   public static setClockStyle(style: string){
     this.clockObj.classList.add(style);
   }
 
+  private static currentWork: Work;
   private static timer: NodeJS.Timeout;
   private static startTime: number;
   private static timeLeft?: number;
@@ -31,7 +31,8 @@ export class Clock {
   /**
    * Démarrage de l'horloge
    */
-  public static start(){
+  public static start(currentWork: Work){
+    this.currentWork = currentWork;
     // console.log("Démarrage de l'horloge");
     this.clockObj.classList.remove('hidden');
     if ( undefined === this.timeLeft ) {
@@ -58,7 +59,28 @@ export class Clock {
   }
 
   private static run(){
-    this.clockObj.innerHTML = this.s2h((this.timeLeft as number) + this.lapsFromStart() );
+    const secondesOfWork: number = (this.timeLeft as number) + this.lapsFromStart()
+    this.clockObj.innerHTML = this.s2h(secondesOfWork);
+    // Si le temps restant est inférieur à 10 minutes et que
+    // l'alerte n'a pas été donnée, on signale la fin imminente
+    // par un changement de couleur
+    if ( this.taskRestTime(secondesOfWork / 60) < 10 && this.alerte10minsDone === false) {
+      this.donneAlerte10mins();
+      this.alerte10minsDone = true;
+    }
+  }; 
+  private static alerte10minsDone: boolean = false;
+
+  private static donneAlerte10mins(){
+    ui.setBackgroundColorAt('orange');
+  }
+
+  /**
+   * Retourne le nombre de minutes restantes avant la fin.
+   * Attention, la méthode est appelée toutes les demi-secondes.
+   */
+  private static taskRestTime(minutesOfWork: number): number {
+    return this.currentWork.restTime - minutesOfWork;
   }
 
   private static lapsFromStart(){

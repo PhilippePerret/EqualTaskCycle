@@ -54,6 +54,7 @@ export class Work {
       Flash.error('No active task. Set the task list.');
       return false;
     } else {
+      ui.resetBackgroundColor();
       this.displayWork(retour.task, retour.options);
       return true;
     }
@@ -77,6 +78,7 @@ export class Work {
   public get id(){ return this.data.id; }
   public get script(): string | undefined {return this.data.script}
   public get folder(): string | undefined {return this.data.folder}
+  public get restTime(): number {return this.data.restTime}
 
   /**
    * Méthode d'instance pour sauver le temps

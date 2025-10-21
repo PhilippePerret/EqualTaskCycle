@@ -11,7 +11,7 @@ div#clock {
 
 div#clock.big {
   position: absolute;
-  left: 200px;
+  left: 130px;
   top: 150px;
   text-align: center;
   font-size: 100pt;

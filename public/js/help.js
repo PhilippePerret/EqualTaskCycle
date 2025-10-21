@@ -1255,23 +1255,20 @@ class Clock {
     let hrs = Math.floor(mn / 60);
     let mns = mn % 60;
     let horloge = [];
-    hrs > 0 && horloge.push(`${hrs}`);
-    mns > 0 && horloge.push(`${mns}`);
-    if (horloge.length) {
-      horloge.push("00");
-      return horloge.join(":");
-    } else {
-      return "---";
-    }
+    horloge.push(`${hrs}`);
+    horloge.push(`${mns > 9 ? "" : "0"}${mns}’`);
+    return horloge.join(" h ");
   }
   static setClockStyle(style) {
     this.clockObj.classList.add(style);
   }
+  static currentWork;
   static timer;
   static startTime;
   static timeLeft;
   static totalTime;
-  static start() {
+  static start(currentWork) {
+    this.currentWork = currentWork;
     this.clockObj.classList.remove("hidden");
     if (this.timeLeft === undefined) {
       this.timeLeft = 0;
@@ -1295,7 +1292,19 @@ class Clock {
     return this.totalTime;
   }
   static run() {
-    this.clockObj.innerHTML = this.s2h(this.timeLeft + this.lapsFromStart());
+    const secondesOfWork = this.timeLeft + this.lapsFromStart();
+    this.clockObj.innerHTML = this.s2h(secondesOfWork);
+    if (this.taskRestTime(secondesOfWork / 60) < 10 && this.alerte10minsDone === false) {
+      this.donneAlerte10mins();
+      this.alerte10minsDone = true;
+    }
+  }
+  static alerte10minsDone = false;
+  static donneAlerte10mins() {
+    ui.setBackgroundColorAt("orange");
+  }
+  static taskRestTime(minutesOfWork) {
+    return this.currentWork.restTime - minutesOfWork;
   }
   static lapsFromStart() {
     return Math.round((new Date().getTime() - this.startTime) / 1000);
@@ -1545,6 +1554,7 @@ class Work {
       Flash.error("No active task. Set the task list.");
       return false;
     } else {
+      ui.resetBackgroundColor();
       this.displayWork(retour.task, retour.options);
       return true;
     }
@@ -1565,6 +1575,9 @@ class Work {
   }
   get folder() {
     return this.data.folder;
+  }
+  get restTime() {
+    return this.data.restTime;
   }
   async addTimeAndSave(time) {
     this.data.totalTime += time;
@@ -1644,6 +1657,12 @@ class UI {
   setUITheme(theme) {
     document.body.className = theme;
   }
+  setBackgroundColorAt(color) {
+    document.body.style.backgroundColor = color;
+  }
+  resetBackgroundColor() {
+    document.body.style.backgroundColor = "";
+  }
   toggleHelp() {
     if (this.isSectionOpen("help")) {
       this.closeSection("help");
@@ -1685,7 +1704,7 @@ class UI {
   onStart(ev) {
     this.mask([this.btnStart]);
     this.reveal([this.btnStop, this.btnPause]);
-    Clock.start();
+    Clock.start(Work.currentWork);
   }
   onStop(ev) {
     this.mask([this.btnStop, this.btnPause]);

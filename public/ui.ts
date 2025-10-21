@@ -21,6 +21,7 @@ interface ButtonType {
 
 
 export class UI {
+
   private static instance: UI;
   private constructor(){}
   public static getInstance(){
@@ -34,6 +35,15 @@ export class UI {
     document.body.className = theme;
   }
 
+  /**
+   * Pour modifier le fond (en cas d'alerte)
+   */
+  public setBackgroundColorAt(color: string) {
+    document.body.style.backgroundColor = color;
+  }
+  public resetBackgroundColor(){
+    document.body.style.backgroundColor = '';
+  }
   /**
    * Pour basculer sur l'aide
    */
@@ -89,7 +99,7 @@ export class UI {
   private onStart(ev: Event){
     this.mask([this.btnStart]);
     this.reveal([this.btnStop, this.btnPause]);
-    Clock.start();
+    Clock.start(Work.currentWork);
   }
 
   /**
