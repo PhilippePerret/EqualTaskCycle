@@ -81,14 +81,18 @@ Pour qu’une tâche devienne « prioritaire » (juste être exécutée avant 
 
 #### Détail des paramètres
 
-| Nom     | description                                                  | notes                                                        |
-| ------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| id      | Identifiant de la tâche                                      | Très important car sert à identifier la tâches/le travail partout dans le programme. |
-| project | Nom du projet auquel appartient la tâche                     |                                                              |
-| content | Le contenu proprement dit de la tâche, donc ce qu’il faut faire. | Le texte peut être assez long et suffisamment informatif pour |
-|         |                                                              |                                                              |
+| Nom           | description                                                  | notes                                                        |
+| ------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| id            | Identifiant de la tâche                                      | Très important car sert à identifier la tâches/le travail partout dans le programme. |
+| project       | Nom du projet auquel appartient la tâche                     |                                                              |
+| content       | Le contenu proprement dit de la tâche, donc ce qu’il faut faire. | Le texte peut être assez long et suffisamment informatif pour |
+| duration      | Optionnellement, la durée de travail par cycle               | Par essence, chaque tâche devrait se voir affecter le même temps de travail. Mais cette donnée permet de donner plus d’importance à certaines tâches. |
+| folder        | Dossier du projet                                            | Ce dossier peut être ouvert à l’aide du bouton « Folder » de l’interface. |
+| startupScript | Script de démarrage du projet                                | Permet de lancer un script de démarrage (par exemple pour créer automatiquement une nouvelle version d’un fichier, simplement en cliquant sur le bouton « Script » de l’interface. |
+| active        | [Optionnel] true si la tâche est active                      | Par défaut, c’est true, mais permet de désactiver un travail sans le retirer du fichier |
+|               |                                                              |                                                              |
 
-
+​	
 
 ### Mode aléatoire
 
