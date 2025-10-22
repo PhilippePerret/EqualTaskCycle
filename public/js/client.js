@@ -15,6 +15,31 @@ function stopEvent(ev) {
 var PORT = 3002;
 var HOST = `http://localhost:${PORT}/`;
 
+// public/activityTracker.ts
+class ActivityTracker {
+  static CHECK_INTERVAL = 10 * 1000;
+  static timer;
+  static startControl() {
+    this.timer = setInterval(this.control.bind(this), this.CHECK_INTERVAL);
+  }
+  static stopControl() {
+    clearInterval(this.timer);
+    delete this.timer;
+  }
+  static async control() {
+    const response = await fetch(HOST + "work/check-activity", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        projectFolder: Work.currentWork.folder,
+        lastCheck: Date.now() - this.CHECK_INTERVAL
+      })
+    });
+    const result = await response.json();
+    console.log("résultat du check:", result);
+  }
+}
+
 // public/js/flash.js
 class Flash {
   static init() {}
@@ -170,16 +195,19 @@ class UI {
     this.mask([this.btnStart]);
     this.reveal([this.btnStop, this.btnPause]);
     Clock.start(Work.currentWork);
+    ActivityTracker.startControl();
   }
   onStop(ev) {
     this.mask([this.btnStop, this.btnPause]);
     this.reveal([this.btnStart]);
+    ActivityTracker.stopControl();
     const workTime = Clock.stop();
     Work.addTimeToCurrentWork(Math.round(workTime / 60));
   }
   onPause(ev) {
     this.mask([this.btnPause]);
     this.reveal([this.btnStart]);
+    ActivityTracker.stopControl();
     Clock.pause();
   }
   async onChange(ev) {

@@ -6,8 +6,8 @@ import { prefs } from './lib/prefs_server_side';
 import { runtime } from './lib/runtime';
 import { existsSync } from 'fs';
 import { execFileSync, execSync } from 'child_process';
-import { Clock } from './lib/Clock';
 import type { RecType, WorkType } from './lib/types';
+import { activTracker } from './lib/activityTracker';
 
 const app = express();
 
@@ -22,6 +22,24 @@ function log(msg: string, data: any = undefined) {
     console.log(msg);
   }
 }
+
+app.post('/work/check-activity', async (req, res) => {
+  log("-> /work/check-activity");
+  const dreq = req.body;
+  const folder: string = dreq.projectFolder;
+  const lastCheck = dreq.lastCheck;
+  const isActive = await activTracker.watchActivity(folder, lastCheck);
+  console.log('isActive:', isActive, 'folder:', folder, 'lastCheck:', lastCheck, 'date', new Date(lastCheck));
+  let response: RecType;
+  if (!isActive) {
+    console.log("-> Alerte pour demander de confirmer le travail.");
+    response = await activTracker.askUserIfWorking();
+    console.log("Réponse de l'utilisateur : ", response);
+  } else {
+    response = {userIsWorking: true};
+  }
+  res.json(response)
+});
 
 app.post('/work/save-times', (req, res) => {
   log("-> /work/save-times");

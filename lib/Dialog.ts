@@ -11,7 +11,8 @@
  *    title: "Le titre du message",
  *    buttons: [ // boutons dans l'ordre
  *      {text: "OK", onclick: <methode to call>},
- *      idem
+ *      idem (ajouter 'default: true' pour le bouton par défaut et 
+ *      'cancel: true' pour le bouton d'annulation)
  *    ],
  *    icon: '/path/to/icon.png',
  *    timeout: <nombre secondes>, // si la fenêtre doit se fermer toute seule
@@ -130,9 +131,6 @@ export class Dialog {
     // Valeurs par défaut
     if (this.defaultButton === undefined) {
       this.defaultButton = this.buttonList[this.buttonList.length - 1] as string;
-    }
-    if (this.cancelButton === undefined && this.buttonList.length > 1) {
-      this.cancelButton = this.buttonList[0] as string;
     }
   }
 

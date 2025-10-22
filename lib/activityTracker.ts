@@ -6,6 +6,68 @@
  */
 import fs from 'fs';
 import path from 'path';
+import { Dialog } from './Dialog';
+
+const fileWatcher = new Worker('./lib/ActivityTracker_worker.ts');
+
+export class ActivityTracker /* SERVER */ {
+  public static getInstance(){
+    return this._inst || (this._inst = new ActivityTracker());
+  }; private static _inst: ActivityTracker;
+  private constructor(){}
+
+
+  // Partie Watcher
+  private get watcher(){
+    return this._watcher || (this._watcher = fileWatcher)
+  }; 
+  private _watcher?: Worker;
+
+  /**
+   * @api
+   * 
+   * Lancement du watcher qui essaie de trouver un fichier modifié 
+   * dans le projet dans le quart d'heure précédent
+   */
+  public watchActivity(folder: string, lastCheckAt: number): Promise<boolean> {
+    return new Promise((resolve) => {
+      const handler = (event: MessageEvent) => {
+        this.watcher.removeEventListener('message', handler);
+        resolve(event.data.active);
+      };
+      this.watcher.addEventListener('message', handler);
+      this.watcher.postMessage({ folder, lastCheckAt });
+    });
+  }
+
+  private on?: boolean; // true if user work
+
+  public async askUserIfWorking(){
+    await this.askIfActifDialog.show();
+    return {userIsWorking: this.on === true}
+  }
+
+  private get askIfActifDialog(){
+    return this._dialog || (this._dialog = this.getDialog())
+  }; private _dialog?: Dialog;
+
+  private onChooseActivityState(state: boolean, ev: Event) { this.on = state }
+
+  private getDialog(){
+    return new Dialog({
+      title: "Confirmation required",
+      message: "Are you still working on this task ?",
+      buttons: [
+        {text: "No, stopped", onclick: this.onChooseActivityState.bind(this, false)},
+        {text: "Yes, still", onclick: this.onChooseActivityState.bind(this, true)}
+      ],
+      timeout: 120,
+      onTimeout: this.onChooseActivityState.bind(this, false)
+    })
+  }
+}
+
+export const activTracker = ActivityTracker.getInstance();
 
 /**
  * @api
@@ -91,7 +153,7 @@ export function isUserWorkingOnProject(folder: string, lastCheckAt: number): boo
 }
 
 
-/* (ajouter un "/" devant pour effectuer le test)
+/* (ajouter un "/" devant pour effectuer le TEST)
 // TEST
 // ----
 // Toucher (touch) ce fichier pour que le test passe

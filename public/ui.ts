@@ -1,5 +1,6 @@
 import { Clock } from "../lib/Clock";
 import { Work } from "./client";
+import { ActivityTracker } from "./activityTracker";
 import { HOST } from "./js/constants";
 import { DGet } from "./js/dom";
 import { Flash } from "./js/flash";
@@ -100,6 +101,7 @@ export class UI {
     this.mask([this.btnStart]);
     this.reveal([this.btnStop, this.btnPause]);
     Clock.start(Work.currentWork);
+    ActivityTracker.startControl();
   }
 
   /**
@@ -109,12 +111,14 @@ export class UI {
   private onStop(ev: Event){
     this.mask([this.btnStop, this.btnPause]);
     this.reveal([this.btnStart]);
+    ActivityTracker.stopControl();
     const workTime: number = Clock.stop();
     Work.addTimeToCurrentWork(Math.round(workTime / 60));
   }
   private onPause(ev: Event){
     this.mask([this.btnPause]);
     this.reveal([this.btnStart]);
+    ActivityTracker.stopControl();
     Clock.pause();
   }
 

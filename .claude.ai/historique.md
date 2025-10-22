@@ -33,3 +33,15 @@
 - Modification de `main.js` : ajout webPreferences et listener IPC
 - Exposition de `window.electronAPI.bringToFront()` côté client
 - Test réussi avec setTimeout
+
+## Système de vérification d'activité (ActivityTracker)
+- Objectif : vérifier que l'utilisateur travaille encore sur le projet
+- Création de `lib/activityTracker.ts` : parcours récursif des dossiers, gestion symlinks, détection boucles
+- Création du Worker : `lib/ActivityTracker_worker.ts` avec API Worker Bun
+- Rationalisation du code : deux fichiers principaux (lib et public)
+- Dialog déplacé côté serveur (utilise osascript via Bun.$)
+- Route `/work/check-activity` : vérifie activité + affiche dialog si inactif
+- Correction bug majeur : dialog affiché systématiquement au lieu de seulement si isActive=false
+- Solution cache Bun : `sudo pkill -f "bun.*server"` nécessaire pour recompilation
+- Système fonctionnel : détecte l'inactivité et demande confirmation utilisateur
+- TODO : Côté client, interrompre le travail si pas de confirmation
