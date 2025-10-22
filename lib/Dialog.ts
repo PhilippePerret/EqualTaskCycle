@@ -104,7 +104,9 @@ export class Dialog {
     if (this.data.title){ o.push(`withTitle: "${this.formatted_title}",`)};
     if (this.data.timeout) { o.push(`givingUpAfter: ${this.data.timeout},`)};
     if (this.data.icon) { o.push(`withIcon: ${this.formatted_icon},`)};
-    o.push(`defaultButton: "${this.defaultButton}",`);
+    if (this.defaultButton) {
+      o.push(`defaultButton: "${this.defaultButton}",`);
+    }
     if ( this.cancelButton) {
       o.push(`cancelButton: "${this.cancelButton}",`);
     }
@@ -129,10 +131,6 @@ export class Dialog {
     // Affectations
     this.tableButtons = tblButtons;
     this.buttonList = boutons;
-    // Valeurs par défaut
-    if (this.defaultButton === undefined) {
-      this.defaultButton = this.buttonList[this.buttonList.length - 1] as string;
-    }
   }
 
   private get formatted_message(): string{
