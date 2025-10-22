@@ -104,7 +104,12 @@ class FlashMessage {
 
 // lib/Clock.ts
 class Clock {
-  static time2horloge(mn) {
+  static getInstance() {
+    return this._instance || (this._instance = new Clock);
+  }
+  static _instance;
+  constructor() {}
+  time2horloge(mn) {
     let hrs = Math.floor(mn / 60);
     let mns = mn % 60;
     let horloge = [];
@@ -112,40 +117,61 @@ class Clock {
     horloge.push(`${mns > 9 ? "" : "0"}${mns}’`);
     return horloge.join(" h ");
   }
-  static setClockStyle(style) {
+  setClockStyle(style) {
     this.clockObj.classList.add(style);
   }
-  static currentWork;
-  static timer;
-  static startTime;
-  static timeLeft;
-  static totalTime;
-  static start(currentWork) {
+  currentWork;
+  timer;
+  startTime;
+  totalTime;
+  currentTimeSegment;
+  timeSegments = [];
+  start(currentWork) {
     this.currentWork = currentWork;
     this.clockObj.classList.remove("hidden");
-    if (this.timeLeft === undefined) {
-      this.timeLeft = 0;
-      this.clockObj.innerHTML = "0:00:00";
-    }
+    this.clockObj.innerHTML = "0:00:00";
+    this.createTimeSegment();
+    this.calcTotalRecTime();
+    this.startTimer();
+  }
+  calcTotalRecTime() {
+    this.totalTime = this.timeSegments.filter((segTime) => segTime.laps !== undefined).reduce((accu, segTime) => accu + segTime.laps, 0);
+  }
+  restart() {
+    this.createTimeSegment();
+    this.startTimer();
+  }
+  startTimer() {
     this.startTime = new Date().getTime();
     this.timer = setInterval(this.run.bind(this), 1000);
   }
-  static getStartTime() {
+  createTimeSegment() {
+    this.currentTimeSegment = { beg: new Date().getTime(), end: undefined };
+  }
+  endCurrentTimeSegment() {
+    const end = new Date().getTime();
+    const laps = end - this.currentTimeSegment.beg;
+    Object.assign(this.currentTimeSegment, { end, laps });
+    this.timeSegments.push(this.currentTimeSegment);
+    delete this.currentTimeSegment;
+    this.calcTotalRecTime();
+  }
+  getStartTime() {
     return this.startTime;
   }
-  static pause() {
+  pause() {
+    this.endCurrentTimeSegment();
     clearInterval(this.timer);
-    this.timeLeft += this.lapsFromStart();
   }
-  static stop() {
+  stop() {
     clearInterval(this.timer);
-    this.totalTime = this.timeLeft + this.lapsFromStart();
-    this.timeLeft = undefined;
+    delete this.timer;
+    this.endCurrentTimeSegment();
     this.clockObj.classList.add("hidden");
     return this.totalTime;
   }
-  static run() {
-    const secondesOfWork = this.timeLeft + this.lapsFromStart();
+  run() {
+    const secondesOfWork = this.totalTime + this.lapsFromStart();
     this.clockObj.innerHTML = this.s2h(secondesOfWork);
     if (this.taskRestTime(secondesOfWork) < 10 && this.alerte10minsDone === false) {
       this.donneAlerte10mins();
@@ -155,31 +181,31 @@ class Clock {
       }
     }
   }
-  static alerte10minsDone = false;
-  static alerteWorkDone = false;
-  static donneAlerte10mins() {
+  alerte10minsDone = false;
+  alerteWorkDone = false;
+  donneAlerte10mins() {
     ui.setBackgroundColorAt("orange");
     this.bringAppToFront();
     Flash.notice("10 minutes of work remaining");
     this.alerte10minsDone = true;
   }
-  static donneAlerteWorkDone() {
+  donneAlerteWorkDone() {
     this.bringAppToFront();
     Flash.notice("Work time is over. Please move on to the next task.");
     this.alerteWorkDone = true;
   }
-  static taskRestTime(minutesOfWork) {
+  taskRestTime(minutesOfWork) {
     minutesOfWork = minutesOfWork / 60;
     return this.currentWork.restTime - minutesOfWork;
   }
-  static lapsFromStart() {
+  lapsFromStart() {
     return Math.round((new Date().getTime() - this.startTime) / 1000);
   }
-  static get clockObj() {
+  get clockObj() {
     return this._clockobj || (this._clockobj = DGet("#clock"));
   }
-  static _clockobj;
-  static s2h(s) {
+  _clockobj;
+  s2h(s) {
     let h = Math.floor(s / 3600);
     s = s % 3600;
     let m = Math.floor(s / 60);
@@ -188,10 +214,11 @@ class Clock {
     const sstr = s < 10 ? `0${s}` : String(s);
     return `${h}:${mstr}:${sstr}`;
   }
-  static bringAppToFront() {
+  bringAppToFront() {
     window.electronAPI.bringToFront();
   }
 }
+var clock = Clock.getInstance();
 
 // public/js/constants.js
 var PORT = 3002;
@@ -228,7 +255,7 @@ class Prefs {
     const value = this.getValue(prop);
     switch (prop) {
       case "clock":
-        Clock.setClockStyle(value);
+        clock.setClockStyle(value);
         break;
       case "theme":
         ui.setUITheme(value);
@@ -1638,7 +1665,7 @@ class Work {
     const retour = await fetch(HOST + "task/current").then((r) => r.json());
     console.log("retour:", retour);
     prefs.setData(retour.prefs);
-    Clock.setClockStyle(retour.prefs.clock);
+    clock.setClockStyle(retour.prefs.clock);
     ui.setUITheme(retour.prefs.theme);
     if (retour.task.ok === false) {
       Flash.error("No active task. Set the task list.");
@@ -1678,9 +1705,9 @@ class Work {
     }
     if (this.data.cycleCount === 0) {
       this.data.cycleCount = 1;
-      this.data.startedAt = Clock.getStartTime();
+      this.data.startedAt = clock.getStartTime();
     }
-    this.data.lastWorkedAt = Clock.getStartTime();
+    this.data.lastWorkedAt = clock.getStartTime();
     console.log("[addTimeAndSave] Enregistrement des temps");
     const result = await fetch(HOST + "work/save-times", {
       method: "POST",
@@ -1714,7 +1741,7 @@ class Work {
           case "totalTime":
           case "cycleTime":
           case "restTime":
-            return Clock.time2horloge(v3);
+            return clock.time2horloge(v3);
           default:
             return v3;
         }
@@ -1735,12 +1762,15 @@ Work.init();
 class ActivityTracker {
   static CHECK_INTERVAL = 10 * 1000;
   static timer;
+  static lastCheckTime;
   static startControl() {
     this.timer = setInterval(this.control.bind(this), this.CHECK_INTERVAL);
   }
   static stopControl() {
-    clearInterval(this.timer);
-    delete this.timer;
+    if (this.timer) {
+      clearInterval(this.timer);
+      delete this.timer;
+    }
   }
   static async control() {
     const response = await fetch(HOST + "work/check-activity", {
@@ -1753,6 +1783,11 @@ class ActivityTracker {
     });
     const result = await response.json();
     console.log("résultat du check:", result);
+    if (result.userIsWorking === false) {
+      ui.onForceStop(this.lastCheckTime);
+    } else {
+      this.lastCheckTime = new Date().getTime();
+    }
   }
 }
 
@@ -1791,17 +1826,11 @@ class UI {
   isSectionOpen(name) {
     return !DGet("section#" + name).classList.contains("hidden");
   }
-  hide(eList) {
+  mask(eList) {
     eList.forEach((e) => e.obj.classList.add("hidden"));
   }
-  show(eList) {
-    eList.forEach((e) => e.obj.classList.remove("hidden"));
-  }
-  mask(eList) {
-    eList.forEach((e) => e.obj.classList.add("invisible"));
-  }
   reveal(eList) {
-    eList.forEach((e) => e.obj.classList.remove("invisible"));
+    eList.forEach((e) => e.obj.classList.remove("hidden"));
   }
   showButtons(states) {
     console.log("states", states);
@@ -1813,27 +1842,33 @@ class UI {
   openSection(name) {
     DGet("section#" + name).classList.remove("hidden");
   }
-  startDate;
-  stopDate;
-  pauseDate;
   onStart(ev) {
     this.mask([this.btnStart]);
+    clock.start(Work.currentWork);
     this.reveal([this.btnStop, this.btnPause]);
-    Clock.start(Work.currentWork);
+    ActivityTracker.startControl();
+  }
+  onRestart(ev) {
+    this.mask([this.btnRestart]);
+    clock.restart();
+    this.reveal([this.btnStop, this.btnPause]);
     ActivityTracker.startControl();
   }
   onStop(ev) {
-    this.mask([this.btnStop, this.btnPause]);
+    this.mask([this.btnStop, this.btnPause, this.btnRestart]);
     this.reveal([this.btnStart]);
     ActivityTracker.stopControl();
-    const workTime = Clock.stop();
+    const workTime = clock.stop();
     Work.addTimeToCurrentWork(Math.round(workTime / 60));
   }
   onPause(ev) {
     this.mask([this.btnPause]);
-    this.reveal([this.btnStart]);
+    this.reveal([this.btnRestart]);
     ActivityTracker.stopControl();
-    Clock.pause();
+    clock.pause();
+  }
+  onForceStop(lastCheckTime) {
+    this.onStop(undefined);
   }
   async onChange(ev) {
     ev && stopEvent2(ev);
@@ -1879,6 +1914,7 @@ class UI {
     return false;
   }
   btnStart;
+  btnRestart;
   btnPause;
   btnStop;
   btnChange;
@@ -1945,6 +1981,14 @@ class UI {
       false,
       1,
       "Pour démarrer le travail sur cette tâche."
+    ],
+    [
+      "Restart",
+      "RESTART",
+      this.onRestart.bind(this),
+      false,
+      1,
+      "Pour redémarrer le travail sur cette tâche"
     ]
   ];
 }

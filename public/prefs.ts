@@ -1,4 +1,4 @@
-import { Clock } from "../lib/Clock";
+import { clock } from "../lib/Clock";
 import type { PrefsDataType } from "../lib/types";
 import { HOST } from "./js/constants";
 import { DGet, stopEvent } from "./js/dom";
@@ -45,7 +45,7 @@ export class Prefs {
     const value = this.getValue(prop);
     switch(prop) {
       case 'clock':
-        Clock.setClockStyle(value); break;
+        clock.setClockStyle(value); break;
       case 'theme':
         ui.setUITheme(value); break;
       default:

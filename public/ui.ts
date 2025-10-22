@@ -1,4 +1,4 @@
-import { Clock } from "../lib/Clock";
+import { clock } from "../lib/Clock";
 import { Work } from "./client";
 import { ActivityTracker } from "./activityTracker";
 import { HOST } from "./js/constants";
@@ -68,17 +68,17 @@ export class UI {
    * ATTENTION : eList n'est pas une liste d'HTMLElements mais une
    * list d'instance possédant un obj.
    */
-  public hide(eList: any[]) {
+  // public hide(eList: any[]) {
+  //   eList.forEach(e => e.obj.classList.add('hidden'));
+  // }
+  // public show(eList: any[]) {
+  //   eList.forEach(e => e.obj.classList.remove('hidden'));
+  // }
+  public mask(eList: any[]){
     eList.forEach(e => e.obj.classList.add('hidden'));
   }
-  public show(eList: any[]) {
-    eList.forEach(e => e.obj.classList.remove('hidden'));
-  }
-  public mask(eList: any[]){
-    eList.forEach(e => e.obj.classList.add('invisible'));
-  }
   public reveal(eList: any[]){
-    eList.forEach(e => e.obj.classList.remove('invisible'));
+    eList.forEach(e => e.obj.classList.remove('hidden'));
   }
 
   public showButtons(states: {[x: string]: boolean}):void {
@@ -93,14 +93,16 @@ export class UI {
     DGet('section#'+name).classList.remove('hidden');
   }
 
-  private startDate!: Date;
-  private stopDate!: Date;
-  private pauseDate!: Date;
-
   private onStart(ev: Event){
     this.mask([this.btnStart]);
+    clock.start(Work.currentWork);
     this.reveal([this.btnStop, this.btnPause]);
-    Clock.start(Work.currentWork);
+    ActivityTracker.startControl();
+  }
+  private onRestart(ev: Event){
+    this.mask([this.btnRestart]);
+    clock.restart();
+    this.reveal([this.btnStop, this.btnPause]);
     ActivityTracker.startControl();
   }
 
@@ -108,18 +110,32 @@ export class UI {
    * Pour stopper le travail. C'est cette méthode qui produit
    * l'enregistrement du temps de travail.
    */
-  private onStop(ev: Event){
-    this.mask([this.btnStop, this.btnPause]);
+  private onStop(ev: Event | undefined){
+    this.mask([this.btnStop, this.btnPause, this.btnRestart]);
     this.reveal([this.btnStart]);
     ActivityTracker.stopControl();
-    const workTime: number = Clock.stop();
+    const workTime: number = clock.stop();
     Work.addTimeToCurrentWork(Math.round(workTime / 60));
   }
+
   private onPause(ev: Event){
     this.mask([this.btnPause]);
-    this.reveal([this.btnStart]);
+    this.reveal([this.btnRestart]);
     ActivityTracker.stopControl();
-    Clock.pause();
+    clock.pause();
+  }
+
+  /**
+   * Fonction appelée lorsque l'user n'est plus en activité, soit
+   * parce qu'il l'a confirmé en cliquant le bouton lui demandant
+   * s'il était toujours en activité, soit parce qu'il n'a pas
+   * répondu à cette demande. Dans ce cas, on arrête le chronomètre
+   * et on retire le temps depuis la dernière vérification de l'ac-
+   * tivité
+   * @api
+   */
+  public onForceStop(lastCheckTime: number){
+    this.onStop(undefined);
   }
 
   // Méthode appelée pour changer de tâche courante
@@ -175,6 +191,7 @@ export class UI {
   }
   
   private btnStart?: Button;
+  private btnRestart?: Button;
   private btnPause?: Button;
   private btnStop?: Button;
   private btnChange?: Button;
@@ -208,6 +225,9 @@ export class UI {
           "Pour mettre le travail en pause."],
     ['Start', 'START', this.onStart.bind(this), false, 1,
       "Pour démarrer le travail sur cette tâche."],
+    ['Restart', 'RESTART', this.onRestart.bind(this), false, 1,
+      "Pour redémarrer le travail sur cette tâche"
+    ]
   ];
 }
 

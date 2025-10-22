@@ -1,4 +1,4 @@
-import { Clock } from "../lib/Clock.js";
+import { clock } from "../lib/Clock.js";
 import type { RecType, RunTimeInfosType, WorkType } from "../lib/types.js";
 import { HOST } from "./js/constants";
 import { DGet } from "./js/dom";
@@ -47,7 +47,7 @@ export class Work {
     .then(r => r.json() as RecType);
     console.log("retour:", retour);
     prefs.setData(retour.prefs);
-    Clock.setClockStyle(retour.prefs.clock);
+    clock.setClockStyle(retour.prefs.clock);
     ui.setUITheme(retour.prefs.theme);
     if (retour.task.ok === false) {
       // <= il n'y aucune tâche active
@@ -90,9 +90,9 @@ export class Work {
     if (this.data.restTime < 0) { this.data.restTime = 0; }
     if ( this.data.cycleCount === 0 ) {
       this.data.cycleCount = 1;
-      this.data.startedAt = Clock.getStartTime();
+      this.data.startedAt = clock.getStartTime();
     }
-    this.data.lastWorkedAt = Clock.getStartTime();
+    this.data.lastWorkedAt = clock.getStartTime();
     console.log("[addTimeAndSave] Enregistrement des temps")
     const result: RecType = 
       await fetch(HOST+'work/save-times', {
@@ -134,7 +134,7 @@ export class Work {
           case 'totalTime': 
           case 'cycleTime':
           case 'restTime':
-            return Clock.time2horloge(v);
+            return clock.time2horloge(v);
           default: 
             return v;
         }
