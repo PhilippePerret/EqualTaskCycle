@@ -1,9 +1,9 @@
 import { clock } from "../lib/Clock";
-import type { PrefsDataType } from "../lib/types";
-import { HOST } from "./js/constants";
+import type { PrefsDataType, RecType } from "../lib/types";
 import { DGet, stopEvent } from "./js/dom";
 import { Flash } from "./js/flash";
 import { ui } from "./ui";
+import { postToServer } from "./utils";
 
 
 export class Prefs {
@@ -22,15 +22,23 @@ export class Prefs {
   }
 
   /**
+   * Pour ouvrir le fichier des données
+   */
+  async onOpenDataFile(ev: MouseEvent){
+    stopEvent(ev);
+    const result = await postToServer('prefs/open-data-file', {
+      filePath: this.getValue('file')
+    })
+    if (result.ok) { Flash.success('File open with success.') } 
+    else { Flash.error('An error occured: ' + result.error) }
+  }
+
+  /**
    * Fonction appelée pour sauver les données de préférence
    */
   async onSave(ev: MouseEvent){
     stopEvent(ev);
-    const result = await fetch(HOST + 'prefs/save', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(this.getData())
-    }).then(r => r.json());
+    const result: RecType = await postToServer('prefs/save', this.getData());
     // console.log("result = ", result);
     if (result.ok) {
       this.close();
@@ -111,6 +119,7 @@ export class Prefs {
     DGet('button.btn-prefs').addEventListener('click', this.onOpen.bind(this));
     DGet('button.btn-close-prefs').addEventListener('click', this.onClose.bind(this));
     DGet('button.btn-save-prefs').addEventListener('click', this.onSave.bind(this));
+    DGet('button.btn-open-datafile').addEventListener('click', this.onOpenDataFile.bind(this));
   }
   private observeFields(){
     Object.keys(this.data).forEach((prop: string) => {

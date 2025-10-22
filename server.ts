@@ -126,6 +126,22 @@ app.post('/task/change', (req, res) => {
   res.json(result);
 });
 
+app.post('/prefs/open-data-file', (req, res) => {
+  const dreq = req.body;
+  const fpath = dreq.filePath
+  let report = {ok: true, error: ''};
+  if (existsSync(fpath)) {
+    try {
+      execSync(`open "${fpath}"`);
+    } catch(err) {
+      console.log('ERR: ' + err);
+      report = {ok: false, error: 'ERROR DURING OPEN DATA FILE (see console)'}
+    }
+  } else {
+    report = {ok: false, error: 'File "'+fpath+'" unfound…'}
+  }
+  res.json(report);
+})
 app.post('/prefs/save', (req, res) => {
   const report = prefs.save(req.body);
   res.json(report);

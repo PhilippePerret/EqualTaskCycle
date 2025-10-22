@@ -1473,6 +1473,15 @@ var clock = Clock.getInstance();
 var PORT = 3002;
 var HOST = `http://localhost:${PORT}/`;
 
+// public/utils.ts
+async function postToServer(route, data) {
+  return await fetch(HOST + route, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  }).then((r) => r.json());
+}
+
 // public/prefs.ts
 class Prefs {
   data;
@@ -1485,13 +1494,20 @@ class Prefs {
   init() {
     this.observeButtons();
   }
+  async onOpenDataFile(ev) {
+    stopEvent(ev);
+    const result = await postToServer("prefs/open-data-file", {
+      filePath: this.getValue("file")
+    });
+    if (result.ok) {
+      Flash.success("File open with success.");
+    } else {
+      Flash.error("An error occured: " + result.error);
+    }
+  }
   async onSave(ev) {
     stopEvent(ev);
-    const result = await fetch(HOST + "prefs/save", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(this.getData())
-    }).then((r) => r.json());
+    const result = await postToServer("prefs/save", this.getData());
     if (result.ok) {
       this.close();
       Flash.success("Preferences saved.");
@@ -1565,6 +1581,7 @@ class Prefs {
     DGet("button.btn-prefs").addEventListener("click", this.onOpen.bind(this));
     DGet("button.btn-close-prefs").addEventListener("click", this.onClose.bind(this));
     DGet("button.btn-save-prefs").addEventListener("click", this.onSave.bind(this));
+    DGet("button.btn-open-datafile").addEventListener("click", this.onOpenDataFile.bind(this));
   }
   observeFields() {
     Object.keys(this.data).forEach((prop) => {
