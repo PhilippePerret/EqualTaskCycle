@@ -62,7 +62,8 @@ export class ActivityTracker /* SERVER */ {
         {text: "Yes, still", onclick: this.onChooseActivityState.bind(this, true)}
       ],
       timeout: 120,
-      onTimeout: this.onChooseActivityState.bind(this, false)
+      onTimeout: this.onChooseActivityState.bind(this, false),
+      icon: process.env.APP_ICON_PATH
     })
   }
 }

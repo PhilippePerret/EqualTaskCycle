@@ -176,10 +176,8 @@ class Clock {
   }
   run() {
     const secondesOfWork = this.totalTime + this.lapsFromStart();
-    console.log("totalTime: %i | fromStart: %i", this.totalTime, this.lapsFromStart());
     this.clockObj.innerHTML = this.s2h(secondesOfWork);
     const restTime = this.taskRestTime(secondesOfWork);
-    console.log("restTime = %i", restTime);
     if (restTime < 10 && this.alerte10minsDone === false) {
       this.donneAlerte10mins();
     } else if (this.alerte10minsDone) {
@@ -1770,7 +1768,7 @@ Work.init();
 class ActivityTracker {
   static CHECK_INTERVAL = 5 * 60 * 1000;
   static timer;
-  static lastCheckTime;
+  static inactiveUser;
   static startControl() {
     this.timer = setInterval(this.control.bind(this), this.CHECK_INTERVAL);
   }
@@ -1778,6 +1776,15 @@ class ActivityTracker {
     if (this.timer) {
       clearInterval(this.timer);
       delete this.timer;
+    }
+  }
+  static inactiveUserCorrection(workingTime) {
+    console.log("Working time : ", workingTime);
+    if (this.inactiveUser) {
+      console.log("Working time rectifié : ", workingTime - this.CHECK_INTERVAL / 2 / 1000);
+      return workingTime - this.CHECK_INTERVAL / 2 / 1000;
+    } else {
+      return workingTime;
     }
   }
   static async control() {
@@ -1791,10 +1798,9 @@ class ActivityTracker {
     });
     const result = await response.json();
     console.log("résultat du check:", result);
-    if (result.userIsWorking === false) {
-      ui.onForceStop(this.lastCheckTime);
-    } else {
-      this.lastCheckTime = new Date().getTime();
+    this.inactiveUser = result.userIsWorking === false;
+    if (this.inactiveUser) {
+      ui.onForceStop();
     }
   }
 }
@@ -1866,7 +1872,7 @@ class UI {
     this.mask([this.btnStop, this.btnPause, this.btnRestart]);
     this.reveal([this.btnStart]);
     ActivityTracker.stopControl();
-    const workTime = clock.stop();
+    const workTime = ActivityTracker.inactiveUserCorrection(clock.stop());
     Work.addTimeToCurrentWork(Math.round(workTime / 60));
   }
   onPause(ev) {
@@ -1875,7 +1881,7 @@ class UI {
     ActivityTracker.stopControl();
     clock.pause();
   }
-  onForceStop(lastCheckTime) {
+  onForceStop() {
     this.onStop(undefined);
   }
   async onChange(ev) {

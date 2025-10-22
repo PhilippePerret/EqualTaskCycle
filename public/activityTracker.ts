@@ -7,7 +7,7 @@ export class ActivityTracker /* CLIENT */ {
   // private static CHECK_INTERVAL = 15 * 60 * 1000;
   private static CHECK_INTERVAL = 5 * 60 * 1000;
   private static timer: NodeJS.Timeout | undefined;
-  private static lastCheckTime: number;
+  private static inactiveUser: boolean;
 
   public static startControl(){
     this.timer = setInterval(this.control.bind(this), this.CHECK_INTERVAL)
@@ -17,6 +17,16 @@ export class ActivityTracker /* CLIENT */ {
     if (this.timer) {
       clearInterval(this.timer);
       delete this.timer;
+    }
+  }
+
+  public static inactiveUserCorrection(workingTime: number): number {
+    console.log("Working time : ", workingTime);
+    if ( this.inactiveUser ) {
+      console.log("Working time rectifié : ", workingTime - ((this.CHECK_INTERVAL / 2) / 1000))
+      return workingTime - ((this.CHECK_INTERVAL / 2) / 1000);
+    } else {
+      return workingTime;
     }
   }
 
@@ -32,12 +42,8 @@ export class ActivityTracker /* CLIENT */ {
       
     const result = await response.json();
     console.log("résultat du check:", result);
-    if (result.userIsWorking === false) {
-      ui.onForceStop(this.lastCheckTime)
-    } else {
-      this.lastCheckTime = new Date().getTime();
-    }
+    this.inactiveUser = result.userIsWorking === false;
+    if (this.inactiveUser) { ui.onForceStop() }
 
-    //TODO POURSUIVRE
   }
 }

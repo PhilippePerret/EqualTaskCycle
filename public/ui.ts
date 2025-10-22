@@ -114,7 +114,7 @@ export class UI {
     this.mask([this.btnStop, this.btnPause, this.btnRestart]);
     this.reveal([this.btnStart]);
     ActivityTracker.stopControl();
-    const workTime: number = clock.stop();
+    const workTime: number =  ActivityTracker.inactiveUserCorrection(clock.stop());
     Work.addTimeToCurrentWork(Math.round(workTime / 60));
   }
 
@@ -131,12 +131,15 @@ export class UI {
    * s'il était toujours en activité, soit parce qu'il n'a pas
    * répondu à cette demande. Dans ce cas, on arrête le chronomètre
    * et on retire le temps depuis la dernière vérification de l'ac-
-   * tivité
+   * tivité.
+   * 
+   * On ne peut pas être sûr que la dernière tranche de vérification
+   * a été travaillé ou non, on coupe la poire en deux (donc on va
+   * retirer la moitié de la durée entre deux vérification).
+   * 
    * @api
    */
-  public onForceStop(lastCheckTime: number){
-    this.onStop(undefined);
-  }
+  public onForceStop(){ this.onStop(undefined) }
 
   // Méthode appelée pour changer de tâche courante
   private async onChange(ev: Event){

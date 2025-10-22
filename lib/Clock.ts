@@ -114,10 +114,10 @@ class Clock {
 
   private run(){
     const secondesOfWork: number = this.totalTime + this.lapsFromStart();
-    console.log("totalTime: %i | fromStart: %i", this.totalTime, this.lapsFromStart());
+    // console.log("totalTime: %i | fromStart: %i", this.totalTime, this.lapsFromStart());
     this.clockObj.innerHTML = this.s2h(secondesOfWork);
     const restTime = this.taskRestTime(secondesOfWork);
-    console.log("restTime = %i", restTime);
+    // console.log("restTime = %i", restTime);
     if ( restTime < 10 && this.alerte10minsDone === false) {
       // 10 minutes restantes sur ce travail
       this.donneAlerte10mins();

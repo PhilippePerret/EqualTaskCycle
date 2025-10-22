@@ -23,7 +23,11 @@ app.whenReady().then(() => {
   const serverPath = path.join(__dirname, '..', 'server.ts');
   server = spawn('bun', ['run', serverPath], {
     cwd: path.join(__dirname, '..'),
-    env: { ...process.env, USER_DATA_PATH: userDataPath }
+    env: { 
+      ...process.env, 
+      USER_DATA_PATH: userDataPath,
+      APP_ICON_PATH: ICON_PATH
+    }
   });
   
   if (server) {
