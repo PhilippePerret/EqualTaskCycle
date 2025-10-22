@@ -17,7 +17,7 @@ var HOST = `http://localhost:${PORT}/`;
 
 // public/activityTracker.ts
 class ActivityTracker {
-  static CHECK_INTERVAL = 10 * 1000;
+  static CHECK_INTERVAL = 5 * 60 * 1000;
   static timer;
   static lastCheckTime;
   static startControl() {
@@ -412,6 +412,9 @@ class Clock {
   totalTime;
   currentTimeSegment;
   timeSegments = [];
+  getTime() {
+    return Math.round(new Date().getTime() / 1000);
+  }
   start(currentWork) {
     this.currentWork = currentWork;
     this.timeSegments = [];
@@ -429,14 +432,14 @@ class Clock {
     this.startTimer();
   }
   startTimer() {
-    this.startTime = new Date().getTime();
+    this.startTime = this.getTime();
     this.timer = setInterval(this.run.bind(this), 1000);
   }
   createTimeSegment() {
-    this.currentTimeSegment = { beg: new Date().getTime(), end: undefined, laps: undefined };
+    this.currentTimeSegment = { beg: this.getTime(), end: undefined, laps: undefined };
   }
   endCurrentTimeSegment() {
-    const end = new Date().getTime();
+    const end = this.getTime();
     const laps = end - this.currentTimeSegment.beg;
     Object.assign(this.currentTimeSegment, { end, laps });
     this.timeSegments.push(this.currentTimeSegment);
@@ -489,7 +492,7 @@ class Clock {
     return this.currentWork.restTime - minutesOfWork;
   }
   lapsFromStart() {
-    return Math.round((new Date().getTime() - this.startTime) / 1000);
+    return Math.round(this.getTime() - this.startTime);
   }
   get clockObj() {
     return this._clockobj || (this._clockobj = DGet("#clock"));

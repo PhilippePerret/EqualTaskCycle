@@ -5,7 +5,7 @@ import { ui } from "./ui";
 export class ActivityTracker /* CLIENT */ {
 
   // private static CHECK_INTERVAL = 15 * 60 * 1000;
-  private static CHECK_INTERVAL = 10 * 1000;
+  private static CHECK_INTERVAL = 5 * 60 * 1000;
   private static timer: NodeJS.Timeout | undefined;
   private static lastCheckTime: number;
 

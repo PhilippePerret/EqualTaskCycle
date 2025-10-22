@@ -40,6 +40,8 @@ class Clock {
   private currentTimeSegment!: TimeSegment;
   private timeSegments: TimeSegment[] = [];
 
+  private getTime(){ return Math.round(new Date().getTime() / 1000) }
+
   /**
    * Démarrage de l'horloge
    */
@@ -72,15 +74,15 @@ class Clock {
   }
 
   private startTimer(){
-    this.startTime = new Date().getTime();
+    this.startTime = this.getTime() ;
     this.timer = setInterval(this.run.bind(this), 1000);
   }
   
   private createTimeSegment(){
-    this.currentTimeSegment = {beg: new Date().getTime(), end: undefined, laps: undefined}
+    this.currentTimeSegment = {beg: this.getTime(), end: undefined, laps: undefined}
   }
   private endCurrentTimeSegment(){
-    const end = new Date().getTime();
+    const end = this.getTime();
     const laps = end - this.currentTimeSegment.beg;
     Object.assign(this.currentTimeSegment, {end: end, laps: laps});
     this.timeSegments.push(this.currentTimeSegment);
@@ -152,7 +154,7 @@ class Clock {
   }
 
   private lapsFromStart(){
-    return Math.round((new Date().getTime() - this.startTime) / 1000) ;
+    return Math.round(this.getTime() - this.startTime) ;
   }
 
   private get clockObj() {

@@ -78,7 +78,7 @@ div#buttons-container div#row2 {
 }
 
 button {
-  padding: 0.6em 1em 0.5em;
+  padding: 0.6em 0 0.5em;
   font-size: inherit;
   border-radius: 8px;
 }
