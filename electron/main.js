@@ -66,3 +66,8 @@ app.whenReady().then(() => {
 
 });
 
+/**
+ * Quand on quitte l'application (donc Electron), il faut aussi
+ * quitter le processus Bun de l'application (le serveur).
+ */
+app.on('before-quit', () => { if (server) { server.kill() } });
