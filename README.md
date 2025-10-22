@@ -106,3 +106,10 @@ En développement, il faut parfois détruire les processus :
 sudo pkill -f "bun.*server"
 ~~~
 
+Pour voir s’il reste un processus sur le port 3002 (réservé à cette application), jouer : 
+
+~~~shell
+lsof -i :3002
+~~~
+
+Ça donne le numéro du processus qui tourne sur ce port.

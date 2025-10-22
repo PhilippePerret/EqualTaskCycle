@@ -96,11 +96,12 @@ app.whenReady().then(() => {
  * quitter le processus Bun de l'application (le serveur).
  */
 app.on('before-quit', () => {
-  if (server) {
-    server.kill('SIGTERM');
-    // If it's not enough, force after 1 sec
-    setTimeout(() => {
-      if (server && !server.killed) { server.kill('SIGKILL') }
-    }, 1000);
+  if (server && server.pid) {
+    try {
+      // Tuer le groupe de processus entier
+      process.kill(-server.pid, 'SIGTERM');
+    } catch(e) {
+      console.error('Error killing server:', e);
+    }
   }
 });
