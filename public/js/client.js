@@ -189,7 +189,6 @@ class UI {
     eList.forEach((e) => e.obj.classList.remove("hidden"));
   }
   showButtons(states) {
-    console.log("states", states);
     this.buttons.forEach((bouton) => bouton.setState(states[bouton.id]));
   }
   closeSection(name) {
@@ -465,6 +464,7 @@ class Clock {
   pause() {
     this.endCurrentTimeSegment();
     clearInterval(this.timer);
+    this.clockContainer.classList.add("hidden");
   }
   stop() {
     clearInterval(this.timer);

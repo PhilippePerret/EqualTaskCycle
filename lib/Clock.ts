@@ -101,6 +101,7 @@ class Clock {
   public pause(){
     this.endCurrentTimeSegment();
     clearInterval(this.timer);
+    this.clockContainer.classList.add('hidden');
   }
 
   /**

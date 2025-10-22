@@ -82,7 +82,7 @@ export class UI {
   }
 
   public showButtons(states: {[x: string]: boolean}):void {
-    console.log("states", states);
+    // console.log("states", states);
     this.buttons.forEach((bouton: Button) => bouton.setState(states[bouton.id] as boolean));
   };
   
