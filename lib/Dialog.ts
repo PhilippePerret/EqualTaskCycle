@@ -66,6 +66,7 @@ export class Dialog {
   async show(values: string[] | undefined = undefined){
     this._built || this.build();
     const detempCode = this.detemplatize(String(this.code), values);
+    console.log("detempCode = ", detempCode);
     const retour = await Bun.$`osascript -l JavaScript -e ${detempCode}`;
     const dRes = retour.json();
     if (dRes.gaveUp) {
@@ -102,7 +103,7 @@ export class Dialog {
     o.push(`const res = app.displayDialog("${this.formatted_message}", {`);
     if (this.data.title){ o.push(`withTitle: "${this.formatted_title}",`)};
     if (this.data.timeout) { o.push(`givingUpAfter: ${this.data.timeout},`)};
-    if (this.data.icon) { o.push(`withIcon: "${this.formatted_icon}",`)};
+    if (this.data.icon) { o.push(`withIcon: ${this.formatted_icon},`)};
     o.push(`defaultButton: "${this.defaultButton}",`);
     if ( this.cancelButton) {
       o.push(`cancelButton: "${this.cancelButton}",`);

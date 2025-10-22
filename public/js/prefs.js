@@ -1844,8 +1844,12 @@ class Clock {
     horloge.push(`${mns > 9 ? "" : "0"}${mns}’`);
     return horloge.join(" h ");
   }
+  get clockContainer() {
+    return this._clockcont || (this._clockcont = DGet("div#clock-container"));
+  }
+  _clockcont;
   setClockStyle(style) {
-    this.clockObj.classList.add(style);
+    this.clockContainer.classList.add(style);
   }
   currentWork;
   timer;
@@ -1859,7 +1863,7 @@ class Clock {
   start(currentWork) {
     this.currentWork = currentWork;
     this.timeSegments = [];
-    this.clockObj.classList.remove("hidden");
+    this.clockContainer.classList.remove("hidden");
     this.clockObj.innerHTML = "0:00:00";
     this.createTimeSegment();
     this.calcTotalRecTime();
@@ -1870,6 +1874,7 @@ class Clock {
   }
   restart() {
     this.createTimeSegment();
+    this.clockContainer.classList.remove("hidden");
     this.startTimer();
   }
   startTimer() {
@@ -1898,7 +1903,7 @@ class Clock {
     clearInterval(this.timer);
     delete this.timer;
     this.endCurrentTimeSegment();
-    this.clockObj.classList.add("hidden");
+    this.clockContainer.classList.add("hidden");
     return this.totalTime;
   }
   run() {

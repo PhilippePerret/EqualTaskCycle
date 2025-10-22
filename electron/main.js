@@ -1,4 +1,4 @@
-const { existsSync } = require('fs');
+const { existsSync, writeFileSync, unlinkSync, readFileSync } = require('fs');
 const { app, BrowserWindow } = require('electron');
 const { spawn } = require('child_process');
 const { HOST } = require('../public/js/constants');
@@ -8,8 +8,9 @@ let server = null;
 
 const path = require('path');
 
+const pidPath = path.join(userDataPath, 'serverPID'); // to kill it
 const ICON_PATH = path.join(path.resolve(__dirname, 'icon.png'));
-// const ICON_PATH = path.join(path.resolve(__dirname, 'icon.icns'));
+
 if (existsSync(ICON_PATH)) {
   // console.log("Icon path: ", ICON_PATH);
 } else {
@@ -17,6 +18,15 @@ if (existsSync(ICON_PATH)) {
 }
 
 app.name = "Equal Task Cycle";
+
+// If old pid exists, try to kill it again
+if (existsSync(pidPath)) {
+  const oldPid = readFileSync(pidPath, 'utf8');
+  try { process.kill(oldPid, 'SIGTERM'); } catch(e) {
+    console.error('Error when kill the old pid', e);
+  }
+  unlinkSync(pidPath);
+}
 
 app.whenReady().then(() => {
   app.dock.setIcon(ICON_PATH);
@@ -31,8 +41,12 @@ app.whenReady().then(() => {
   });
   
   if (server) {
+
+    writeFileSync(pidPath, server.pid.toString());
+
     server.stdout.on('data', (data) => console.log(`SERVER STDOUT: ${data}`));
     server.stderr.on('data', (data) => console.error(`SERVER STDERR: ${data}`));
+
   }
   
   const win = new BrowserWindow({
@@ -74,4 +88,12 @@ app.whenReady().then(() => {
  * Quand on quitte l'application (donc Electron), il faut aussi
  * quitter le processus Bun de l'application (le serveur).
  */
-app.on('before-quit', () => { if (server) { server.kill() } });
+app.on('before-quit', () => {
+  if (server) {
+    server.kill('SIGTERM');
+    // If it's not enough, force after 1 sec
+    setTimeout(() => {
+      if (server && !server.killed) { server.kill('SIGKILL') }
+    }, 1000);
+  }
+});

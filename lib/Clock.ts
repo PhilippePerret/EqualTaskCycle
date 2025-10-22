@@ -25,12 +25,17 @@ class Clock {
     return horloge.join(' h ');
   }
 
+  private get clockContainer(){
+    return this._clockcont || (this._clockcont = DGet('div#clock-container'))
+  }; 
+  private _clockcont?: HTMLDivElement;
+
   /**
    * Affectation du style de l'horloge
    * (3 tailles, de très gros à petit)
    */
   public setClockStyle(style: string){
-    this.clockObj.classList.add(style);
+    this.clockContainer.classList.add(style);
   }
 
   private currentWork!: Work;
@@ -49,7 +54,7 @@ class Clock {
     this.currentWork = currentWork;
     // console.log("Démarrage de l'horloge");
     this.timeSegments = [];
-    this.clockObj.classList.remove('hidden');
+    this.clockContainer.classList.remove('hidden');
     this.clockObj.innerHTML = '0:00:00';
     this.createTimeSegment();
     this.calcTotalRecTime();
@@ -70,6 +75,7 @@ class Clock {
    */
   public restart(){
     this.createTimeSegment();
+    this.clockContainer.classList.remove('hidden');
     this.startTimer();
   }
 
@@ -108,7 +114,7 @@ class Clock {
     clearInterval(this.timer);
     delete (this as any).timer;
     this.endCurrentTimeSegment();
-    this.clockObj.classList.add('hidden');
+    this.clockContainer.classList.add('hidden');
     return this.totalTime;
   }
 

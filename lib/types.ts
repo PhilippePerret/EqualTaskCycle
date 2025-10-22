@@ -22,7 +22,7 @@ export interface RunTimeInfosType {
 
 export interface PrefsDataType {
   file?: string;
-  clock: 'mini' | 'mediane' | 'big';
+  clock: 'mini' | 'medium' | 'big';
   theme: 'dark' | 'light';
   random: boolean;
   shortest: boolean; 
