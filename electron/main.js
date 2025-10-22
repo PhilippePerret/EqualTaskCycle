@@ -22,9 +22,16 @@ app.name = "Equal Task Cycle";
 // If old pid exists, try to kill it again
 if (existsSync(pidPath)) {
   const oldPid = readFileSync(pidPath, 'utf8');
-  try { process.kill(oldPid, 'SIGTERM'); } catch(e) {
-    console.error('Error when kill the old pid', e);
+
+  try { 
+    process.kill(oldPid, 'SIGTERM'); 
+  } catch(e) {
+    // Ignore this error
+    if (e.code !== 'ESRCH') {
+      console.error('Error when kill the old pid', e);
+    }
   }
+
   unlinkSync(pidPath);
 }
 
