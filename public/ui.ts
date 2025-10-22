@@ -213,9 +213,9 @@ export class UI {
     });
   } 
   DATA_BUTTONS: [string, string, Function, boolean, 1 | 2, string][] = [
-    ['runScript', 'RUN SCRIPT', this.onRunScript.bind(this), false, 2,
+    ['runScript', 'RUN', this.onRunScript.bind(this), false, 2,
       "Pour lancer le script défini au démarrage"],
-    ['openFolder', 'OPEN FOLDER', this.onOpenFolder.bind(this), false, 2,
+    ['openFolder', 'OPEN', this.onOpenFolder.bind(this), false, 2,
       "Pour ouvrir le dossier défini dans les données"],
     ['Change', 'CHANGE', this.onChange.bind(this), false, 2,
       "Pour changer de tâche (mais attention : une seule fois par session !"],

@@ -53,29 +53,29 @@ div#buttons-container {
   position: fixed;
   bottom: 2em;
   max-width: 680px;
-  width: 100%;
+  width: calc(100% - 4em);
   margin-top: 2em;
 }
 div#buttons-container button {
   margin-left: 0.5em;
 }
 
-div#buttons-container div#row1 {
+div#buttons-container div.row {
   text-align: right;
+  padding: 0 40px;
+}
+div#buttons-container div.row button {
+  width: 140px;
+}
+
+div#buttons-container div#row1 {
   font-size: 18pt;
 }
-div#buttons-container div#row1 button {
-  width: 180px;
-}
+
 div#buttons-container div#row2 {
-  text-align: right;
   font-size: 12pt;
   margin-top: 1em;
 }
-div#buttons-container div#row2 button {
-  width: 180px;
-}
-
 
 button {
   padding: 0.6em 1em 0.5em;

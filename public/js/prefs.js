@@ -1717,7 +1717,7 @@ class UI {
   DATA_BUTTONS = [
     [
       "runScript",
-      "RUN SCRIPT",
+      "RUN",
       this.onRunScript.bind(this),
       false,
       2,
@@ -1725,7 +1725,7 @@ class UI {
     ],
     [
       "openFolder",
-      "OPEN FOLDER",
+      "OPEN",
       this.onOpenFolder.bind(this),
       false,
       2,
@@ -1847,6 +1847,7 @@ class Clock {
   timeSegments = [];
   start(currentWork) {
     this.currentWork = currentWork;
+    this.timeSegments = [];
     this.clockObj.classList.remove("hidden");
     this.clockObj.innerHTML = "0:00:00";
     this.createTimeSegment();
@@ -1854,7 +1855,7 @@ class Clock {
     this.startTimer();
   }
   calcTotalRecTime() {
-    this.totalTime = this.timeSegments.filter((segTime) => segTime.laps !== undefined).reduce((accu, segTime) => accu + segTime.laps, 0);
+    this.totalTime = this.timeSegments.filter((segTime) => !!segTime.laps).reduce((accu, segTime) => accu + segTime.laps, 0);
   }
   restart() {
     this.createTimeSegment();
@@ -1865,7 +1866,7 @@ class Clock {
     this.timer = setInterval(this.run.bind(this), 1000);
   }
   createTimeSegment() {
-    this.currentTimeSegment = { beg: new Date().getTime(), end: undefined };
+    this.currentTimeSegment = { beg: new Date().getTime(), end: undefined, laps: undefined };
   }
   endCurrentTimeSegment() {
     const end = new Date().getTime();
@@ -1891,11 +1892,14 @@ class Clock {
   }
   run() {
     const secondesOfWork = this.totalTime + this.lapsFromStart();
+    console.log("totalTime: %i | fromStart: %i", this.totalTime, this.lapsFromStart());
     this.clockObj.innerHTML = this.s2h(secondesOfWork);
-    if (this.taskRestTime(secondesOfWork) < 10 && this.alerte10minsDone === false) {
+    const restTime = this.taskRestTime(secondesOfWork);
+    console.log("restTime = %i", restTime);
+    if (restTime < 10 && this.alerte10minsDone === false) {
       this.donneAlerte10mins();
     } else if (this.alerte10minsDone) {
-      if (this.alerteWorkDone === false && this.taskRestTime(secondesOfWork) < 0) {
+      if (this.alerteWorkDone === false && restTime < 0) {
         this.donneAlerteWorkDone();
       }
     }
