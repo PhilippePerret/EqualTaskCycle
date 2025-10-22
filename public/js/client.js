@@ -202,6 +202,7 @@ class UI {
     clock.start(Work.currentWork);
     this.reveal([this.btnStop, this.btnPause]);
     ActivityTracker.startControl();
+    Flash.notice("STOP + ⌘ = Don’t add & save time");
   }
   onRestart(ev) {
     this.mask([this.btnRestart]);
@@ -213,8 +214,13 @@ class UI {
     this.mask([this.btnStop, this.btnPause, this.btnRestart]);
     this.reveal([this.btnStart]);
     ActivityTracker.stopControl();
-    const workTime = ActivityTracker.inactiveUserCorrection(clock.stop());
-    Work.addTimeToCurrentWork(Math.round(workTime / 60));
+    console.log("ev", ev);
+    if (ev && (ev.shiftKey || ev.metaKey)) {
+      Flash.notice("I don’t add & save time");
+    } else {
+      const workTime = ActivityTracker.inactiveUserCorrection(clock.stop());
+      Work.addTimeToCurrentWork(Math.round(workTime / 60));
+    }
   }
   onPause(ev) {
     this.mask([this.btnPause]);
@@ -362,7 +368,7 @@ class Button {
     this[state ? "show" : "hide"]();
   }
   onClick(ev) {
-    this.data.onclick();
+    this.data.onclick(ev);
     return stopEvent2(ev);
   }
   build() {

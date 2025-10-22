@@ -98,6 +98,7 @@ export class UI {
     clock.start(Work.currentWork);
     this.reveal([this.btnStop, this.btnPause]);
     ActivityTracker.startControl();
+    Flash.notice('STOP + ⌘ = Don’t add & save time');
   }
   private onRestart(ev: Event){
     this.mask([this.btnRestart]);
@@ -110,12 +111,17 @@ export class UI {
    * Pour stopper le travail. C'est cette méthode qui produit
    * l'enregistrement du temps de travail.
    */
-  private onStop(ev: Event | undefined){
+  private onStop(ev: MouseEvent | undefined){
     this.mask([this.btnStop, this.btnPause, this.btnRestart]);
     this.reveal([this.btnStart]);
     ActivityTracker.stopControl();
-    const workTime: number =  ActivityTracker.inactiveUserCorrection(clock.stop());
-    Work.addTimeToCurrentWork(Math.round(workTime / 60));
+    console.log("ev", ev);
+    if (ev && (ev.shiftKey || ev.metaKey)) {
+      Flash.notice('I don’t add & save time');
+    } else {
+      const workTime: number =  ActivityTracker.inactiveUserCorrection(clock.stop());
+      Work.addTimeToCurrentWork(Math.round(workTime / 60));
+    }
   }
 
   private onPause(ev: Event){
@@ -250,7 +256,7 @@ class Button {
   }
 
   onClick(ev: MouseEvent){
-    this.data.onclick();
+    this.data.onclick(ev);
     return stopEvent(ev);
   }
 
