@@ -119,6 +119,7 @@ export class Work {
     this.dispatchData();
     ui.showButtons({
       Start: true,
+      Restart: false,
       Stop: false,
       Pause: false,
       Change: options.canChange,

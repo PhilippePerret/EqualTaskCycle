@@ -1507,6 +1507,7 @@ class Work {
     this.dispatchData();
     ui.showButtons({
       Start: true,
+      Restart: false,
       Stop: false,
       Pause: false,
       Change: options.canChange,
@@ -1750,7 +1751,7 @@ class UI {
       "Pause",
       "PAUSE",
       this.onPause.bind(this),
-      false,
+      true,
       1,
       "Pour mettre le travail en pause."
     ],
@@ -1766,9 +1767,9 @@ class UI {
       "Restart",
       "RESTART",
       this.onRestart.bind(this),
-      false,
+      true,
       1,
-      "Pour redémarrer le travail sur cette tâche"
+      "Pour redémarrer le travail sur cette tâche."
     ]
   ];
 }
@@ -1806,10 +1807,10 @@ class Button {
     return this;
   }
   show() {
-    this.obj.classList.remove("invisible");
+    this.obj.classList.remove("hidden");
   }
   hide() {
-    this.obj.classList.add("invisible");
+    this.obj.classList.add("hidden");
   }
   get id() {
     return this.data.id;

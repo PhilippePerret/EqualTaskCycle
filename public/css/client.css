@@ -53,6 +53,7 @@ div#buttons-container {
   position: fixed;
   bottom: 2em;
   max-width: 680px;
+  width: 100%;
   margin-top: 2em;
 }
 div#buttons-container button {

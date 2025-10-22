@@ -221,13 +221,12 @@ export class UI {
       "Pour changer de tâche (mais attention : une seule fois par session !"],
     ['Stop', 'STOP', this.onStop.bind(this), true, 1, 
         "Pour arrêter la tâche et passer à la suivante (éviter…)"],
-    ['Pause', 'PAUSE', this.onPause.bind(this), false, 1,
+    ['Pause', 'PAUSE', this.onPause.bind(this), true, 1,
           "Pour mettre le travail en pause."],
     ['Start', 'START', this.onStart.bind(this), false, 1,
       "Pour démarrer le travail sur cette tâche."],
-    ['Restart', 'RESTART', this.onRestart.bind(this), false, 1,
-      "Pour redémarrer le travail sur cette tâche"
-    ]
+    ['Restart', 'RESTART', this.onRestart.bind(this), true, 1,
+      "Pour redémarrer le travail sur cette tâche."]
   ];
 }
 
@@ -266,10 +265,10 @@ class Button {
     return this;  // chainage
   }
   show(){
-    this.obj.classList.remove('invisible');
+    this.obj.classList.remove('hidden');
   }
   hide(){
-    this.obj.classList.add('invisible');
+    this.obj.classList.add('hidden');
   }
 
   public get id(){ return this.data.id; }
