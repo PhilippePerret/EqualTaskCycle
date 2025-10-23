@@ -69,20 +69,37 @@
   </section>
 
   <!--
-    SECTION POUR ÉDITER LES TÂCHES
+    SECTION POUR L'ÉDITION (TÂCHES et CONFIG DATA)
   -->
   <section id="editing" class="hidden">
     <h2>Task Editing</h2>
-    <p>[Ici on va pouvoir éditer les tâches]</p>
-    <div id="editing-gene-container">
+    <div id="editing-config-container">
+
+
+      <h3>Config Data</h3>
       <!-- Pour mettre les données générales, comme le temps d'édition par défaut -->
-      [ICI LES GÉNÉRALITÉS]
+      
+      <div class="row-flex">
+        <label>Default duration</label>
+        <input id="config-data-duration" type="number" max="1000" min="15" default="120">
+        <label>minutes</label>
+      </div>
+
+      <div class="row-flex">
+        <label>UI Theme</label>
+        <select id="config-data-theme">
+          <option value="dark">Dark</option>
+          <option value="light">Light</option>
+        </select>
+      </div>
+
     </div>
+
     <h3>Tasks <span class="small">(<span id="tasks-count">---</span>)</span></h3>
     <div id="editing-tasks-container">
       <!-- Container pour afficher et éditer les tâches -->
     </div>
-    <!-- TÂCHE À CLONE -->
+    <!-- TÂCHE À CLONER -->
     <div class="editing-task-form hidden" data-id="0" style="width:600px;">
       <input 
         type="hidden" class="form-task-id" value="" />

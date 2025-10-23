@@ -128,11 +128,11 @@ div.buttons {
   margin-bottom: 0.5em;
 }
 .row-flex label {
-  flex: 0 0 120px;
+  flex: 0 0 140px;
 }
 .row label:first-child {
   display:inline-block;
-  width: 120px;
+  width: 140px;
 }
 .row label:first-child + input {
   margin-left: -5px;

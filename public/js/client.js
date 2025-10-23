@@ -1999,18 +1999,63 @@ help.init();
 var WorkProps = ["active", "id", "project", "content", "duration", "folder", "script"];
 
 // public/editing.ts
+var ConfigProperties = [
+  ["duration", 120],
+  ["theme", "light"]
+];
+
 class Editing {
   get section() {
     return DGet("section#editing");
   }
+  get configContainer() {
+    return this._configcont || (this._configcont = DGet("#editing-config-container", this.section));
+  }
+  _configcont;
   getAllData() {
-    return {};
+    const AllData = this.collectConfigData();
+    Object.assign(AllData, { works: this.collectTaskData() });
+    return AllData;
   }
-  setAllValues() {
-    this.editTasks();
-    this.setConfigData();
+  collectConfigData() {
+    const configData = {
+      duration: Number(this.getConfProp("duration")),
+      theme: this.getConfProp("theme")
+    };
+    return configData;
   }
-  async editTasks() {
+  getConfProp(prop) {
+    return DGet(`#config-data-${prop}`, this.configContainer).value;
+  }
+  setConfigData(data) {
+    ConfigProperties.forEach((paire) => {
+      const [prop, defaultValue] = paire;
+      this.setConfProp(prop, data[prop] || defaultValue);
+    });
+  }
+  setConfProp(prop, value) {
+    DGet(`#config-data-${prop}`, this.configContainer).value = value;
+  }
+  collectTaskData() {
+    const newTaskData = [];
+    this.taskContainer.querySelectorAll(".editing-task-form").forEach((form) => {
+      newTaskData.push(this.getTaskDataIn(form));
+    });
+    console.log("newTaskData = ", newTaskData);
+  }
+  getTaskDataIn(form) {
+    const taskData = {};
+    WorkProps.forEach((prop) => {
+      let value = DGet(`.task-form-${prop}`, form).value;
+      if (prop === "active") {
+        value = (0, eval)(value);
+      }
+      Object.assign(taskData, { [prop]: value });
+    });
+    return taskData;
+  }
+  async startEditing() {
+    ui.toggleSection("editing");
     const container = this.taskContainer;
     console.log("container", container);
     const formClone = this.section.querySelector(".editing-task-form");
@@ -2021,6 +2066,7 @@ class Editing {
     if (retour.ok === false) {
       return Flash.error(retour.error);
     }
+    this.setConfigData(retour.data);
     const works = retour.data.works;
     DGet("span#tasks-count", this.section).innerHTML = works.length;
     works.forEach((work) => {
@@ -2043,19 +2089,12 @@ class Editing {
   get taskContainer() {
     return DGet("div#editing-tasks-container");
   }
-  setConfigData() {
-    console.error("Je dois apprendre à renseigner les valeurs de configuration.");
-  }
   onAddTask() {
     Flash.notice("Je dois apprendre à ajouter une tâche.");
   }
   onSaveData() {
     Flash.error("Je dois apprendre à sauver les données.");
-    postToServer("/tasks/save", this.getAllData());
-  }
-  startEditing() {
-    ui.toggleSection("editing");
-    this.setAllValues();
+    console.log("On doit sauver les données : ", this.getAllData());
   }
   stopEditing() {
     ui.toggleSection("work");

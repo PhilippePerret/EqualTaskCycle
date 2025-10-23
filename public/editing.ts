@@ -10,31 +10,85 @@ interface AllDataType {
   works: WorkType;
 }
 
+interface ConfigDataType {
+  duration: number;
+  theme?: string;
+}
+const ConfigProperties: [string, any][] = [
+  ['duration', 120], 
+  ['theme', 'light']
+];
+
 class Editing {
 
   private get section(){ return DGet('section#editing')}
+  private get configContainer(){
+    return this._configcont || (this._configcont = DGet('#editing-config-container', this.section))
+  }; private _configcont!: HTMLDivElement;
 
   /**
    * Fonction retourne toutes les données pour les enregistrer
    * 
    */
   getAllData(): AllDataType{
-    return {} as AllDataType
+    const AllData = this.collectConfigData();
+    Object.assign(AllData, {works: this.collectTaskData()})
+    return AllData as AllDataType;
   }
 
   /**
-   * Fonction qui met dans la fenêtre toutes les valeurs  
-   * 
+   * Fonction qui relève et revoie les données de configuration générale
    */
-  setAllValues(){
-    this.editTasks();
-    this.setConfigData();
+  collectConfigData(): ConfigDataType {
+    const configData: ConfigDataType = {
+      duration: Number(this.getConfProp('duration')),
+      theme: this.getConfProp('theme')
+    }
+    return configData;
+  }
+  private getConfProp(prop: string): string {
+    return DGet(`#config-data-${prop}`, this.configContainer).value;
+  }
+
+  private setConfigData(data: RecType){
+    ConfigProperties.forEach((paire: [string, any]) => {
+      const [prop, defaultValue] = paire;
+      this.setConfProp(prop, data[prop] || defaultValue);
+    })
+  }
+  private setConfProp(prop: string, value: any): void {
+    DGet(`#config-data-${prop}`, this.configContainer).value = value;
   }
 
   /**
-   * Grande fonction qui édite les tâches
+   * Fonction qui relève (et renvoie) les données des tâches dans 
+   * la liste.
    */
-  async editTasks(){
+  collectTaskData(){
+    const newTaskData: WorkType[] = [];
+    this.taskContainer.querySelectorAll('.editing-task-form').forEach((form: HTMLDivElement) => {
+      newTaskData.push(this.getTaskDataIn(form));
+    })
+    console.log("newTaskData = ", newTaskData);
+  }
+
+  getTaskDataIn(form: HTMLDivElement): WorkType {
+    const taskData: RecType = {};
+    WorkProps.forEach((prop: string) => {
+      let value: string | boolean | number = DGet(`.task-form-${prop}`, form).value;
+      if (prop === 'active') { value = (0, eval)(value as string); }
+      Object.assign(taskData, {[prop]: value});
+    })
+    return taskData as WorkType;
+  }
+
+  /**
+   * Grande fonction qui remonte les données du fichier de donnée
+   * et prépare les formulaires des données de configuration et de 
+   * tâches
+   */
+  async startEditing(){
+    ui.toggleSection('editing');
     const container = this.taskContainer;
     console.log("container", container);
     const formClone = this.section.querySelector('.editing-task-form');
@@ -43,6 +97,9 @@ class Editing {
     const retour: RecType = await postToServer('tasks/all', {dataPath: prefs.getValue('file')});
     console.log("Retour de tasks/all", retour);
     if (retour.ok === false ) { return Flash.error(retour.error) }
+    // --- Données de configuration (générales) ---
+    this.setConfigData(retour.data);
+    // --- TACHES/WORKS ---
     const works = retour.data.works;
     // Indiquer le nombre de tâches
     DGet('span#tasks-count', this.section).innerHTML = works.length;
@@ -67,28 +124,16 @@ class Editing {
     return DGet('div#editing-tasks-container');
   }
 
-  setConfigData(){
-    console.error("Je dois apprendre à renseigner les valeurs de configuration.")
-  }
-
-
-
   onAddTask(){
     Flash.notice("Je dois apprendre à ajouter une tâche.")
   }
 
   onSaveData(){
     Flash.error("Je dois apprendre à sauver les données.")
-    postToServer('/tasks/save', this.getAllData());
+    console.log("On doit sauver les données : ", this.getAllData());
+    // postToServer('/tasks/save', this.getAllData());
   }
-  
-  /**
-   * Pour démarrer l'édition des tâches (en fait tout le fichier d'édition)
-   */
-  startEditing(){
-    ui.toggleSection('editing');
-    this.setAllValues();
-  }
+
 
   // Pour finir l'édition et revenir au panneau principal
   stopEditing(){
