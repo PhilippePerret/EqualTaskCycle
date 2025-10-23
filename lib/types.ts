@@ -26,4 +26,5 @@ export interface PrefsDataType {
   theme: 'dark' | 'light';
   random: boolean;
   shortest: boolean; 
+  counter: 'clock' | 'countdown';
 }

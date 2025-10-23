@@ -54,6 +54,8 @@ export class Prefs {
     switch(prop) {
       case 'clock':
         clock.setClockStyle(value); break;
+      case 'counter':
+        clock.setCounterMode(value); break;
       case 'theme':
         ui.setUITheme(value); break;
       default:

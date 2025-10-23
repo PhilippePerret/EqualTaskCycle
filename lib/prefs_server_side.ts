@@ -17,6 +17,7 @@ class Prefs {
     clock:  'big',
     theme:  'dark',
     random: true,
+    counter: 'clock', // Temps sous forme de compte à rebours
     shortest: false // => les plus longues d'abord
   }
 
@@ -41,7 +42,6 @@ class Prefs {
 
   save(data: RecType){
     // Sauvegarde du fichier de données des tâches
-    console.log("data prefs à save", data);
     const report: ReportType = {ok: true, errors: []};
     this.checkWorksFileValidity(data.file, report, data);
     // Todo Faire ici les autres checks nécessaires

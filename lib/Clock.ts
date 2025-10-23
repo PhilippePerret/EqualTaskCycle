@@ -1,6 +1,6 @@
 import { DGet } from "../public/js/dom";
 import { ui } from "../public/ui";
-import type { Work } from "../public/client";
+import { Work } from "../public/client";
 import { Flash } from "../public/js/flash";
 
 interface TimeSegment {
@@ -9,10 +9,16 @@ interface TimeSegment {
   laps?: number; // durée de ce segment
 }
 
+type CounterModeType = 'clock' | 'countdown'
+
+
 class Clock {
+
   public static getInstance(){return this._instance || (this._instance = new Clock())}
   private static _instance: Clock;
   private constructor(){}
+
+  private counterMode!: CounterModeType ;
 
 
   public time2horloge(mn: number) {
@@ -37,6 +43,14 @@ class Clock {
   public setClockStyle(style: string){
     this.clockContainer.classList.add(style);
   }
+  /**
+   * Affectation du mode de comptage, en mode "horloge" (défilage
+   * normal du temps) ou en mode "compte à rebours" (défilage du
+   * temps à rebours à partir du temps restant)
+   */
+  public setCounterMode(mode: CounterModeType = 'clock'){
+    this.counterMode = mode;
+  }
 
   private currentWork!: Work;
   private timer!: NodeJS.Timeout;
@@ -55,12 +69,30 @@ class Clock {
     // console.log("Démarrage de l'horloge");
     this.timeSegments = [];
     this.clockContainer.classList.remove('hidden');
-    this.clockObj.innerHTML = '0:00:00';
+    this.clockObj.innerHTML = this.startClockPerCounterMode();
     this.createTimeSegment();
     this.calcTotalRecTime();
     this.startTimer()
   }
 
+  private startClockPerCounterMode(): string {
+    if (this.counterMode === 'clock') {
+      return '0:00:00';
+    } else {
+      return this.s2h(this.currentWork.restTime * 60);
+    }
+  }
+
+  private get totalRestTimeSeconds(){
+    return this._totresttime || (this._totresttime = this.currentWork.restTime * 60)
+  }; private _totresttime!: number;
+
+  /**
+   * Calcul du temps complet de travail depuis le lancement de la 
+   * tâche, en sachant que ce travail peut être interrompu (mis en
+   * pause). Donc le temps total est enregistré en consignant chaque
+   * tranche de temps travaillée.
+   */
   private calcTotalRecTime(): void {
     this.totalTime = this.timeSegments
       .filter((segTime: TimeSegment) => !!segTime.laps)
@@ -122,7 +154,13 @@ class Clock {
   private run(){
     const secondesOfWork: number = this.totalTime + this.lapsFromStart();
     // console.log("totalTime: %i | fromStart: %i", this.totalTime, this.lapsFromStart());
-    this.clockObj.innerHTML = this.s2h(secondesOfWork);
+    let displayedSeconds: number;
+    if (this.counterMode === 'clock') { displayedSeconds = secondesOfWork}
+    else /* countdown */ { displayedSeconds = this.totalRestTimeSeconds - secondesOfWork}
+    /****************************************
+     * AFFICHAGE DU TEMPS DANS L'INTERFACE  *
+     ****************************************/
+    this.clockObj.innerHTML = this.s2h(displayedSeconds);
     const restTime = this.taskRestTime(secondesOfWork);
     // console.log("restTime = %i", restTime);
     if ( restTime < 10 && this.alerte10minsDone === false) {

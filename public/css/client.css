@@ -115,7 +115,7 @@ div.buttons {
   margin-bottom: 0.5em;
 }
 .row-flex label {
-  flex: 0 0 100px;
+  flex: 0 0 120px;
 }
 .row-flex input + label {
   flex: 1 1 auto;

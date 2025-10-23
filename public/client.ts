@@ -48,6 +48,7 @@ export class Work {
     console.log("retour:", retour);
     prefs.setData(retour.prefs);
     clock.setClockStyle(retour.prefs.clock);
+    clock.setCounterMode(retour.prefs.counter);
     ui.setUITheme(retour.prefs.theme);
     if (retour.task.ok === false) {
       // <= il n'y aucune tâche active

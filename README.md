@@ -4,6 +4,26 @@
 
 Par exemple, si nous avons 5 tâches, et un temps par défaut de 2 heures, les tâches seront proposées dans le désordre, jusqu'à ce que chacune ait été accomplie pendant au moins 2 heures avant que le cycle ne recommence.
 
+---
+
+<a name="travail-par-cycle"></a>
+
+## Travail par cyle
+
+L’idée principale de cette application est donc de permettre de travail par cycle, en consacrant un temps de travail dans l’idée identique à toutes les tâches (en gardant la possibilité de fixer une durée de tranche de travail spécifique à chaque tâche, quand c’est nécessaire (et suivant sa philosophie personnelle de travail.
+
+Ce mode par cycle permet de faire avancer plusieurs gros chantiers de front sans en laisser de côté. Il permet aussi, avec le [choix aléatoire des tâches](#random-tasks) de produire des journées de travail toujours différentes.
+
+---
+
+<a name="random-tasks"></a>
+
+### Choix aléatoire des tâches
+
+Pour produire des journées de travail toujours différentes et casser la routine de travail, ETC peut fonctionner en mode aléatoire au niveau du choix des tâches. Dans ce mode, les tâches seront choisies au hasard.
+
+Pour régler ce mode, rejoindre les préférences (⚙️) et choisir le mode « random ».
+
 ## Mode Electron
 
 Pour pouvoir enrouler l’application à l’intérieur d’une application *Electron*, nous avons besoin de mettre son code dans le dossier `./Electron`. Il faut donc veiller à être dans le bon dossier lorsqu’on joue une commande.
@@ -98,6 +118,12 @@ Pour qu’une tâche devienne « prioritaire » (juste être exécutée avant 
 
 Par défaut, les tâches sont proposées dans un ordre aléatoire (pour épicer les journées). On peut désactiver ce comportement dans les préférences, en décochant la case « ordre aléatoire » (ou similaire).
 
+### Affichage du temps
+
+L’affichage du « chronomètre » peut se faire suivant deux modes, qu’on choisit dans les préférences de l’application (⚙️) :
+
+* Mode Horloge (Clock). Le temps défile à partir de 0 jusqu’à une heure infinie (noter cependant que puisque le travail se fait par [cycle][], même si vous laissez tourner indéfiniment le chronomètre, seul le temps restant à travailler sera ajouté)
+
 ## Annexe
 
 En développement, il faut parfois détruire les processus :
@@ -113,3 +139,7 @@ lsof -i :3002
 ~~~
 
 Ça donne le numéro du processus qui tourne sur ce port.
+
+
+
+[cycle]: #travail-par-cycle

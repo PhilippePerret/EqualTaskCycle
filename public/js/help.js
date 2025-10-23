@@ -1347,6 +1347,7 @@ class Clock {
   }
   static _instance;
   constructor() {}
+  counterMode;
   time2horloge(mn) {
     let hrs = Math.floor(mn / 60);
     let mns = mn % 60;
@@ -1362,6 +1363,9 @@ class Clock {
   setClockStyle(style) {
     this.clockContainer.classList.add(style);
   }
+  setCounterMode(mode = "clock") {
+    this.counterMode = mode;
+  }
   currentWork;
   timer;
   startTime;
@@ -1375,11 +1379,22 @@ class Clock {
     this.currentWork = currentWork;
     this.timeSegments = [];
     this.clockContainer.classList.remove("hidden");
-    this.clockObj.innerHTML = "0:00:00";
+    this.clockObj.innerHTML = this.startClockPerCounterMode();
     this.createTimeSegment();
     this.calcTotalRecTime();
     this.startTimer();
   }
+  startClockPerCounterMode() {
+    if (this.counterMode === "clock") {
+      return "0:00:00";
+    } else {
+      return this.s2h(this.currentWork.restTime * 60);
+    }
+  }
+  get totalRestTimeSeconds() {
+    return this._totresttime || (this._totresttime = this.currentWork.restTime * 60);
+  }
+  _totresttime;
   calcTotalRecTime() {
     this.totalTime = this.timeSegments.filter((segTime) => !!segTime.laps).reduce((accu, segTime) => accu + segTime.laps, 0);
   }
@@ -1420,7 +1435,13 @@ class Clock {
   }
   run() {
     const secondesOfWork = this.totalTime + this.lapsFromStart();
-    this.clockObj.innerHTML = this.s2h(secondesOfWork);
+    let displayedSeconds;
+    if (this.counterMode === "clock") {
+      displayedSeconds = secondesOfWork;
+    } else {
+      displayedSeconds = this.totalRestTimeSeconds - secondesOfWork;
+    }
+    this.clockObj.innerHTML = this.s2h(displayedSeconds);
     const restTime = this.taskRestTime(secondesOfWork);
     if (restTime < 10 && this.alerte10minsDone === false) {
       this.donneAlerte10mins();
@@ -1522,6 +1543,9 @@ class Prefs {
       case "clock":
         clock.setClockStyle(value);
         break;
+      case "counter":
+        clock.setCounterMode(value);
+        break;
       case "theme":
         ui.setUITheme(value);
         break;
@@ -1620,6 +1644,7 @@ class Work {
     console.log("retour:", retour);
     prefs.setData(retour.prefs);
     clock.setClockStyle(retour.prefs.clock);
+    clock.setCounterMode(retour.prefs.counter);
     ui.setUITheme(retour.prefs.theme);
     if (retour.task.ok === false) {
       Flash.error("No active task. Set the task list.");
