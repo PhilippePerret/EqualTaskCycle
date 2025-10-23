@@ -82,6 +82,11 @@ button {
   font-size: inherit;
   border-radius: 8px;
 }
+div#buttons-container div#row1 button,
+div#buttons-container div#row2 button {
+  padding: 0.4em 0 0.3em;
+}
+
 button.small {
   font-size: 0.75em;
 }
