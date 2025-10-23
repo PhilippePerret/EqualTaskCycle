@@ -1473,19 +1473,22 @@ class Editing {
   }
   collectTaskData() {
     const newTaskData = [];
-    this.taskContainer.querySelectorAll(".editing-task-form").forEach((form) => {
+    this.taskContainer.querySelectorAll(".editing-form-task").forEach((form) => {
       newTaskData.push(this.getTaskDataIn(form));
     });
     console.log("newTaskData = ", newTaskData);
+    return newTaskData;
   }
   getTaskDataIn(form) {
     const taskData = {};
     WorkProps.forEach((prop) => {
-      let value = DGet(`.task-form-${prop}`, form).value;
+      let value = DGet(`.form-task-${prop}`, form).value;
       if (prop === "active") {
         value = (0, eval)(value);
       }
-      Object.assign(taskData, { [prop]: value });
+      if (value !== "") {
+        Object.assign(taskData, { [prop]: value });
+      }
     });
     return taskData;
   }
@@ -1493,7 +1496,7 @@ class Editing {
     ui.toggleSection("editing");
     const container = this.taskContainer;
     console.log("container", container);
-    const formClone = this.section.querySelector(".editing-task-form");
+    const formClone = this.section.querySelector(".editing-form-task");
     console.log("formClone", formClone);
     container.innerHTML = "";
     const retour = await postToServer("tasks/all", { dataPath: prefs.getValue("file") });
@@ -1508,6 +1511,7 @@ class Editing {
       const owork = formClone.cloneNode(true);
       container.appendChild(owork);
       this.peupleWorkForm(owork, work);
+      this.observeWorkForm(owork, work);
       owork.classList.remove("hidden");
     });
   }
@@ -1521,6 +1525,28 @@ class Editing {
       field.value = value || "";
     });
   }
+  observeWorkForm(owork, work) {
+    this.listenBtn("up", this.onUp.bind(this, owork), owork);
+    this.listenBtn("down", this.onDown.bind(this, owork), owork);
+    this.listenBtn("remove", this.onRemove.bind(this, work), owork);
+  }
+  onUp(owork, ev) {
+    if (owork.previousSibling) {
+      owork.parentNode.insertBefore(owork, owork.previousSibling);
+    }
+  }
+  onDown(owork, ev) {
+    if (owork.nextSibling) {
+      if (owork.nextSibling.nextSibling) {
+        owork.parentNode.insertBefore(owork, owork.nextSibling.nextSibling);
+      } else {
+        owork.parentNode.appendChild(owork);
+      }
+    }
+  }
+  onRemove(work, ev) {
+    Flash.notice(`Détruire ${work.id}`);
+  }
   get taskContainer() {
     return DGet("div#editing-tasks-container");
   }
@@ -1529,7 +1555,7 @@ class Editing {
   }
   onSaveData() {
     Flash.error("Je dois apprendre à sauver les données.");
-    console.log("On doit sauver les données : ", this.getAllData());
+    postToServer("/tasks/save", this.getAllData());
   }
   stopEditing() {
     ui.toggleSection("work");
@@ -1538,13 +1564,13 @@ class Editing {
     this.observeButtons();
   }
   observeButtons() {
-    this.listenBtn("start", this.startEditing.bind(this));
-    this.listenBtn("end", this.stopEditing.bind(this));
-    this.listenBtn("add", this.onAddTask.bind(this));
-    this.listenBtn("save", this.onSaveData.bind(this));
+    this.listenBtn("editing-start", this.startEditing.bind(this));
+    this.listenBtn("editing-end", this.stopEditing.bind(this));
+    this.listenBtn("editing-add", this.onAddTask.bind(this));
+    this.listenBtn("editing-save", this.onSaveData.bind(this));
   }
-  listenBtn(id, method) {
-    DGet(`button.btn-editing-${id}`).addEventListener("click", method);
+  listenBtn(id, method, container = document.body) {
+    DGet(`button.btn-${id}`, container).addEventListener("click", method);
   }
   static getIntance() {
     return this._inst || (this._inst = new Editing);

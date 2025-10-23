@@ -66,9 +66,11 @@ div.editing-task-form {
 }
 body.dark div.editing-task-form {
   border: 1px solid #CCC;
+  background-color: #585959;
 }
 body.light div.editing-task-form {
   border: 1px solid #5790cd;
+  background-color: #afced4
 }
 
 div.editing-task-form input.form-task-project {
