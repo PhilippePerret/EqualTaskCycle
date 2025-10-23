@@ -8,7 +8,10 @@ export class DataManager {
   private _data!: RecType;
 
   // Relever les données du fichier ou des données par défaut
+  // ATTENTION !!! ICI C'EST FAUX, ON DÉTERMINE MAINTENANT 
+  // SOI-MÊME LE NOM DU FICHIER
   public getData(){
+    console.error("IL FAUT CORRIGER ICI LE NOM FIXÉ")
     if (existsSync('_TASKS_.yaml')) {
       this._data = yaml.load(readFileSync('_TASKS_.yaml', 'utf8')) as RecType;
     } else {

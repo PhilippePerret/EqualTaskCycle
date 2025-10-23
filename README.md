@@ -8,7 +8,7 @@ Par exemple, si nous avons 5 tâches, et un temps par défaut de 2 heures, les t
 
 <a name="travail-par-cycle"></a>
 
-## Travail par cyle
+## Travail par cycle
 
 L’idée principale de cette application est donc de permettre de travail par cycle, en consacrant un temps de travail dans l’idée identique à toutes les tâches (en gardant la possibilité de fixer une durée de tranche de travail spécifique à chaque tâche, quand c’est nécessaire (et suivant sa philosophie personnelle de travail.
 

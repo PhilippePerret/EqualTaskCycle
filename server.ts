@@ -4,10 +4,11 @@ import { HOST, PORT } from './public/js/constants';
 import { Work } from "./lib/work";
 import { prefs } from './lib/prefs_server_side';
 import { runtime } from './lib/runtime';
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { execFileSync, execSync } from 'child_process';
 import type { RecType, WorkType } from './lib/types';
 import { activTracker } from './lib/activityTracker';
+import yaml from 'js-yaml';
 
 const app = express();
 
@@ -125,6 +126,18 @@ app.post('/task/change', (req, res) => {
   }
   res.json(result);
 });
+
+app.post('/tasks/all', (req, res) => {
+  const dreq = req.body;
+  let retour: RecType = {ok: true, error: ''}
+  const dataPath = dreq.dataPath;
+  if (existsSync(dataPath)) {
+    retour = {ok: true, data: yaml.load(readFileSync(dataPath,'utf8'))};
+  } else {
+    retour = {ok: false, error: 'Data File Unfound : ' + dataPath};
+  }
+  res.json(retour);
+})
 
 app.post('/prefs/open-data-file', (req, res) => {
   const dreq = req.body;

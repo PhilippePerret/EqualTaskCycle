@@ -87,7 +87,7 @@ export class Prefs {
     return this.data;
   }
 
-  private getValue(prop: string) {
+  public getValue(prop: string) {
     switch(prop) {
       case 'random':
         return this.field('random').checked;

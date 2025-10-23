@@ -6,6 +6,9 @@ body {
 .fleft {float: left;}
 .fright {float: right;}
 
+.tiny {font-size: 0.8em;}
+.mono {font-family: monospace, 'Courier New', Courier}
+
 section#help {
   margin-top: -2em;
 }
@@ -120,10 +123,19 @@ div.buttons {
 }
 .row-flex {
   display: flex;
+}
+.row-flex, .row {
   margin-bottom: 0.5em;
 }
 .row-flex label {
   flex: 0 0 120px;
+}
+.row label:first-child {
+  display:inline-block;
+  width: 120px;
+}
+.row label:first-child + input {
+  margin-left: -5px;
 }
 .row-flex label + input,
 .row-flex label + textarea,

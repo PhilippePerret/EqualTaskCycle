@@ -9,7 +9,9 @@ export interface WorkType {
     duration?: number;
     folder?: string;
     script?: string; // path du script de démarrage
+    active?: boolean;
 }
+export const WorkProps = ['active', 'id','project', 'content', 'duration','folder', 'script'];
 
 export interface RunTimeInfosType {
   totalTime: number;  // Le nombre total de minutes de travail

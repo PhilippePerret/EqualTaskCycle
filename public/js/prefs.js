@@ -1418,22 +1418,85 @@ class Help {
 var help = Help.getInstance();
 help.init();
 
+// lib/types.ts
+var WorkProps = ["active", "id", "project", "content", "duration", "folder", "script"];
+
+// public/utils.ts
+async function postToServer(route, data) {
+  if (route.startsWith("/")) {
+    route = route.substring(1, route.length);
+  }
+  return await fetch(HOST + route, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  }).then((r) => r.json());
+}
+
 // public/editing.ts
 class Editing {
-  init() {
-    this.observeButtons();
+  get section() {
+    return DGet("section#editing");
+  }
+  getAllData() {
+    return {};
+  }
+  setAllValues() {
+    this.editTasks();
+    this.setConfigData();
+  }
+  async editTasks() {
+    const container = this.taskContainer;
+    console.log("container", container);
+    const formClone = this.section.querySelector(".editing-task-form");
+    console.log("formClone", formClone);
+    container.innerHTML = "";
+    const retour = await postToServer("tasks/all", { dataPath: prefs.getValue("file") });
+    console.log("Retour de tasks/all", retour);
+    if (retour.ok === false) {
+      return Flash.error(retour.error);
+    }
+    const works = retour.data.works;
+    DGet("span#tasks-count", this.section).innerHTML = works.length;
+    works.forEach((work) => {
+      const owork = formClone.cloneNode(true);
+      container.appendChild(owork);
+      this.peupleWorkForm(owork, work);
+      owork.classList.remove("hidden");
+    });
+  }
+  peupleWorkForm(obj, work) {
+    WorkProps.forEach((prop) => {
+      const field = DGet(`.form-task-${prop}`, obj);
+      let value = work[prop];
+      if (prop === "active" && value === undefined) {
+        value = true;
+      }
+      field.value = value || "";
+    });
+  }
+  get taskContainer() {
+    return DGet("div#editing-tasks-container");
+  }
+  setConfigData() {
+    console.error("Je dois apprendre à renseigner les valeurs de configuration.");
   }
   onAddTask() {
     Flash.notice("Je dois apprendre à ajouter une tâche.");
   }
   onSaveData() {
     Flash.error("Je dois apprendre à sauver les données.");
+    postToServer("/tasks/save", this.getAllData());
   }
   startEditing() {
     ui.toggleSection("editing");
+    this.setAllValues();
   }
   stopEditing() {
     ui.toggleSection("work");
+  }
+  init() {
+    this.observeButtons();
   }
   observeButtons() {
     this.listenBtn("start", this.startEditing.bind(this));
@@ -2026,15 +2089,6 @@ class Clock {
   }
 }
 var clock = Clock.getInstance();
-
-// public/utils.ts
-async function postToServer(route, data) {
-  return await fetch(HOST + route, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  }).then((r) => r.json());
-}
 
 // public/prefs.ts
 class Prefs {

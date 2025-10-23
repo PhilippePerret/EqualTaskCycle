@@ -78,38 +78,47 @@
       <!-- Pour mettre les données générales, comme le temps d'édition par défaut -->
       [ICI LES GÉNÉRALITÉS]
     </div>
-    <h3>Tasks</h3>
-    <div id="editing-task-container">
+    <h3>Tasks <span class="small">(<span id="tasks-count">---</span>)</span></h3>
+    <div id="editing-tasks-container">
       <!-- Container pour afficher et éditer les tâches -->
-      
-      <!-- TÂCHE À CLONE -->
-      <div class="editing-task-container" style="width:600px;">
-        <div class="row-flex">
-          <input id="task-0-active" class="task-active" type="checkbox"/>
-          <label for="task-0-active">Active</label>
-        </div>
-        <div class="row-flex">
-          <label>Project</label>
-          <input type="text" class="task-project" />
-        </div>
-        <div class="row-flex">
-          <label>Content</label>
-          <textarea class="task-content"></textarea>
-        </div>
-        <div class="row-flex">
-          <label>Folder</label>
-          <input type="text" class="task-folder"/>
-        </div>
-        <div class="row-flex">
-          <label>Script</label><input type="text" class="task-script"/>
-        </div>
-        <div class="row-flex">
-          <label>Duration</label>
-          <input type="number" max="1000" min="15" class="task-duration"/>
-          <label>minutes</label>
-        </div>
-      </div>      
     </div>
+    <!-- TÂCHE À CLONE -->
+    <div class="editing-task-form hidden" data-id="0" style="width:600px;">
+      <input 
+        type="hidden" class="form-task-id" value="" />
+      <div class="row">
+        <span class="task-id-disp tiny mono fright">kkjllf2147fdsq-fdf4f</span>
+        <select class="form-task-active small">
+          <option value="true">Active</option>
+          <option value="false">Inactive</option>
+        </select>
+      </div>
+      <div class="row-flex">
+        <label>Project</label>
+        <input type="text" class="form-task-project" />
+      </div>
+      <div class="row-flex">
+        <label>Content</label>
+        <textarea class="form-task-content"></textarea>
+      </div>
+      <div class="row-flex">
+        <label>Folder</label>
+        <input type="text" class="form-task-folder"/>
+      </div>
+      <div class="row-flex">
+        <label>Script</label><input type="text" class="form-task-script"/>
+      </div>
+      <div class="row">
+        <label>Duration</label>
+        <input type="number" max="1000" min="15" class="form-task-duration"/>
+        <label>minutes</label>
+      </div>
+      <div class="btns">
+        <button class="btn-up">⬆</button>
+        <button class="btn-down">⬇</button>
+        <button class="btn-remove" confirm="Are you sure?">🗑️</button>
+      </div>
+    </div>      
     <footer>
       <button class="btn-editing-add fleft" title="Add a task">➕</button>
       <button class="btn-editing-end" class="small">Finir</button>
