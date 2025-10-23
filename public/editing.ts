@@ -12,6 +12,10 @@ class Editing {
   onAddTask(){
     Flash.notice("Je dois apprendre à ajouter une tâche.")
   }
+
+  onSaveData(){
+    Flash.error("Je dois apprendre à sauver les données.")
+  }
   
   /**
    * Pour démarrer l'édition des tâches (ou de tout le fichier d'édition)
@@ -29,6 +33,7 @@ class Editing {
     this.listenBtn('start', this.startEditing.bind(this));
     this.listenBtn('end', this.stopEditing.bind(this));
     this.listenBtn('add', this.onAddTask.bind(this));
+    this.listenBtn('save', this.onSaveData.bind(this));
   }
   listenBtn(id: string, method: Function) {
     DGet(`button.btn-editing-${id}`).addEventListener('click', method);

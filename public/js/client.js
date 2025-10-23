@@ -2000,6 +2000,9 @@ class Editing {
   onAddTask() {
     Flash.notice("Je dois apprendre à ajouter une tâche.");
   }
+  onSaveData() {
+    Flash.error("Je dois apprendre à sauver les données.");
+  }
   startEditing() {
     ui.toggleSection("editing");
   }
@@ -2010,6 +2013,7 @@ class Editing {
     this.listenBtn("start", this.startEditing.bind(this));
     this.listenBtn("end", this.stopEditing.bind(this));
     this.listenBtn("add", this.onAddTask.bind(this));
+    this.listenBtn("save", this.onSaveData.bind(this));
   }
   listenBtn(id, method) {
     DGet(`button.btn-editing-${id}`).addEventListener("click", method);

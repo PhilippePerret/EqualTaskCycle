@@ -54,3 +54,13 @@ section#current-work-container div#current-work-times span {
 section#current-work-container div#current-work-times div.libelles span {
   font-size: 9pt;
 }
+
+section#editing div#editing-task-container {
+  font-size: 1.2em;
+}
+
+div.editing-task-container {
+  border: 1px solid #CCC;
+  border-radius: 0.5em;
+  padding: 1em;
+}

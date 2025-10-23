@@ -78,15 +78,42 @@
       <!-- Pour mettre les données générales, comme le temps d'édition par défaut -->
       [ICI LES GÉNÉRALITÉS]
     </div>
+    <h3>Tasks</h3>
     <div id="editing-task-container">
       <!-- Container pour afficher et éditer les tâches -->
-      [ICI LES TÂCHES]
-      <div class="buttons left">
-        <button class="btn-editing-add">➕++</button>
-      </div>
+      
+      <!-- TÂCHE À CLONE -->
+      <div class="editing-task-container" style="width:600px;">
+        <div class="row-flex">
+          <input id="task-0-active" class="task-active" type="checkbox"/>
+          <label for="task-0-active">Active</label>
+        </div>
+        <div class="row-flex">
+          <label>Project</label>
+          <input type="text" class="task-project" />
+        </div>
+        <div class="row-flex">
+          <label>Content</label>
+          <textarea class="task-content"></textarea>
+        </div>
+        <div class="row-flex">
+          <label>Folder</label>
+          <input type="text" class="task-folder"/>
+        </div>
+        <div class="row-flex">
+          <label>Script</label><input type="text" class="task-script"/>
+        </div>
+        <div class="row-flex">
+          <label>Duration</label>
+          <input type="number" max="1000" min="15" class="task-duration"/>
+          <label>minutes</label>
+        </div>
+      </div>      
     </div>
     <footer>
+      <button class="btn-editing-add fleft" title="Add a task">➕</button>
       <button class="btn-editing-end" class="small">Finir</button>
+      <button class="btn-editing-save" class="small">Save</button>
     </footer>
   </section>
 

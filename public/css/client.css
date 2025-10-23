@@ -125,6 +125,12 @@ div.buttons {
 .row-flex label {
   flex: 0 0 120px;
 }
+.row-flex label + input,
+.row-flex label + textarea,
+.row-flex label + select {
+  flex: 1 1 auto;
+  margin-left: 0!important;
+}
 .row-flex input + label {
   flex: 1 1 auto;
   margin-left: 0.5em;
