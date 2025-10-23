@@ -1418,6 +1418,36 @@ class Help {
 var help = Help.getInstance();
 help.init();
 
+// public/editing.ts
+class Editing {
+  init() {
+    this.observeButtons();
+  }
+  onAddTask() {
+    Flash.notice("Je dois apprendre à ajouter une tâche.");
+  }
+  startEditing() {
+    ui.toggleSection("editing");
+  }
+  stopEditing() {
+    ui.toggleSection("work");
+  }
+  observeButtons() {
+    this.listenBtn("start", this.startEditing.bind(this));
+    this.listenBtn("end", this.stopEditing.bind(this));
+    this.listenBtn("add", this.onAddTask.bind(this));
+  }
+  listenBtn(id, method) {
+    DGet(`button.btn-editing-${id}`).addEventListener("click", method);
+  }
+  static getIntance() {
+    return this._inst || (this._inst = new Editing);
+  }
+  static _inst;
+  constructor() {}
+}
+var editor = Editing.getIntance();
+
 // public/client.ts
 class Work {
   data;
@@ -1425,6 +1455,7 @@ class Work {
     const res = await this.getCurrent();
     if (res === true) {
       prefs.init();
+      editor.init();
       Flash.notice(`App is ready. <span id="mes123">(Show help)</span>`);
       DGet("span#mes123").addEventListener("click", help.show.bind(help, ["introduction", "tasks_file", "tasks_file_format"]), { once: true, capture: true });
     }
@@ -1603,14 +1634,21 @@ class UI {
   resetBackgroundColor() {
     document.body.style.backgroundColor = "";
   }
+  SECTIONS = ["work", "help", "prefs", "editing"];
+  toggleSection(name) {
+    this.SECTIONS.forEach((section) => {
+      if (name === section) {
+        this.openSection(section);
+      } else {
+        this.closeSection(section);
+      }
+    });
+  }
   toggleHelp() {
     if (this.isSectionOpen("help")) {
-      this.closeSection("help");
-      this.openSection("work");
+      this.toggleSection("work");
     } else {
-      this.closeSection("work");
-      this.closeSection("prefs");
-      this.openSection("help");
+      this.toggleSection("help");
     }
   }
   isSectionOpen(name) {

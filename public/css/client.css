@@ -1,7 +1,10 @@
 body {
-  font-size: 24pt;
+  font-size: 14pt;
   padding:2em;
 }
+
+.fleft {float: left;}
+.fright {float: right;}
 
 section#help {
   margin-top: -2em;
@@ -43,7 +46,11 @@ input, select, select option, textarea {
 
 button {
   cursor: pointer;
+  padding: 0.4em 1em 0.3em;
+  font-size: inherit;
+  border-radius: 8px;
 }
+
 button:active {
   background-color:green;
   color:white;
@@ -51,7 +58,7 @@ button:active {
 
 div#buttons-container {
   position: fixed;
-  bottom: 2em;
+  bottom: 4em;
   max-width: 680px;
   width: calc(100% - 4em);
   margin-top: 2em;
@@ -62,8 +69,16 @@ div#buttons-container button {
 
 div#buttons-container div.row {
   text-align: right;
-  padding: 0 40px;
 }
+
+/* (par exemple le bouton "préférences" */
+div#buttons-container div.row button.short {
+  width: 60px;
+  padding: 0.1em 0.3em;
+  text-align:center;
+  font-size: 1.1em;
+}
+
 div#buttons-container div.row button {
   width: 140px;
 }
@@ -74,18 +89,9 @@ div#buttons-container div#row1 {
 
 div#buttons-container div#row2 {
   font-size: 12pt;
-  margin-top: 1em;
+  margin-top: 0.5em;
 }
 
-button {
-  padding: 0.4em 1em 0.3em;
-  font-size: inherit;
-  border-radius: 8px;
-}
-div#buttons-container div#row1 button,
-div#buttons-container div#row2 button {
-  padding: 0.4em 0 0.3em;
-}
 
 button.small {
   font-size: 0.75em;
@@ -96,9 +102,6 @@ button.small {
 .hidden { display: none !important; }
 
 
-section#prefs {
-  font-size: 14pt;
-}
 label + input,
 label + select {
   margin-left: 1em;
@@ -125,4 +128,25 @@ div.buttons {
 .row-flex input + label {
   flex: 1 1 auto;
   margin-left: 0.5em;
+}
+
+footer {
+  display: block;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 720px;
+  padding: 8px 1em;
+  text-align: right;
+  margin: 0;
+}
+body.light footer {
+  background-color: #c1c1c1;
+}
+body.dark footer {
+  background-color: #2a3e3e;
+}
+footer button {
+  padding-top: 0.1em!important;
+  padding-bottom: 0.2em!important;
 }

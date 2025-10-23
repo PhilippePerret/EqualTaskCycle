@@ -6,6 +6,7 @@ import { Flash } from "./js/flash";
 import { ui } from "./ui";
 import { prefs } from "./prefs";
 import { help } from "./help.js";
+import { editor } from "./editing.js";
 
 export class Work {
 
@@ -13,6 +14,7 @@ export class Work {
     const res = await this.getCurrent();
     if (res === true) {
       prefs.init();
+      editor.init();
       Flash.notice(`App is ready. <span id="mes123">(Show help)</span>`)
       DGet('span#mes123').addEventListener('click', 
         help.show.bind(help, ['introduction', 'tasks_file', 'tasks_file_format']),

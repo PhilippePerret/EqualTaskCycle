@@ -45,17 +45,29 @@ export class UI {
   public resetBackgroundColor(){
     document.body.style.backgroundColor = '';
   }
+
+  SECTIONS = ['work', 'help', 'prefs', 'editing']
+  /**
+   * To display one section
+   */
+  public toggleSection(name: string){
+    this.SECTIONS.forEach(section => {
+      if ( name === section ) {
+        this.openSection(section);
+      } else {
+        this.closeSection(section);
+      }
+    })
+  }
+
   /**
    * Pour basculer sur l'aide
    */
   public toggleHelp(){
     if (this.isSectionOpen('help')) {
-      this.closeSection('help');
-      this.openSection('work');
+      this.toggleSection('work');
     } else {
-      this.closeSection('work');
-      this.closeSection('prefs');
-      this.openSection('help');
+      this.toggleSection('help');
     }
   }
 

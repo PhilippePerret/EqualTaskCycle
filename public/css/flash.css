@@ -5,7 +5,7 @@ div#flash-group {
   border: 1px solid transparent;
   outline: 1px solid transparent;
   right: 1em;
-  bottom: 14px;
+  top: 8px;
   max-width: 640px;
   z-index: 1500;
 }

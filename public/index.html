@@ -56,15 +56,44 @@
     <div id="buttons-container">
       <div id="row1" class="row"></div>
       <div id="row2" class="row">
-        <button class="btn-prefs" style="width:60px;padding:0.3em;text-align:center;">⚙️</button>
       </div>
     </div>
 
+    <footer>
+      <div style="float:left;">
+        <button class="btn-prefs short">⚙️</button>
+        <button class="btn-editing-start short">✍🏽</button>
+      </div>
+    </footer>
+
   </section>
 
+  <!--
+    SECTION POUR ÉDITER LES TÂCHES
+  -->
+  <section id="editing" class="hidden">
+    <h2>Task Editing</h2>
+    <p>[Ici on va pouvoir éditer les tâches]</p>
+    <div id="editing-gene-container">
+      <!-- Pour mettre les données générales, comme le temps d'édition par défaut -->
+      [ICI LES GÉNÉRALITÉS]
+    </div>
+    <div id="editing-task-container">
+      <!-- Container pour afficher et éditer les tâches -->
+      [ICI LES TÂCHES]
+      <div class="buttons left">
+        <button class="btn-editing-add">➕++</button>
+      </div>
+    </div>
+    <footer>
+      <button class="btn-editing-end" class="small">Finir</button>
+    </footer>
+  </section>
 
+  <!--
+    SECTION DES PRÉFÉRENCES
+  -->
   <section id="prefs" class="hidden">
-    <button class="btn-close-prefs" style="float:right;width:40px;padding:0;font-size: 12pt">x</button>
     <h2>Préférences</h2>
     <div style="width: 480px;">
     
@@ -113,9 +142,11 @@
     
     </div>
 
-    <div class="buttons">
+    <footer>
+      <button class="btn-close-prefs fleft">Close</button>
       <button class="btn-save-prefs">Save…</button>
-    </div>
+    </footer>
+
   </section>
 
   <div id="flash-group">
