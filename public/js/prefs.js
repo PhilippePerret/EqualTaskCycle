@@ -1476,17 +1476,18 @@ class Editing {
     this.taskContainer.querySelectorAll(".editing-form-task").forEach((form) => {
       newTaskData.push(this.getTaskDataIn(form));
     });
-    console.log("newTaskData = ", newTaskData);
     return newTaskData;
   }
   getTaskDataIn(form) {
     const taskData = {};
     WorkProps.forEach((prop) => {
       let value = DGet(`.form-task-${prop}`, form).value;
-      if (prop === "active") {
-        value = (0, eval)(value);
-      }
       if (value !== "") {
+        if (prop === "active") {
+          value = (0, eval)(value);
+        } else if (prop === "duration") {
+          value = Number(value);
+        }
         Object.assign(taskData, { [prop]: value });
       }
     });
@@ -1495,12 +1496,9 @@ class Editing {
   async startEditing() {
     ui.toggleSection("editing");
     const container = this.taskContainer;
-    console.log("container", container);
     const formClone = this.section.querySelector(".editing-form-task");
-    console.log("formClone", formClone);
     container.innerHTML = "";
     const retour = await postToServer("tasks/all", { dataPath: prefs.getValue("file") });
-    console.log("Retour de tasks/all", retour);
     if (retour.ok === false) {
       return Flash.error(retour.error);
     }
@@ -1554,7 +1552,6 @@ class Editing {
     Flash.notice("Je dois apprendre à ajouter une tâche.");
   }
   onSaveData() {
-    Flash.error("Je dois apprendre à sauver les données.");
     postToServer("/tasks/save", this.getAllData());
   }
   stopEditing() {

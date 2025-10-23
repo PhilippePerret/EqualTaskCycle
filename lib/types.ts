@@ -6,8 +6,8 @@ export interface WorkType {
     id: string;
     project: string;
     content: string;
+    folder: string; // Required (to watch activity)
     duration?: number;
-    folder?: string;
     script?: string; // path du script de démarrage
     active?: boolean;
 }

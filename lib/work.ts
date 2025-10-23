@@ -13,9 +13,8 @@ export class Work {
    * Initialisation de l'application (au niveau des travaux)
    */
   public static init() {
-    const dataManager = new DataManager();
-    const works = dataManager.getData().works;
-    this.defaultDuration = dataManager.getDefaultDuration();
+    const works = this.dataManager.getData().works;
+    this.defaultDuration = this.dataManager.getDefaultDuration();
     this.table = {};
     works.forEach((wdata: WorkType) => {
       const w = new Work(wdata)
@@ -68,9 +67,19 @@ export class Work {
    * 
    * @param work Le travail à ajouter
   */
- public static add(work: Work) {
+  public static add(work: Work) {
 
-}
+  }
+
+  public static saveAllData(allData: WorkType[]) {
+    this.dataManager.setData(allData);
+  }
+
+  private static get dataManager(){
+    return this._datamanager || (this._datamanager = new DataManager())
+  }; private static _datamanager: DataManager;
+
+
 
   constructor(
     private data: WorkType

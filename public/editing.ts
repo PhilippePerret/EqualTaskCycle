@@ -69,7 +69,6 @@ class Editing {
     this.taskContainer.querySelectorAll('.editing-form-task').forEach((form: HTMLDivElement) => {
       newTaskData.push(this.getTaskDataIn(form));
     })
-    console.log("newTaskData = ", newTaskData);
     return newTaskData;
   }
 
@@ -77,8 +76,10 @@ class Editing {
     const taskData: RecType = {};
     WorkProps.forEach((prop: string) => {
       let value: string | boolean | number = DGet(`.form-task-${prop}`, form).value;
-      if (prop === 'active') { value = (0, eval)(value as string); }
       if (value !== '') {
+        if (prop === 'active') { value = (0, eval)(value as string) }
+        else if (prop === 'duration') { value = Number(value) }
+        // On consigne la valeur
         Object.assign(taskData, {[prop]: value});
       }
     })
@@ -93,12 +94,9 @@ class Editing {
   async startEditing(){
     ui.toggleSection('editing');
     const container = this.taskContainer;
-    console.log("container", container);
     const formClone = this.section.querySelector('.editing-form-task');
-    console.log("formClone", formClone);
     container.innerHTML = '';
     const retour: RecType = await postToServer('tasks/all', {dataPath: prefs.getValue('file')});
-    console.log("Retour de tasks/all", retour);
     if (retour.ok === false ) { return Flash.error(retour.error) }
     // --- Données de configuration (générales) ---
     this.setConfigData(retour.data);
@@ -160,7 +158,6 @@ class Editing {
   }
 
   onSaveData(){
-    Flash.error("Je dois apprendre à sauver les données.")
     postToServer('/tasks/save', this.getAllData());
   }
 

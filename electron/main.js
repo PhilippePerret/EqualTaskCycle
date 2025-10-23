@@ -53,7 +53,8 @@ app.whenReady().then(() => {
 
     server.stdout.on('data', (data) => console.log(`SERVER STDOUT: ${data}`));
     server.stderr.on('data', (data) => console.error(`SERVER STDERR: ${data}`));
-
+    server.on('error', (err) => console.error('SERVER FAILED TO START:', err));
+    server.on('exit', (code) => console.log('SERVER EXITED WITH CODE:', code));
   }
   
   const win = new BrowserWindow({

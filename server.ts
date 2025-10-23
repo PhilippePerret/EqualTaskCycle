@@ -139,6 +139,13 @@ app.post('/tasks/all', (req, res) => {
   res.json(retour);
 })
 
+app.post('/tasks/save', (req, res) => {
+  const allData = req.body;
+  let retour = {ok: true, error: ''};
+  Work.saveAllData(allData);
+  res.json(retour);
+})
+
 app.post('/prefs/open-data-file', (req, res) => {
   const dreq = req.body;
   const fpath = dreq.filePath
