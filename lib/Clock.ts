@@ -1,6 +1,6 @@
 import { DGet } from "../public/js/dom";
 import { ui } from "../public/ui";
-import { Work } from "../public/client";
+import { Work } from "../public/work_client";
 import { Flash } from "../public/js/flash";
 
 interface TimeSegment {

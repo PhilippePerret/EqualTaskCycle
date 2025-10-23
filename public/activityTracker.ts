@@ -1,4 +1,4 @@
-import { Work } from "./client";
+import { Work } from "./work_client";
 import { HOST } from "./js/constants";
 import { ui } from "./ui";
 

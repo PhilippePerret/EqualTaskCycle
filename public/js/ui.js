@@ -1840,7 +1840,7 @@ class Editing {
 }
 var editor = Editing.getIntance();
 
-// public/client.ts
+// public/work_client.ts
 class Work {
   data;
   static async init() {
@@ -1960,6 +1960,7 @@ class Work {
   field(prop) {
     return Work.obj.querySelector(`#current-work-${prop}`);
   }
+  endWorkReport() {}
 }
 Work.init();
 

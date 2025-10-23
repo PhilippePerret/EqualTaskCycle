@@ -1,5 +1,5 @@
 import { clock } from "../lib/Clock";
-import { Work } from "./client";
+import { Work } from "./work_client";
 import { ActivityTracker } from "./activityTracker";
 import { HOST } from "./js/constants";
 import { DGet } from "./js/dom";
