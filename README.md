@@ -16,6 +16,40 @@ Ce mode par cycle permet de faire avancer plusieurs gros chantiers de front sans
 
 ---
 
+## Trois zones de l’application
+
+L’application/interface est composée de trois parties.
+
+* La [**Zone de travail**](#zone-travail) proprement dite, on la tâche est présentée, où elle sera lancée et le temps comptabilisé.
+* La [**Zone de préférences**](#zone-preferences), pour régler les préférences d’interface principalement
+* La [**Zone d’enregistrement**](#zone-enregistrement). Pour enregistrer les tâches, les modifier ainsi que régler les paramètres généraux et les valeurs par défaut.
+
+<a name="zone-travail"></a>
+
+### La Zone de travail
+
+{Décrire}
+
+<a name="zone-preferences"></a>
+
+### La Zone de préférence
+
+On l’atteint avec le bouton ⚙️.
+
+{Décrire}
+
+<a name="zone-enregistrement"></a>
+
+### La Zone d’enregistrement
+
+On l’atteint avec le bouton ✍🏽.
+
+{Décrire}
+
+
+
+---
+
 <a name="random-tasks"></a>
 
 ### Choix aléatoire des tâches
