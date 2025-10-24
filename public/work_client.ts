@@ -7,6 +7,7 @@ import { ui } from "./ui.js";
 import { prefs } from "./prefs.js";
 import { help } from "./help.js";
 import { editor } from "./editing.js";
+import { EndWorkReport } from "./js/end_work_report.js";
 
 export class Work {
 
@@ -26,6 +27,8 @@ export class Work {
   public static currentWork: Work;
 
   public static async addTimeToCurrentWork(time: number){
+    const report = new EndWorkReport(this.currentWork);
+    report.open();
     if (time) {
       await this.currentWork.addTimeAndSave(time)
     } else {
@@ -152,22 +155,6 @@ export class Work {
 
   field(prop: string){
     return Work.obj.querySelector(`#current-work-${prop}`);
-  }
-
-  /**
-   * Avant d'aller enregistrer le temps après un STOP de la tâche,
-   * on présent à l'utilisateur une fenêtre qui lui permet d'indiquer
-   * ce qu'il y aura à faire au prochain cycle sur la tâche, pour
-   * reprendre le travail plus rapidement et plus efficacement.
-   * 
-   * C'est cette partie qui gère ça, en permettant même de proposer
-   * des questions à l'utilisateur pour savoir ce qu'il doit écrire
-   * (car ce n'est jamais facile). Par exemple, d'indique le nom du
-   * fichier qui sera consulté en priorité par rapport à la tâche
-   * à poursuivre ou à commencer.
-   */
-  private endWorkReport() {
-    
   }
 }
 

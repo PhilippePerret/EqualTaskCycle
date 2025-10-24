@@ -61,8 +61,8 @@ app.whenReady().then(() => {
     x: 10,
     y: 800,
     width: 800,
-    width: 1200, // Pour console
-    // height: 600,
+    // width: 1200, // Pour console
+    height: 600,
     icon: ICON_PATH,
     /** Pour le preload qui doit permettre la communication
      *  entre les éléments pour mettre la fenêtre au premier

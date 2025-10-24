@@ -1,4 +1,7 @@
-import type { WorkType } from "../../lib/types";
+import type { Work } from "../work_client";
+import { listenBtn } from "../utils";
+import { DGet, stopEvent } from "./dom";
+import { Flash } from "./flash";
 
 /**
  * RAPPORT DE FIN DE TÂCHE (ET DE DÉBUT DE TÂCHE FUTURE)
@@ -16,37 +19,121 @@ import type { WorkType } from "../../lib/types";
  */
 export class EndWorkReport {
 
+  private inited: boolean = false;
+
   constructor(
-    private work: WorkType
+    private work: Work
   ){}
+
+  /**
+   * @api
+   * 
+   * Ouvre la boite de rapport de fin de travail pour le remplir.
+   * 
+   */
+  public open(){
+    this.inited || this.init();
+    this.reset();
+    this.show();
+  }
+
+  /**
+   * Pour enregistrer le rapport 
+   * (normalement, ça doit être fait avec l'enregistrement du temps)
+   */
+  onSave(ev: MouseEvent){
+    return ev && stopEvent(ev);
+  }
+
+  onDontSave(ev: MouseEvent){
+    return ev && stopEvent(ev);
+  }
+
+  /**
+   * Applique le template dans le champ de rédaction.
+   * 
+   * TODO Plus tard, pouvoir définir des templates soi-même et les 
+   * choisir.
+   */
+  onTemplate(ev: MouseEvent): boolean {
+    if ( this.getContent().length ) {
+      Flash.error('Empty content before apply template. (prudence)')
+    } else {
+      // TODO Pouvoir choisir parmi les templates proposé
+      this.setContent(this.TEMPLATES[0] as string);
+    }
+    return ev && stopEvent(ev);
+  }
+
+  private getContent(){return this.contentField.value;}
+  private setContent(s: string){this.contentField.value = s;}
+
+  private init(){
+    this.contentField.setAttribute('placeholder', `
+      Description de ce qu'il faudra faire à la prochaine session.
+
+      En précisant bien les points importants, les choses à noter, les implémentations particulières du projet, surtout s'il s'agit de programmation.
+      `.replace(/^ +/gm, '').trim());
+    DGet('#ETR-explication', this.obj).innerText = 'Ce rapport doit servir à commencer la prochaine session de travail plus rapidement et plus efficacement. C’est votre baton de relais pour la prochaine session.'
+    this.observeButtons();
+  }
+  private observeButtons(){
+    listenBtn('etr-save', this.onSave.bind(this));
+    listenBtn('etr-dont-save', this.onDontSave.bind(this));
+    listenBtn('etr-template', this.onTemplate.bind(this));
+  }
+  private reset(){
+    this.contentField.value = '';
+  }
 
   /**
    * Méthode affichant la fenêtre pour entrer le rapport
    */
   private show(){
-
+    this.obj.classList.remove('hidden');
   }
-
-  /**
-   * Fonction construisant la fenêtre du rapport
-   * 
-   * NOTES
-   * -----
-   *  "ETR" stands for "End Task Report"
-   */
-  private build(){
-    const o = document.createElement('div');
-    this.id = `report${new Date().getTime()/1000}`;
-    o.id = this.id;
-    o.className = 'ETR-container';
-    const rep = document.createElement('textarea');
-    rep.id = `${this.id}-content`;
-    rep.className = 'ETR-content';
-    // Bouton pour n'enregistrer ni le temps ni le rapport
-    const btnNoop = document.createElement('button');
-    btnNoop.innerHTML = 'No Save No Report'
+  private hide(){
+    this.obj.classList.add('hidden');
   }
 
   private id!: string;
   
+
+  private get contentField(){
+    return this._contfield || (this._contfield = DGet('textarea#ETR-report', this.obj));
+  }
+
+  private get obj(){
+    return this._obj || (this._obj = DGet('div#ETR-container'))
+  }
+
+
+  private _contfield!: HTMLTextAreaElement;
+  private _obj!: HTMLDivElement;
+
+
+
+  TEMPLATES = [
+    `
+    *(Taking up the baton for the next work session)*
+    ## Main Goal : 
+
+    ## Main Tasks :
+    - 
+    -
+    -
+
+    ## Main Usefull Files :
+    - 
+    - 
+    - 
+
+    ## Remarque
+    *(mind about this)*
+
+    ## Config Note
+    *(note about curren config or situation)*
+
+    `
+  ]
 }

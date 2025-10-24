@@ -127,7 +127,7 @@ export class UI {
     this.mask([this.btnStop, this.btnPause, this.btnRestart]);
     this.reveal([this.btnStart]);
     ActivityTracker.stopControl();
-    console.log("ev", ev);
+    // console.log("ev", ev);
     if (ev && (ev.shiftKey || ev.metaKey)) {
       Flash.notice('I don’t add & save time');
     } else {

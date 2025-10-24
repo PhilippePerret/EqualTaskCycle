@@ -3,7 +3,7 @@ import type { PrefsDataType, RecType } from "../lib/types";
 import { DGet, stopEvent } from "./js/dom";
 import { Flash } from "./js/flash";
 import { ui } from "./ui";
-import { postToServer } from "./utils";
+import { listenBtn, postToServer } from "./utils";
 
 
 export class Prefs {
@@ -118,10 +118,10 @@ export class Prefs {
   }
 
   private observeButtons(){
-    DGet('button.btn-prefs').addEventListener('click', this.onOpen.bind(this));
-    DGet('button.btn-close-prefs').addEventListener('click', this.onClose.bind(this));
-    DGet('button.btn-save-prefs').addEventListener('click', this.onSave.bind(this));
-    DGet('button.btn-open-datafile').addEventListener('click', this.onOpenDataFile.bind(this));
+    listenBtn('prefs', this.onOpen.bind(this));
+    listenBtn('close-prefs', this.onClose.bind(this));
+    listenBtn('save-prefs', this.onSave.bind(this));
+    listenBtn('open-datafile', this.onOpenDataFile.bind(this));
   }
   private observeFields(){
     Object.keys(this.data).forEach((prop: string) => {

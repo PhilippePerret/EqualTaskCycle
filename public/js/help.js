@@ -1505,6 +1505,9 @@ async function postToServer(route, data) {
     body: JSON.stringify(data)
   }).then((r) => r.json());
 }
+function listenBtn(id, method, container = document.body) {
+  DGet(`button.btn-${id}`, container).addEventListener("click", method);
+}
 
 // public/prefs.ts
 class Prefs {
@@ -1605,10 +1608,10 @@ class Prefs {
     ui.closeSection("work");
   }
   observeButtons() {
-    DGet("button.btn-prefs").addEventListener("click", this.onOpen.bind(this));
-    DGet("button.btn-close-prefs").addEventListener("click", this.onClose.bind(this));
-    DGet("button.btn-save-prefs").addEventListener("click", this.onSave.bind(this));
-    DGet("button.btn-open-datafile").addEventListener("click", this.onOpenDataFile.bind(this));
+    listenBtn("prefs", this.onOpen.bind(this));
+    listenBtn("close-prefs", this.onClose.bind(this));
+    listenBtn("save-prefs", this.onSave.bind(this));
+    listenBtn("open-datafile", this.onOpenDataFile.bind(this));
   }
   observeFields() {
     Object.keys(this.data).forEach((prop) => {
@@ -1713,9 +1716,9 @@ class Editing {
     });
   }
   observeWorkForm(owork, work) {
-    this.listenBtn("up", this.onUp.bind(this, owork), owork);
-    this.listenBtn("down", this.onDown.bind(this, owork), owork);
-    this.listenBtn("remove", this.onRemove.bind(this, work), owork);
+    listenBtn("up", this.onUp.bind(this, owork), owork);
+    listenBtn("down", this.onDown.bind(this, owork), owork);
+    listenBtn("remove", this.onRemove.bind(this, work), owork);
   }
   onUp(owork, ev) {
     if (owork.previousSibling) {
@@ -1750,13 +1753,10 @@ class Editing {
     this.observeButtons();
   }
   observeButtons() {
-    this.listenBtn("editing-start", this.startEditing.bind(this));
-    this.listenBtn("editing-end", this.stopEditing.bind(this));
-    this.listenBtn("editing-add", this.onAddTask.bind(this));
-    this.listenBtn("editing-save", this.onSaveData.bind(this));
-  }
-  listenBtn(id, method, container = document.body) {
-    DGet(`button.btn-${id}`, container).addEventListener("click", method);
+    listenBtn("editing-start", this.startEditing.bind(this));
+    listenBtn("editing-end", this.stopEditing.bind(this));
+    listenBtn("editing-add", this.onAddTask.bind(this));
+    listenBtn("editing-save", this.onSaveData.bind(this));
   }
   static getIntance() {
     return this._inst || (this._inst = new Editing);
@@ -1765,6 +1765,95 @@ class Editing {
   constructor() {}
 }
 var editor = Editing.getIntance();
+
+// public/js/end_work_report.ts
+class EndWorkReport {
+  work;
+  inited = false;
+  constructor(work) {
+    this.work = work;
+  }
+  open() {
+    this.inited || this.init();
+    this.reset();
+    this.show();
+  }
+  onSave(ev) {
+    return ev && stopEvent(ev);
+  }
+  onDontSave(ev) {
+    return ev && stopEvent(ev);
+  }
+  onTemplate(ev) {
+    if (this.getContent().length) {
+      Flash.error("Empty content before apply template. (prudence)");
+    } else {
+      this.setContent(this.TEMPLATES[0]);
+    }
+    return ev && stopEvent(ev);
+  }
+  getContent() {
+    return this.contentField.value;
+  }
+  setContent(s) {
+    this.contentField.value = s;
+  }
+  init() {
+    this.contentField.setAttribute("placeholder", `
+      Description de ce qu'il faudra faire à la prochaine session.
+
+      En précisant bien les points importants, les choses à noter, les implémentations particulières du projet, surtout s'il s'agit de programmation.
+      `.replace(/^ +/gm, "").trim());
+    DGet("#ETR-explication", this.obj).innerText = "Ce rapport doit servir à commencer la prochaine session de travail plus rapidement et plus efficacement. C’est votre baton de relais pour la prochaine session.";
+    this.observeButtons();
+  }
+  observeButtons() {
+    listenBtn("etr-save", this.onSave.bind(this));
+    listenBtn("etr-dont-save", this.onDontSave.bind(this));
+    listenBtn("etr-template", this.onTemplate.bind(this));
+  }
+  reset() {
+    this.contentField.value = "";
+  }
+  show() {
+    this.obj.classList.remove("hidden");
+  }
+  hide() {
+    this.obj.classList.add("hidden");
+  }
+  id;
+  get contentField() {
+    return this._contfield || (this._contfield = DGet("textarea#ETR-report", this.obj));
+  }
+  get obj() {
+    return this._obj || (this._obj = DGet("div#ETR-container"));
+  }
+  _contfield;
+  _obj;
+  TEMPLATES = [
+    `
+    *(Taking up the baton for the next work session)*
+    ## Main Goal : 
+
+    ## Main Tasks :
+    - 
+    -
+    -
+
+    ## Main Usefull Files :
+    - 
+    - 
+    - 
+
+    ## Remarque
+    *(mind about this)*
+
+    ## Config Note
+    *(note about curren config or situation)*
+
+    `
+  ];
+}
 
 // public/work_client.ts
 class Work {
@@ -1780,6 +1869,8 @@ class Work {
   }
   static currentWork;
   static async addTimeToCurrentWork(time) {
+    const report = new EndWorkReport(this.currentWork);
+    report.open();
     if (time) {
       await this.currentWork.addTimeAndSave(time);
     } else {
@@ -1886,7 +1977,6 @@ class Work {
   field(prop) {
     return Work.obj.querySelector(`#current-work-${prop}`);
   }
-  endWorkReport() {}
 }
 Work.init();
 
@@ -2005,7 +2095,6 @@ class UI {
     this.mask([this.btnStop, this.btnPause, this.btnRestart]);
     this.reveal([this.btnStart]);
     ActivityTracker.stopControl();
-    console.log("ev", ev);
     if (ev && (ev.shiftKey || ev.metaKey)) {
       Flash.notice("I don’t add & save time");
     } else {

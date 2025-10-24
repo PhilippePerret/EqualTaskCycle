@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Equal Task Cycle</title>
-  <script type="module" src="./js/client.js"></script>
+  <script type="module" src="./js/work_client.js"></script>
   <link rel="stylesheet" href="./css/client.css"/>
   <link rel="stylesheet" href="./css/work.css"/>
   <link rel="stylesheet" href="./css/flash.css"/>
@@ -23,11 +23,20 @@
   </section>
 
   <!--
-    CONTAINER (FENÊTRE) POUR ÉCRIRE LE END-TASK-REPORT ET 
-    ENREGISTRER LE TEMPS DE TRAVAIL
+    Panneau pour écrire le RAPPORT DE FIN DE SESSION 
+    (END-TASK-REPORT)
   -->
-  <div id="ETR-container">
-
+  <div id="ETR-container" class="hidden">
+    <h3>
+      <div id="ETR-explication"></div>
+      <img src="images/relais.jpg" alt="Baton de relais" width="60"/>
+      <span>STOP Report</span></h3>
+    <textarea id="ETR-report" placeholder="Here the report for the future work session\\nYou can write anything that can help you to restart easily and quickly the work at the next cycle\n\n"></textarea>
+    <div class="buttons">
+      <button class="btn-etr-dont-save fleft small">Don’t save Time and Report</button>
+      <button class="btn-etr-template">Use template…</button>
+      <button class="btn-etr-save">Save</button>
+    </div>
   </div>
 
 

@@ -3,7 +3,7 @@ import { DGet } from "./js/dom";
 import { Flash } from "./js/flash";
 import { prefs } from "./prefs";
 import { ui } from "./ui";
-import { postToServer } from "./utils";
+import { listenBtn, postToServer } from "./utils";
 
 interface AllDataType {
   duration: number;
@@ -122,9 +122,9 @@ class Editing {
     })
   }
   private observeWorkForm(owork: HTMLDivElement, work: WorkType){
-    this.listenBtn('up', this.onUp.bind(this, owork), owork);
-    this.listenBtn('down', this.onDown.bind(this, owork), owork);
-    this.listenBtn('remove', this.onRemove.bind(this, work), owork);
+    listenBtn('up', this.onUp.bind(this, owork), owork);
+    listenBtn('down', this.onDown.bind(this, owork), owork);
+    listenBtn('remove', this.onRemove.bind(this, work), owork);
   }
 
 
@@ -172,17 +172,12 @@ class Editing {
   }
 
   private observeButtons(){
-    this.listenBtn('editing-start', this.startEditing.bind(this));
-    this.listenBtn('editing-end', this.stopEditing.bind(this));
-    this.listenBtn('editing-add', this.onAddTask.bind(this));
-    this.listenBtn('editing-save', this.onSaveData.bind(this));
+    listenBtn('editing-start', this.startEditing.bind(this));
+    listenBtn('editing-end', this.stopEditing.bind(this));
+    listenBtn('editing-add', this.onAddTask.bind(this));
+    listenBtn('editing-save', this.onSaveData.bind(this));
   }
 
-
-
-  private listenBtn(id: string, method: Function, container: any = document.body) {
-    DGet(`button.btn-${id}`, container).addEventListener('click', method);
-  }
 
   public static getIntance(){return this._inst || (this._inst = new Editing())}
   private static _inst: Editing;

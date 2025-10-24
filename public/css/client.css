@@ -168,3 +168,50 @@ footer button {
   padding-top: 0.1em!important;
   padding-bottom: 0.2em!important;
 }
+
+/* 
+  ========== STOP REPORT ==========
+*/
+
+div#ETR-container {
+  position: fixed;
+  z-index: 10;
+  padding: 1em 2em;
+  left: 100px;
+  width: calc(100% - 200px - 2em);
+  top: 10px;
+  height: 500px ;
+  background-color: white;
+  box-shadow: 5px 5px 16px 0px #4f4f4f;
+}
+
+div#ETR-container h3 img {
+  position:absolute;
+  top: 5px;
+  left: 5px;
+  z-index: -1;
+}
+div#ETR-container div#ETR-explication {
+  font-style: italic;
+  font-size: 12pt;
+  width: 360px;
+  float: right;
+  text-align: justify;
+}
+
+div#ETR-container textarea#ETR-report {
+  width: calc(100% - 2em);
+  height: 320px;
+  padding: 0.5em;
+  resize: none;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+div#ETR-container div.buttons {
+  position: absolute;
+  bottom: 0;
+  width: calc(100% - 2em);
+  left: 0;
+  background-color: #2a3e3e;
+  padding: 8px 1em;
+}
