@@ -2001,15 +2001,14 @@ class Clock {
       displayedSeconds = this.totalRestTimeSeconds - secondesOfWork;
     }
     const restTime = this.taskRestTime(secondesOfWork);
-    const thisMinute = Math.round(secondesOfWork / 60);
     this.clockObj.innerHTML = this.s2h(displayedSeconds);
-    if (this.currentMinute != thisMinute) {
+    if (secondesOfWork % 60 === 0) {
+      const thisMinute = Math.round(secondesOfWork / 60);
       const elapsedMinutes = this.currentWork.cycleTime + thisMinute;
       const totalMinutes = this.currentWork.totalTime + thisMinute;
       this.restTimeField.innerHTML = this.time2horloge(restTime);
       this.cycleTimeField.innerHTML = this.time2horloge(elapsedMinutes);
       this.totalTimeField.innerHTML = this.time2horloge(totalMinutes);
-      this.currentMinute = thisMinute;
     }
     if (restTime < 10 && this.alerte10minsDone === false) {
       this.donneAlerte10mins();
@@ -2067,7 +2066,6 @@ class Clock {
   _restfield;
   _cycledurfield;
   _totalfield;
-  currentMinute = 0;
 }
 var clock = Clock.getInstance();
 

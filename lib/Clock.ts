@@ -158,20 +158,19 @@ class Clock {
     if (this.counterMode === 'clock') { displayedSeconds = secondesOfWork}
     else /* countdown */ { displayedSeconds = this.totalRestTimeSeconds - secondesOfWork}
     const restTime = this.taskRestTime(secondesOfWork);
-    const thisMinute = Math.round(secondesOfWork / 60);
     /****************************************
      * AFFICHAGE DU TEMPS DANS L'INTERFACE  *
      ****************************************/
     // L'horloge principale
     this.clockObj.innerHTML = this.s2h(displayedSeconds);
     // Les temps du travail (seulement si la "minute" a changé)
-    if (this.currentMinute != thisMinute) {
+    if (secondesOfWork % 60 === 0) {
+      const thisMinute = Math.round(secondesOfWork / 60);
       const elapsedMinutes = this.currentWork.cycleTime + thisMinute;
       const totalMinutes = this.currentWork.totalTime + thisMinute;
       this.restTimeField.innerHTML  = this.time2horloge(restTime);
       this.cycleTimeField.innerHTML = this.time2horloge(elapsedMinutes);
       this.totalTimeField.innerHTML = this.time2horloge(totalMinutes);
-      this.currentMinute = thisMinute;
     }
     /****************************************/
     // console.log("restTime = %i", restTime);
@@ -246,7 +245,6 @@ class Clock {
   private _restfield!: HTMLSpanElement;
   private _cycledurfield!: HTMLSpanElement;
   private _totalfield!: HTMLSpanElement;
-  private currentMinute: number = 0;
 }
 
 export const clock = Clock.getInstance();
