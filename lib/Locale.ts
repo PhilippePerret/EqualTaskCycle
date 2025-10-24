@@ -76,7 +76,7 @@ class Locale {
       const { prefs } = await import("../public/prefs");
       const { Flash } = await import("../public/js/flash");
 
-      const retour = await postToServer('locales/get-all', {lang: prefs.getLang()});
+      const retour = await postToServer('localization/get-all', {lang: prefs.getLang()});
       if (retour.ok) {
         this.locales = retour.locales;
       } else {

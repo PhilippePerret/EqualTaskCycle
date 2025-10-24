@@ -174,7 +174,7 @@ app.post('/prefs/save', (req, res) => {
   res.json(report);
 });
 
-app.post('/locales/get-all', (req, res) => {
+app.post('/localization/get-all', (req, res) => {
   const lang = req.body.lang;
   let retour = {ok: true, error: '', locales: loc.getLocales()};
   res.json(retour);

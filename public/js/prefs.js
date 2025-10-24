@@ -15032,7 +15032,7 @@ class Locale {
       const { postToServer: postToServer2 } = await Promise.resolve().then(() => (init_utils(), exports_utils));
       const { prefs } = await Promise.resolve().then(() => (init_prefs(), exports_prefs));
       const { Flash: Flash2 } = await Promise.resolve().then(() => (init_flash(), exports_flash));
-      const retour = await postToServer2("locales/get-all", { lang: prefs.getLang() });
+      const retour = await postToServer2("localization/get-all", { lang: prefs.getLang() });
       if (retour.ok) {
         this.locales = retour.locales;
       } else {
