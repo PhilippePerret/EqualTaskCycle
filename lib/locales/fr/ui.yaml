@@ -1,0 +1,50 @@
+---
+appName: "Equal Task Cycle"
+
+ui:
+  button:
+    close: Fermer
+    dont_save_time_and_report: Ne sauver ni temps ni rapport
+    finish: Finir
+    open_min: ouvrir
+    save: Enregistrer
+    use_template: Utiliser modèle…
+  title:
+    config_data: Données de configuration
+    content: Contenu
+    preferences: Préférences
+    project: Projet
+    task_editing: Édition des tâches
+    tasks: Tâches
+  thing:
+    Clock: Horloge
+    Countdown: Compte à rebours
+    Duration: Durée
+    minute: minute
+    minutes: minutes
+    Folder: Dossier
+    Theme: Thème
+  adj:
+    active_m: actif
+    Active_m: Actif
+    Big: Gros
+    dark: sombre
+    Dark: Sombre
+    Inactive_m: Inactif
+    Medium: Medium
+    Miniature: Miniature
+    light: clair
+    Light: Clair
+  text:
+    baton_relais: Bâton de relais
+    counter_mode: Mode de compteur
+    cycle: Cycle
+    default_duration: Durée par défaut
+    elapsed_time: Temps accompli
+    order: Ordre
+    shortest_tasks_first: Les plus courtes d’abord
+    task_in_random_order: Tâches au hasard
+    time_left: Temps restant
+    total_duration: Durée totale
+    ui_theme: Thème interface
+    works_file: Fichier tâches

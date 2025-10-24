@@ -17,9 +17,9 @@
     <div id="help-content">
 
     </div>
-    <div class="buttons">
-      <button class="btn-close-help small">Close</button>
-    </div>
+    <footer>
+      <button class="btn-close-help small">t(ui.button.close)</button>
+    </footer>
   </section>
 
   <!--
@@ -29,13 +29,13 @@
   <div id="ETR-container" class="hidden">
     <h3>
       <div id="ETR-explication"></div>
-      <img src="images/relais.jpg" alt="Baton de relais" width="60"/>
+      <img src="images/relais.jpg" alt="t(ui.text.baton_relais)" width="60"/>
       <span>STOP Report</span></h3>
-    <textarea id="ETR-report" placeholder="Here the report for the future work session\\nYou can write anything that can help you to restart easily and quickly the work at the next cycle\n\n"></textarea>
+    <textarea id="ETR-report" placeholder=""></textarea>
     <div class="buttons">
-      <button class="btn-etr-dont-save fleft small">Don’t save Time and Report</button>
-      <button class="btn-etr-template">Use template…</button>
-      <button class="btn-etr-save">Save</button>
+      <button class="btn-etr-dont-save fleft small">t(ui.button.dont_save_time_and_report)</button>
+      <button class="btn-etr-template">t(ui.button.use_template)</button>
+      <button class="btn-etr-save">t(ui.button.save)</button>
     </div>
   </div>
 
@@ -55,16 +55,16 @@
       </div>
       <div id="current-work-times">
         <div class="libelles">
-          <span>Time left</span>
-          <span>Elapsed time</span>
-          <span>Total duration</span>
-          <span>Cycle</span>
+          <span>t(ui.text.time_left)</span>
+          <span>t(ui.text.elapsed_time)</span>
+          <span>t(ui.text.total_duration)</span>
+          <span>t(ui.text.cycle)</span>
         </div>
         <div>
-          <span id="current-work-restTime" title="Rest time for the cycle">0:00</span>
-          <span id="current-work-cycleTime" title="Duration done on cycle">0:00</span>
-          <span id="current-work-totalTime" title="Total duration work time">0:00</span>
-          <span id="current-work-cycleCount" title="Total Cycle Count">---</span>
+          <span id="current-work-restTime">0:00</span>
+          <span id="current-work-cycleTime">0:00</span>
+          <span id="current-work-totalTime">0:00</span>
+          <span id="current-work-cycleCount">---</span>
         </div>
       </div>
     </section>
@@ -86,6 +86,7 @@
       <div style="float:left;">
         <button class="btn-prefs short">⚙️</button>
         <button class="btn-editing-start short">✍🏽</button>
+        <button class="btn-help-toggle">🛟</button>
       </div>
     </footer>
 
@@ -95,30 +96,30 @@
     SECTION POUR L'ÉDITION (TÂCHES et CONFIG DATA)
   -->
   <section id="editing" class="hidden">
-    <h2>Task Editing</h2>
+    <h2>t(ui.title.task_editing)</h2>
     <div id="editing-config-container">
 
 
-      <h3>Config Data</h3>
+      <h3>t(ui.title.config_data)</h3>
       <!-- Pour mettre les données générales, comme le temps d'édition par défaut -->
       
       <div class="row-flex">
-        <label>Default duration</label>
+        <label>t(ui.text.default_duration)</label>
         <input id="config-data-duration" type="number" max="1000" min="15" default="120">
-        <label>minutes</label>
+        <label>t(ui.thing.minutes)</label>
       </div>
 
       <div class="row-flex">
-        <label>UI Theme</label>
+        <label>t(ui.text.ui_theme)</label>
         <select id="config-data-theme">
-          <option value="dark">Dark</option>
-          <option value="light">Light</option>
+          <option value="dark">t(ui.adj.Dark)</option>
+          <option value="light">t(ui.adj.Light)</option>
         </select>
       </div>
 
     </div>
 
-    <h3>Tasks <span class="small">(<span id="tasks-count">---</span>)</span></h3>
+    <h3>t(ui.title.tasks) <span class="small">(<span id="tasks-count">---</span>)</span></h3>
     <div id="editing-tasks-container">
       <!-- Container pour afficher et éditer les tâches -->
     </div>
@@ -128,40 +129,40 @@
       <div class="row">
         <span class="task-id-disp tiny mono fright"></span>
         <select class="form-task-active small">
-          <option value="true">Active</option>
-          <option value="false">Inactive</option>
+          <option value="true">t(ui.adj.Active_m)</option>
+          <option value="false">t(ui.adj.Inactive_m)</option>
         </select>
       </div>
       <div class="row-flex">
-        <label>Project</label>
+        <label>t(ui.title.project)</label>
         <input type="text" class="form-task-project" />
       </div>
       <div class="row-flex">
-        <label>Content</label>
+        <label>t(ui.title.content)</label>
         <textarea class="form-task-content"></textarea>
       </div>
       <div class="row-flex">
-        <label>Folder</label>
+        <label>t(ui.thing.Folder)</label>
         <input type="text" class="form-task-folder"/>
       </div>
       <div class="row-flex">
         <label>Script</label><input type="text" class="form-task-script"/>
       </div>
       <div class="row">
-        <label>Duration</label>
+        <label>t(ui.thing.Duration)</label>
         <input type="number" max="1000" min="15" class="form-task-duration"/>
-        <label>minutes</label>
+        <label>t(ui.thing.minutes)</label>
       </div>
       <div class="btns">
         <button class="btn-up">⬆</button>
         <button class="btn-down">⬇</button>
-        <button class="btn-remove" confirm="Are you sure?">🗑️</button>
+        <button class="btn-remove">🗑️</button>
       </div>
     </div>      
     <footer>
       <button class="btn-editing-add fleft" title="Add a task">➕</button>
-      <button class="btn-editing-end" class="small">Finir</button>
-      <button class="btn-editing-save" class="small">Save</button>
+      <button class="btn-editing-end" class="small">t(ui.button.finish)</button>
+      <button class="btn-editing-save" class="small">t(ui.button.save)</button>
     </footer>
   </section>
 
@@ -169,57 +170,57 @@
     SECTION DES PRÉFÉRENCES
   -->
   <section id="prefs" class="hidden">
-    <h2>Préférences</h2>
+    <h2>t(ui.title.preferences)</h2>
     <div style="width: 480px;">
     
       <div class="row-flex">
-        <label>Works File</label>
+        <label>t(ui.text.works_file)</label>
         <input type="text" id="prefs-file" style="flex: 1 1 auto" />
-        <button class="small btn-open-datafile">open</button>
+        <button class="small btn-open-datafile">t(ui.button.open_min)</button>
       </div>
 
       <div class="row-flex">
-        <label>Ordre</label>
+        <label>t(ui.text.order)</label>
         <input type="checkbox" id="prefs-random" />
-        <label for="prefs-random">Tasks in random order</label>
+        <label for="prefs-random">t(ui.text.tasks_in_random_order)</label>
       </div>
       
       <div class="row-flex">
         <label></label>
         <input type="checkbox" id="prefs-shortest" />
-        <label for="prefs-shortest">Shortest tasks first</label>
+        <label for="prefs-shortest">t(ui.text.shortest_tasks_first)</label>
       </div>
     
       <div class="row-flex">
-        <label for="prefs-counter">Counter Mode</label>
+        <label for="prefs-counter">t(ui.text.counter_mode)</label>
         <select id="prefs-counter">
-          <option value="clock">Clock</option>
-          <option value="countdown">countdown</option>
+          <option value="clock">t(ui.thing.Clock)</option>
+          <option value="countdown">t(ui.thing.Countdown)</option>
         </select>
       </div>
 
       <div class="row-flex">
-        <label for="prefs-theme">Theme</label>
+        <label for="prefs-theme">t(ui.thing.Theme)</label>
         <select id="prefs-theme">
-          <option value="dark">Dark</option>
-          <option value="light">Light</option>
+          <option value="dark">t(ui.adj.Dark)</option>
+          <option value="light">t(ui.adj.Light)</option>
         </select>
       </div>
 
       <div class="row-flex">
-        <label for="prefs-clock">Clock</label>
+        <label for="prefs-clock">t(ui.thing.Clock)</label>
         <select id="prefs-clock">
-          <option value="mini">Miniature</option>
-          <option value="medium">Mediane</option>
-          <option value="big">Big</option>
+          <option value="mini">t(ui.adj.Miniature)</option>
+          <option value="medium">t(ui.adj.Medium)</option>
+          <option value="big">t(ui.adj.Big)</option>
         </select>
       </div>
     
     </div>
 
     <footer>
-      <button class="btn-close-prefs fleft">Close</button>
-      <button class="btn-save-prefs">Save…</button>
+      <button class="btn-close-prefs fleft">t(ui.button.close)</button>
+      <button class="btn-save-prefs">t(ui.button.save)</button>
     </footer>
 
   </section>

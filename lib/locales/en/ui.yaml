@@ -1,0 +1,50 @@
+---
+appName: "Equal Task Cycle"
+
+ui:
+  button:
+    close: Close
+    dont_save_time_and_report: Don’t save Time and Report
+    finish: Finish
+    open_min: open
+    save: Save
+    use_template: Use template…
+  title:
+    config_data: Config Data
+    content: Content
+    preferences: Preferences
+    project: Project
+    task_editing: Task Editing
+    tasks: Tasks
+  thing:
+    Clock: Clock
+    Countdown: Countdown
+    Duration: Duration
+    minute: minute
+    minutes: minutes
+    Folder: Folder
+    Theme: Theme
+  adj:
+    active_m: active
+    Active_m: Active
+    Big: Big
+    dark: dark
+    Dark: Dark
+    Inactive_m: Inactive
+    Medium: Medium
+    Miniature: Miniature
+    light: light
+    Light: Light
+  text:
+    baton_relais: Relay baton
+    counter_mode: Counter Mode
+    cycle: Cycle
+    default_duration: Default duration
+    elapsed_time: Elapsed time
+    order: Order
+    shortest_tasks_first: Shortest tasks first
+    task_in_random_order: Tasks in random order
+    time_left: Time left
+    total_duration: Total duration
+    ui_theme: UI Theme
+    works_file: Works File

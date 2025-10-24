@@ -11757,7 +11757,6 @@ class Work {
   static _obj;
   static async getCurrent() {
     const retour = await fetch(HOST + "task/current").then((r) => r.json());
-    console.log("retour:", retour);
     prefs.setData(retour.prefs);
     clock.setClockStyle(retour.prefs.clock);
     clock.setCounterMode(retour.prefs.counter);

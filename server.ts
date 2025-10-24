@@ -9,8 +9,15 @@ import { execFileSync, execSync } from 'child_process';
 import type { RecType, WorkType } from './lib/types';
 import { activTracker } from './lib/activityTracker';
 import yaml from 'js-yaml';
+import { loc, tf } from './lib/Locale';
 
 const app = express();
+
+app.get('/', (req, res) => {
+  console.log("-> route /")
+  loc.init('fr');
+  res.send(tf(path.join(__dirname, 'public', 'main.html')));
+});
 
 app.use(express.static(__dirname));
 app.use(express.json());
@@ -167,9 +174,6 @@ app.post('/prefs/save', (req, res) => {
   res.json(report);
 });
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
 
 
 app.listen(PORT, () => {

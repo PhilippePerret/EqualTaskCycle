@@ -83,7 +83,7 @@ export class Work {
   public static async getCurrent(): Promise<boolean> {
     const retour: RecType = await fetch(HOST + 'task/current')
     .then(r => r.json() as RecType);
-    console.log("retour:", retour);
+    // console.log("retour:", retour);
     prefs.setData(retour.prefs);
     clock.setClockStyle(retour.prefs.clock);
     clock.setCounterMode(retour.prefs.counter);
