@@ -11903,7 +11903,7 @@ class Clock {
   counterMode;
   time2horloge(mn) {
     let hrs = Math.floor(mn / 60);
-    let mns = mn % 60;
+    let mns = Math.round(mn % 60);
     let horloge = [];
     horloge.push(`${hrs}`);
     horloge.push(`${mns > 9 ? "" : "0"}${mns}’`);

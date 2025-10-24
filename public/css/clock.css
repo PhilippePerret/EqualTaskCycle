@@ -1,9 +1,8 @@
 div#clock-container {
-  position: relative;
+  position: absolute;
 
 }
 div#clock-container.big {
-  position: fixed;
   top: 0;
   left: 0;
   display: flex;
@@ -16,8 +15,15 @@ div#clock-container.big * {
   margin: 0;
 }
 
-div#clock-container:not(.big) {
-  position:absolute;
+div#clock-container.medium {
+  bottom: -7px;
+  left: 270px;
+  z-index: 20;
+}
+
+div#clock-container.mini {
+  position: absolute;
+  top: 12px;
 }
 
 div#clock {
@@ -51,16 +57,11 @@ div#clock-container.big div#clock {
 }
 
 div#clock-container.medium div#clock {
-  position: absolute;
   font-size: 40pt;
-  top: 7px;
-  left: 100px;
 }
 
 div#clock-container.mini div#clock {
-  position: absolute;
   font-size: 16pt;
-  top: 25px;
 }
 body.dark div#clock {
   color: rgb(56, 207, 53);
