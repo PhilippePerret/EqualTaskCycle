@@ -4,7 +4,7 @@ import { DGet, stopEvent } from "./js/dom";
 import { Flash } from "./js/flash";
 import { ui } from "./ui";
 import { listenBtn, postToServer } from "./utils";
-
+import { t } from '../lib/Locale';
 
 export class Prefs {
 
@@ -31,8 +31,8 @@ export class Prefs {
     const result = await postToServer('prefs/open-data-file', {
       filePath: this.getValue('file')
     })
-    if (result.ok) { Flash.success('File open with success.') } 
-    else { Flash.error('An error occured: ' + result.error) }
+    if (result.ok) { Flash.success(t('data_file.open_with_sucess')) } 
+    else { Flash.error(t('err.error_occured', result.error)) }
   }
 
   /**
@@ -44,7 +44,7 @@ export class Prefs {
     // console.log("result = ", result);
     if (result.ok) {
       this.close();
-      Flash.success("Preferences saved.")
+      Flash.success(t('prefs.saved'))
     } else {
       Flash.error(result.errors);
     }
@@ -107,7 +107,7 @@ export class Prefs {
   }
 
   private field(key: string){
-    return DGet(`#prefs-${key}`) || console.error("Le champ 'prefs-%s' est introuvable", key);
+    return DGet(`#prefs-${key}`) || console.error(t('err.unfound_field', [`prefs-${key}`]));
   }
 
   private close(){ 

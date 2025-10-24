@@ -12096,155 +12096,6 @@ var init_utils = __esm(() => {
   init_rehype_stringify();
 });
 
-// public/prefs.ts
-var exports_prefs = {};
-__export(exports_prefs, {
-  prefs: () => prefs,
-  Prefs: () => Prefs
-});
-
-class Prefs {
-  data;
-  fieldsReady = false;
-  static instance;
-  constructor() {}
-  static getInstance() {
-    return this.instance || (this.instance = new Prefs);
-  }
-  init() {
-    this.observeButtons();
-  }
-  getLang() {
-    return "fr";
-  }
-  async onOpenDataFile(ev) {
-    stopEvent(ev);
-    const result = await postToServer("prefs/open-data-file", {
-      filePath: this.getValue("file")
-    });
-    if (result.ok) {
-      Flash.success("File open with success.");
-    } else {
-      Flash.error("An error occured: " + result.error);
-    }
-  }
-  async onSave(ev) {
-    stopEvent(ev);
-    const result = await postToServer("prefs/save", this.getData());
-    if (result.ok) {
-      this.close();
-      Flash.success("Preferences saved.");
-    } else {
-      Flash.error(result.errors);
-    }
-    return false;
-  }
-  onChangePref(prop, ev) {
-    const value = this.getValue(prop);
-    switch (prop) {
-      case "clock":
-        clock.setClockStyle(value);
-        break;
-      case "counter":
-        clock.setCounterMode(value);
-        break;
-      case "theme":
-        ui.setUITheme(value);
-        break;
-      default:
-    }
-  }
-  onOpen(ev) {
-    this.open();
-    return stopEvent(ev);
-  }
-  onClose(ev) {
-    this.close();
-    return stopEvent(ev);
-  }
-  setData(data) {
-    this.data = data;
-    this.fieldsReady || this.observeFields();
-    Object.entries(this.data).forEach(([k2, v2]) => {
-      this.setValue(k2, v2);
-    });
-  }
-  getData() {
-    Object.entries(this.data).forEach(([k2, _v]) => {
-      Object.assign(this.data, { [k2]: this.getValue(k2) });
-    });
-    return this.data;
-  }
-  getValue(prop) {
-    switch (prop) {
-      case "random":
-        return this.field("random").checked;
-      default:
-        return this.field(prop).value;
-    }
-  }
-  setValue(prop, value) {
-    switch (prop) {
-      case "random":
-        this.field("random").checked = value;
-        break;
-      default:
-        this.field(prop).value = value;
-    }
-  }
-  field(key2) {
-    return DGet(`#prefs-${key2}`) || console.error("Le champ 'prefs-%s' est introuvable", key2);
-  }
-  close() {
-    ui.openSection("work");
-    ui.closeSection("prefs");
-  }
-  open() {
-    ui.openSection("prefs");
-    ui.closeSection("work");
-  }
-  observeButtons() {
-    listenBtn("prefs", this.onOpen.bind(this));
-    listenBtn("close-prefs", this.onClose.bind(this));
-    listenBtn("save-prefs", this.onSave.bind(this));
-    listenBtn("open-datafile", this.onOpenDataFile.bind(this));
-  }
-  observeFields() {
-    Object.keys(this.data).forEach((prop) => {
-      this.field(prop).addEventListener("change", this.onChangePref.bind(this, prop));
-    });
-    this.fieldsReady = true;
-  }
-}
-var prefs;
-var init_prefs = __esm(() => {
-  init_Clock();
-  init_flash();
-  init_ui();
-  init_utils();
-  prefs = Prefs.getInstance();
-});
-
-// lib/types.ts
-var WorkProps;
-var init_types3 = __esm(() => {
-  WorkProps = ["active", "id", "project", "content", "duration", "folder", "script"];
-});
-
-// node_modules/nanoid/url-alphabet/index.js
-var urlAlphabet = "useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict";
-
-// node_modules/nanoid/index.browser.js
-var nanoid = (size = 21) => {
-  let id = "";
-  let bytes = crypto.getRandomValues(new Uint8Array(size |= 0));
-  while (size--) {
-    id += urlAlphabet[bytes[size] & 63];
-  }
-  return id;
-};
-var init_index_browser = () => {};
-
 // node:path
 function assertPath3(path) {
   if (typeof path !== "string")
@@ -15256,9 +15107,9 @@ class Locale {
       });
     } else {
       const { postToServer: postToServer2 } = await Promise.resolve().then(() => (init_utils(), exports_utils));
-      const { prefs: prefs2 } = await Promise.resolve().then(() => (init_prefs(), exports_prefs));
+      const { prefs } = await Promise.resolve().then(() => (init_prefs(), exports_prefs));
       const { Flash: Flash2 } = await Promise.resolve().then(() => (init_flash(), exports_flash));
-      const retour = await postToServer2("localization/get-all", { lang: prefs2.getLang() });
+      const retour = await postToServer2("localization/get-all", { lang: prefs.getLang() });
       if (retour.ok) {
         this.locales = retour.locales;
       } else {
@@ -15281,6 +15132,156 @@ var init_Locale = __esm(() => {
   LOCALES_FOLDER = path_default.resolve(path_default.join(__dirname, "locales"));
   loc = Locale.getInstance();
 });
+
+// public/prefs.ts
+var exports_prefs = {};
+__export(exports_prefs, {
+  prefs: () => prefs,
+  Prefs: () => Prefs
+});
+
+class Prefs {
+  data;
+  fieldsReady = false;
+  static instance;
+  constructor() {}
+  static getInstance() {
+    return this.instance || (this.instance = new Prefs);
+  }
+  init() {
+    this.observeButtons();
+  }
+  getLang() {
+    return "fr";
+  }
+  async onOpenDataFile(ev) {
+    stopEvent(ev);
+    const result = await postToServer("prefs/open-data-file", {
+      filePath: this.getValue("file")
+    });
+    if (result.ok) {
+      Flash.success(t("data_file.open_with_sucess"));
+    } else {
+      Flash.error(t("err.error_occured", result.error));
+    }
+  }
+  async onSave(ev) {
+    stopEvent(ev);
+    const result = await postToServer("prefs/save", this.getData());
+    if (result.ok) {
+      this.close();
+      Flash.success(t("prefs.saved"));
+    } else {
+      Flash.error(result.errors);
+    }
+    return false;
+  }
+  onChangePref(prop, ev) {
+    const value = this.getValue(prop);
+    switch (prop) {
+      case "clock":
+        clock.setClockStyle(value);
+        break;
+      case "counter":
+        clock.setCounterMode(value);
+        break;
+      case "theme":
+        ui.setUITheme(value);
+        break;
+      default:
+    }
+  }
+  onOpen(ev) {
+    this.open();
+    return stopEvent(ev);
+  }
+  onClose(ev) {
+    this.close();
+    return stopEvent(ev);
+  }
+  setData(data) {
+    this.data = data;
+    this.fieldsReady || this.observeFields();
+    Object.entries(this.data).forEach(([k2, v2]) => {
+      this.setValue(k2, v2);
+    });
+  }
+  getData() {
+    Object.entries(this.data).forEach(([k2, _v]) => {
+      Object.assign(this.data, { [k2]: this.getValue(k2) });
+    });
+    return this.data;
+  }
+  getValue(prop) {
+    switch (prop) {
+      case "random":
+        return this.field("random").checked;
+      default:
+        return this.field(prop).value;
+    }
+  }
+  setValue(prop, value) {
+    switch (prop) {
+      case "random":
+        this.field("random").checked = value;
+        break;
+      default:
+        this.field(prop).value = value;
+    }
+  }
+  field(key2) {
+    return DGet(`#prefs-${key2}`) || console.error(t("err.unfound_field", [`prefs-${key2}`]));
+  }
+  close() {
+    ui.openSection("work");
+    ui.closeSection("prefs");
+  }
+  open() {
+    ui.openSection("prefs");
+    ui.closeSection("work");
+  }
+  observeButtons() {
+    listenBtn("prefs", this.onOpen.bind(this));
+    listenBtn("close-prefs", this.onClose.bind(this));
+    listenBtn("save-prefs", this.onSave.bind(this));
+    listenBtn("open-datafile", this.onOpenDataFile.bind(this));
+  }
+  observeFields() {
+    Object.keys(this.data).forEach((prop) => {
+      this.field(prop).addEventListener("change", this.onChangePref.bind(this, prop));
+    });
+    this.fieldsReady = true;
+  }
+}
+var prefs;
+var init_prefs = __esm(() => {
+  init_Clock();
+  init_flash();
+  init_ui();
+  init_utils();
+  init_Locale();
+  prefs = Prefs.getInstance();
+});
+
+// lib/types.ts
+var WorkProps;
+var init_types3 = __esm(() => {
+  WorkProps = ["active", "id", "project", "content", "duration", "folder", "script"];
+});
+
+// node_modules/nanoid/url-alphabet/index.js
+var urlAlphabet = "useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict";
+
+// node_modules/nanoid/index.browser.js
+var nanoid = (size = 21) => {
+  let id = "";
+  let bytes = crypto.getRandomValues(new Uint8Array(size |= 0));
+  while (size--) {
+    id += urlAlphabet[bytes[size] & 63];
+  }
+  return id;
+};
+var init_index_browser = () => {};
 
 // public/editing.ts
 class Editing {

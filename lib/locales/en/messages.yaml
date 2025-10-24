@@ -1,7 +1,13 @@
 ---
+err:
+  error_occured: "An error occured: _0_"
+  unfound_field: "Unfound field: _0_"
 task:
   saved: "Task saved successfully"
   destroy: 'Destroy task _0_'
 report:
   empty_content: "Empty content before apply template. (prudence)"
-  
+data_file:
+  open_with_sucess: "File open with success."
+prefs:
+  saved: "Preferences saved."

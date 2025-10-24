@@ -15998,9 +15998,9 @@ class Prefs {
       filePath: this.getValue("file")
     });
     if (result.ok) {
-      Flash.success("File open with success.");
+      Flash.success(t("data_file.open_with_sucess"));
     } else {
-      Flash.error("An error occured: " + result.error);
+      Flash.error(t("err.error_occured", result.error));
     }
   }
   async onSave(ev) {
@@ -16008,7 +16008,7 @@ class Prefs {
     const result = await postToServer("prefs/save", this.getData());
     if (result.ok) {
       this.close();
-      Flash.success("Preferences saved.");
+      Flash.success(t("prefs.saved"));
     } else {
       Flash.error(result.errors);
     }
@@ -16068,7 +16068,7 @@ class Prefs {
     }
   }
   field(key2) {
-    return DGet(`#prefs-${key2}`) || console.error("Le champ 'prefs-%s' est introuvable", key2);
+    return DGet(`#prefs-${key2}`) || console.error(t("err.unfound_field", [`prefs-${key2}`]));
   }
   close() {
     ui.openSection("work");
@@ -16097,6 +16097,7 @@ var init_prefs = __esm(() => {
   init_flash();
   init_ui();
   init_utils();
+  init_Locale();
   prefs = Prefs.getInstance();
 });
 init_prefs();
