@@ -42,9 +42,17 @@ ui:
     default_duration: Durée par défaut
     elapsed_time: Temps accompli
     order: Ordre
+    path_example: "REQUIRED/PROJECT/FOLDER/PATH"
     shortest_tasks_first: Les plus courtes d’abord
     task_in_random_order: Tâches au hasard
+    temp_description: "Description de votre projet/tâche. Mettre en actif pour l'activer."
     time_left: Temps restant
     total_duration: Durée totale
     ui_theme: Thème interface
+    your_project: "Votre projet/Tâche"
     works_file: Fichier tâches
+    description_stop_report_modele: |
+      Description de ce qu'il faudra faire à la prochaine session.
+
+      En précisant bien les points importants, les choses à noter, les implémentations particulières du projet, surtout s'il s'agit de programmation.
+    description_stop_report : "This report is meant to help start the next work session more quickly and efficiently. It’s your baton for the next session."

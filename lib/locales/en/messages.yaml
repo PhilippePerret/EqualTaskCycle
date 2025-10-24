@@ -1,3 +1,7 @@
 ---
 task:
   saved: "Task saved successfully"
+  destroy: 'Destroy task _0_'
+report:
+  empty_content: "Empty content before apply template. (prudence)"
+  

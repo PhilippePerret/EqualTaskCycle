@@ -5,6 +5,7 @@ import { prefs } from "./prefs";
 import { ui } from "./ui";
 import { listenBtn, postToServer } from "./utils";
 import { nanoid } from 'nanoid';
+import { t } from '../lib/Locale';
 
 interface AllDataType {
   duration: number;
@@ -17,7 +18,7 @@ interface ConfigDataType {
 }
 const ConfigProperties: [string, any][] = [
   ['duration', 120], 
-  ['theme', 'light']
+  ['theme', t('ui.adj.light')]
 ];
 
 class Editing {
@@ -164,9 +165,8 @@ class Editing {
     }
   }
   private onRemove(work: WorkType, ev: MouseEvent){
-    Flash.notice(`Détruire ${work.id}`);
+    Flash.notice(t('task.destroy', [work.id]));
   }
-
 
   private get taskContainer(){
     return DGet('div#editing-tasks-container');
@@ -175,9 +175,9 @@ class Editing {
   onAddTask(){
     const owork = this.createNewTask({
       id: nanoid(),
-      project: 'Your project/Task',
-      content: "Description of your project/task\n\nSet active to true to active it.",
-      folder: 'REQUIRED/FOLDER/PATH',
+      project: t('ui.text.your_project'),
+      content: t('ui.text.temp_description'),
+      folder: t('ui.text.path_example'),
       active: false
     } as WorkType);
     owork.scrollIntoView({ behavior: 'smooth', block: 'start' });

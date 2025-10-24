@@ -2,6 +2,7 @@ import type { Work } from "./work_client";
 import { listenBtn } from "./utils";
 import { DGet, stopEvent } from "./js/dom";
 import { Flash } from "./js/flash";
+import { t } from '../lib/Locale';
 
 /**
  * RAPPORT DE FIN DE TÂCHE (ET DE DÉBUT DE TÂCHE FUTURE)
@@ -77,7 +78,7 @@ export class EndWorkReport {
    */
   onTemplate(ev: MouseEvent): boolean {
     if ( this.getContent().length ) {
-      Flash.error('Empty content before apply template. (prudence)')
+      Flash.error(t('report.empty_content'))
     } else {
       // TODO Pouvoir choisir parmi les templates proposé
       this.setContent(this.TEMPLATES[0] as string);
@@ -89,12 +90,8 @@ export class EndWorkReport {
   private setContent(s: string){this.contentField.value = s;}
 
   private init(){
-    this.contentField.setAttribute('placeholder', `
-      Description de ce qu'il faudra faire à la prochaine session.
-
-      En précisant bien les points importants, les choses à noter, les implémentations particulières du projet, surtout s'il s'agit de programmation.
-      `.replace(/^ +/gm, '').trim());
-    DGet('#ETR-explication', this.obj).innerText = 'Ce rapport doit servir à commencer la prochaine session de travail plus rapidement et plus efficacement. C’est votre baton de relais pour la prochaine session.'
+    this.contentField.setAttribute('placeholder', t('ui.text.description_stop_report_modele'));
+    DGet('#ETR-explication', this.obj).innerText = t('ui.text.description_stop_report');
     this.observeButtons();
   }
   private observeButtons(){

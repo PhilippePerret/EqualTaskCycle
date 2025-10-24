@@ -9,6 +9,7 @@ import { help } from "./help.js";
 import { editor } from "./editing.js";
 import { EndWorkReport } from "./end_work_report.js";
 import { markdown, postToServer } from "./utils.js";
+import { loc } from "../lib/Locale.js";
 
 export class Work {
 
@@ -17,6 +18,7 @@ export class Work {
     if (res === true) {
       prefs.init();
       editor.init();
+      await loc.init(prefs.getLang());
       Flash.notice(`App is ready. <span id="mes123">(Show help)</span>`)
       DGet('span#mes123').addEventListener('click', 
         help.show.bind(help, ['introduction', 'tasks_file', 'tasks_file_format']),

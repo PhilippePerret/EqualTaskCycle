@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import yaml from 'js-yaml';
 import { HOST, PORT } from './public/js/constants';
 import { Work } from "./lib/work";
 import { prefs } from './lib/prefs_server_side';
@@ -8,7 +9,6 @@ import { existsSync, readFileSync } from 'fs';
 import { execFileSync, execSync } from 'child_process';
 import type { RecType, WorkType } from './lib/types';
 import { activTracker } from './lib/activityTracker';
-import yaml from 'js-yaml';
 import { loc, tf } from './lib/Locale';
 
 const app = express();
@@ -174,6 +174,11 @@ app.post('/prefs/save', (req, res) => {
   res.json(report);
 });
 
+app.post('/locales/get-all', (req, res) => {
+  const lang = req.body.lang;
+  let retour = {ok: true, error: '', locales: loc.getLocales()};
+  res.json(retour);
+});
 
 
 app.listen(PORT, () => {

@@ -84,4 +84,5 @@ class Help {
 }
 
 export const help = Help.getInstance();
+
 help.init();

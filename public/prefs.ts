@@ -21,6 +21,8 @@ export class Prefs {
     this.observeButtons();
   }
 
+  public getLang(){ return 'fr' } /* <=========== TODO */
+
   /**
    * Pour ouvrir le fichier des données
    */

@@ -1,6 +1,6 @@
 import { Work } from "./work_client";
-import { HOST } from "./js/constants";
 import { ui } from "./ui";
+import { postToServer } from "./utils";
 
 export class ActivityTracker /* CLIENT */ {
 
@@ -31,15 +31,10 @@ export class ActivityTracker /* CLIENT */ {
   }
 
   private static async control(){
-    const response = await fetch(HOST + 'work/check-activity', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    const response = await postToServer('work/check-activity',{
         projectFolder: Work.currentWork.folder,
         lastCheck: Date.now() - this.CHECK_INTERVAL
-      })
     });
-      
     const result = await response.json();
     console.log("résultat du check:", result);
     this.inactiveUser = result.userIsWorking === false;
