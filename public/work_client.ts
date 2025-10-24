@@ -118,6 +118,8 @@ export class Work {
   public get script(): string | undefined {return this.data.script}
   public get folder(): string | undefined {return this.data.folder}
   public get restTime(): number {return this.data.restTime}
+  public get cycleTime(): number {return this.data.cycleTime}
+  public get totalTime(): number {return this.data.totalTime}
 
   /**
    * Fonction appelée pour afficher le travail (courant)

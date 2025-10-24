@@ -157,11 +157,23 @@ class Clock {
     let displayedSeconds: number;
     if (this.counterMode === 'clock') { displayedSeconds = secondesOfWork}
     else /* countdown */ { displayedSeconds = this.totalRestTimeSeconds - secondesOfWork}
+    const restTime = this.taskRestTime(secondesOfWork);
+    const thisMinute = Math.round(secondesOfWork / 60);
     /****************************************
      * AFFICHAGE DU TEMPS DANS L'INTERFACE  *
      ****************************************/
+    // L'horloge principale
     this.clockObj.innerHTML = this.s2h(displayedSeconds);
-    const restTime = this.taskRestTime(secondesOfWork);
+    // Les temps du travail (seulement si la "minute" a changé)
+    if (this.currentMinute != thisMinute) {
+      const elapsedMinutes = this.currentWork.cycleTime + thisMinute;
+      const totalMinutes = this.currentWork.totalTime + thisMinute;
+      this.restTimeField.innerHTML  = this.time2horloge(restTime);
+      this.cycleTimeField.innerHTML = this.time2horloge(elapsedMinutes);
+      this.totalTimeField.innerHTML = this.time2horloge(totalMinutes);
+      this.currentMinute = thisMinute;
+    }
+    /****************************************/
     // console.log("restTime = %i", restTime);
     if ( restTime < 10 && this.alerte10minsDone === false) {
       // 10 minutes restantes sur ce travail
@@ -174,6 +186,16 @@ class Clock {
       }
     }
   }; 
+  private get restTimeField(){
+    return this._restfield || (this._restfield = DGet('span#current-work-restTime'))
+  }
+  private get cycleTimeField(){
+    return this._cycledurfield || (this._cycledurfield = DGet('span#current-work-cycleTime'))
+  }
+  private get totalTimeField(){
+    return this._totalfield || (this._totalfield = DGet('span#current-work-totalTime'))
+  }
+
   private alerte10minsDone: boolean = false;
   private alerteWorkDone: boolean = false;
 
@@ -221,6 +243,10 @@ class Clock {
     (window as any).electronAPI.bringToFront();
   }
 
+  private _restfield!: HTMLSpanElement;
+  private _cycledurfield!: HTMLSpanElement;
+  private _totalfield!: HTMLSpanElement;
+  private currentMinute: number = 0;
 }
 
 export const clock = Clock.getInstance();

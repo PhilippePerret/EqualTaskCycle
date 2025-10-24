@@ -762,8 +762,17 @@ class Clock {
     } else {
       displayedSeconds = this.totalRestTimeSeconds - secondesOfWork;
     }
-    this.clockObj.innerHTML = this.s2h(displayedSeconds);
     const restTime = this.taskRestTime(secondesOfWork);
+    const thisMinute = Math.round(secondesOfWork / 60);
+    this.clockObj.innerHTML = this.s2h(displayedSeconds);
+    if (this.currentMinute != thisMinute) {
+      const elapsedMinutes = this.currentWork.cycleTime + thisMinute;
+      const totalMinutes = this.currentWork.totalTime + thisMinute;
+      this.restTimeField.innerHTML = this.time2horloge(restTime);
+      this.cycleTimeField.innerHTML = this.time2horloge(elapsedMinutes);
+      this.totalTimeField.innerHTML = this.time2horloge(totalMinutes);
+      this.currentMinute = thisMinute;
+    }
     if (restTime < 10 && this.alerte10minsDone === false) {
       this.donneAlerte10mins();
     } else if (this.alerte10minsDone) {
@@ -771,6 +780,15 @@ class Clock {
         this.donneAlerteWorkDone();
       }
     }
+  }
+  get restTimeField() {
+    return this._restfield || (this._restfield = DGet("span#current-work-restTime"));
+  }
+  get cycleTimeField() {
+    return this._cycledurfield || (this._cycledurfield = DGet("span#current-work-cycleTime"));
+  }
+  get totalTimeField() {
+    return this._totalfield || (this._totalfield = DGet("span#current-work-totalTime"));
   }
   alerte10minsDone = false;
   alerteWorkDone = false;
@@ -808,6 +826,10 @@ class Clock {
   bringAppToFront() {
     window.electronAPI.bringToFront();
   }
+  _restfield;
+  _cycledurfield;
+  _totalfield;
+  currentMinute = 0;
 }
 var clock = Clock.getInstance();
 
@@ -11803,6 +11825,12 @@ class Work {
   }
   get restTime() {
     return this.data.restTime;
+  }
+  get cycleTime() {
+    return this.data.cycleTime;
+  }
+  get totalTime() {
+    return this.data.totalTime;
   }
   display(options) {
     this.dispatchData();
