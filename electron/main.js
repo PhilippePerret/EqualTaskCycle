@@ -8,7 +8,6 @@ let server = null;
 
 const path = require('path');
 
-const pidPath = path.join(userDataPath, 'serverPID'); // to kill it
 const ICON_PATH = path.join(path.resolve(__dirname, 'icon.png'));
 
 if (existsSync(ICON_PATH)) {
@@ -18,22 +17,6 @@ if (existsSync(ICON_PATH)) {
 }
 
 app.name = "Equal Task Cycle";
-
-// If old pid exists, try to kill it again
-if (existsSync(pidPath)) {
-  const oldPid = readFileSync(pidPath, 'utf8');
-
-  try { 
-    process.kill(oldPid, 'SIGTERM'); 
-  } catch(e) {
-    // Ignore this error
-    if (e.code !== 'ESRCH') {
-      console.error('Error when kill the old pid', e);
-    }
-  }
-
-  unlinkSync(pidPath);
-}
 
 app.whenReady().then(() => {
   app.dock.setIcon(ICON_PATH);
@@ -48,21 +31,20 @@ app.whenReady().then(() => {
   });
   
   if (server) {
-
-    writeFileSync(pidPath, server.pid.toString());
-
     server.stdout.on('data', (data) => console.log(`SERVER STDOUT: ${data}`));
     server.stderr.on('data', (data) => console.error(`SERVER STDERR: ${data}`));
     server.on('error', (err) => console.error('SERVER FAILED TO START:', err));
     server.on('exit', (code) => console.log('SERVER EXITED WITH CODE:', code));
   }
+
+  const WITH_CONSOLE_DEV = true;
   
   const win = new BrowserWindow({
     x: 10,
-    y: 800,
+    y: WITH_CONSOLE_DEV ? 400 : 800,
+    height: WITH_CONSOLE_DEV ? 1000 : 600,
     width: 800,
     // width: 1200, // Pour console
-    height: 600,
     icon: ICON_PATH,
     /** Pour le preload qui doit permettre la communication
      *  entre les éléments pour mettre la fenêtre au premier
@@ -73,6 +55,7 @@ app.whenReady().then(() => {
         contextIsolation: true
       }    
   });
+  WITH_CONSOLE_DEV && win.webContents.openDevTools({ mode: 'bottom' });
 
   // Pour mettre au premier plan (communication IPC)
   const { ipcMain } = require('electron');

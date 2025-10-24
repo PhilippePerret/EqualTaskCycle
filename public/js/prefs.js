@@ -11210,6 +11210,19 @@ function markdown(md) {
   return html6;
 }
 
+// node_modules/nanoid/url-alphabet/index.js
+var urlAlphabet = "useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict";
+
+// node_modules/nanoid/index.browser.js
+var nanoid = (size = 21) => {
+  let id = "";
+  let bytes = crypto.getRandomValues(new Uint8Array(size |= 0));
+  while (size--) {
+    id += urlAlphabet[bytes[size] & 63];
+  }
+  return id;
+};
+
 // public/editing.ts
 var ConfigProperties = [
   ["duration", 120],
@@ -11273,7 +11286,6 @@ class Editing {
   async startEditing() {
     ui.toggleSection("editing");
     const container = this.taskContainer;
-    const formClone = this.section.querySelector(".editing-form-task");
     container.innerHTML = "";
     const retour = await postToServer("tasks/all", { dataPath: prefs.getValue("file") });
     if (retour.ok === false) {
@@ -11283,27 +11295,45 @@ class Editing {
     const works = retour.data.works;
     DGet("span#tasks-count", this.section).innerHTML = works.length;
     works.forEach((work) => {
-      const owork = formClone.cloneNode(true);
-      container.appendChild(owork);
-      this.peupleWorkForm(owork, work);
-      this.observeWorkForm(owork, work);
-      owork.classList.remove("hidden");
+      this.createNewTask(work);
     });
+  }
+  get formClone() {
+    return this._formtemp || (this._formtemp = this.section.querySelector(".editing-form-task"));
+  }
+  createNewTask(work) {
+    const owork = this.formClone.cloneNode(true);
+    this.taskContainer.appendChild(owork);
+    this.peupleWorkForm(owork, work);
+    this.observeWorkForm(owork, work);
+    owork.classList.remove("hidden");
+    if (work.active)
+      owork.classList.remove("off");
+    return owork;
   }
   peupleWorkForm(obj, work) {
     WorkProps.forEach((prop) => {
       const field = DGet(`.form-task-${prop}`, obj);
       let value = work[prop];
-      if (prop === "active" && value === undefined) {
-        value = true;
+      if (prop === "active") {
+        if (value === undefined) {
+          value = true;
+        }
+        value = String(value);
       }
-      field.value = value || "";
+      field.value = String(value || "");
     });
+    DGet("span.task-id-disp", obj).innerHTML = work.id;
   }
   observeWorkForm(owork, work) {
     listenBtn("up", this.onUp.bind(this, owork), owork);
     listenBtn("down", this.onDown.bind(this, owork), owork);
     listenBtn("remove", this.onRemove.bind(this, work), owork);
+    const menuActive = DGet(".form-task-active", owork);
+    menuActive.addEventListener("change", (ev) => {
+      const actif = menuActive.value === "true";
+      owork.classList[actif ? "remove" : "add"]("off");
+    });
   }
   onUp(owork, ev) {
     if (owork.previousSibling) {
@@ -11326,7 +11356,16 @@ class Editing {
     return DGet("div#editing-tasks-container");
   }
   onAddTask() {
-    Flash.notice("Je dois apprendre à ajouter une tâche.");
+    const owork = this.createNewTask({
+      id: nanoid(),
+      project: "Your project/Task",
+      content: `Description of your project/task
+
+Set active to true to active it.`,
+      folder: "REQUIRED/FOLDER/PATH",
+      active: false
+    });
+    owork.scrollIntoView({ behavior: "smooth", block: "start" });
   }
   onSaveData() {
     postToServer("/tasks/save", this.getAllData());
@@ -11348,6 +11387,7 @@ class Editing {
   }
   static _inst;
   constructor() {}
+  _formtemp;
 }
 var editor = Editing.getIntance();
 

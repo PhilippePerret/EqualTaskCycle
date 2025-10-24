@@ -4,6 +4,7 @@ import { Flash } from "./js/flash";
 import { prefs } from "./prefs";
 import { ui } from "./ui";
 import { listenBtn, postToServer } from "./utils";
+import { nanoid } from 'nanoid';
 
 interface AllDataType {
   duration: number;
@@ -94,7 +95,6 @@ class Editing {
   async startEditing(){
     ui.toggleSection('editing');
     const container = this.taskContainer;
-    const formClone = this.section.querySelector('.editing-form-task');
     container.innerHTML = '';
     const retour: RecType = await postToServer('tasks/all', {dataPath: prefs.getValue('file')});
     if (retour.ok === false ) { return Flash.error(retour.error) }
@@ -105,26 +105,45 @@ class Editing {
     // Indiquer le nombre de tâches
     DGet('span#tasks-count', this.section).innerHTML = works.length;
     // Créer tous les formulaires pour les tâches
-    works.forEach((work: WorkType) => {
-      const owork:HTMLDivElement = formClone.cloneNode(true);
-      container.appendChild(owork);
-      this.peupleWorkForm(owork, work);
-      this.observeWorkForm(owork, work);
-      owork.classList.remove('hidden');
-    })
+    works.forEach((work: WorkType) => { this.createNewTask(work) })
   }
+
+  private get formClone(){
+    return this._formtemp || (this._formtemp = this.section.querySelector('.editing-form-task'))
+  }
+
+  private createNewTask(work: WorkType): HTMLDivElement {
+    const owork:HTMLDivElement = this.formClone.cloneNode(true) as HTMLDivElement;
+    this.taskContainer.appendChild(owork);
+    this.peupleWorkForm(owork, work);
+    this.observeWorkForm(owork, work);
+    owork.classList.remove('hidden');
+    if (work.active) owork.classList.remove('off');
+    return owork;
+  }
+
+
   private peupleWorkForm(obj: HTMLDivElement, work: WorkType){
     WorkProps.forEach((prop: string) => {
       const field = DGet(`.form-task-${prop}`, obj);
       let value = (work as any)[prop];
-      if (prop === 'active' && undefined === value) { value = true }
-      field.value = value || '';
-    })
+      if (prop === 'active') {
+        if (undefined === value) { value = true }
+        value = String(value);
+      }
+      field.value = String(value || '');
+    });
+    DGet('span.task-id-disp', obj).innerHTML = work.id;
   }
   private observeWorkForm(owork: HTMLDivElement, work: WorkType){
     listenBtn('up', this.onUp.bind(this, owork), owork);
     listenBtn('down', this.onDown.bind(this, owork), owork);
     listenBtn('remove', this.onRemove.bind(this, work), owork);
+    const menuActive = DGet('.form-task-active', owork)
+    menuActive.addEventListener('change', (ev: Event) => {
+      const actif = menuActive.value === 'true';
+      owork.classList[actif?'remove':'add']('off'); 
+    });
   }
 
 
@@ -154,7 +173,14 @@ class Editing {
   }
 
   onAddTask(){
-    Flash.notice("Je dois apprendre à ajouter une tâche.")
+    const owork = this.createNewTask({
+      id: nanoid(),
+      project: 'Your project/Task',
+      content: "Description of your project/task\n\nSet active to true to active it.",
+      folder: 'REQUIRED/FOLDER/PATH',
+      active: false
+    } as WorkType);
+    owork.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   onSaveData(){
@@ -182,6 +208,8 @@ class Editing {
   public static getIntance(){return this._inst || (this._inst = new Editing())}
   private static _inst: Editing;
   private constructor(){}
+  private _formtemp!: HTMLDivElement;
+
 }
 
 export const editor = Editing.getIntance();
