@@ -20,6 +20,7 @@ export interface RunTimeInfosType {
   cycleCount: number; // Nombre de cycles
   startedAt: number;  // Date de démarrage du travail
   lastWorkedAt: number; // Date de dernier travail
+  report: string; // Le Stop Report (rapport de fin, bâton de relais)
 }
 
 export interface PrefsDataType {

@@ -42,10 +42,10 @@ app.post('/work/check-activity', async (req, res) => {
   res.json(response)
 });
 
-app.post('/work/save-times', (req, res) => {
-  log("-> /work/save-times");
+app.post('/work/save-session', (req, res) => {
+  log("-> /work/save-session");
   const dwork = req.body;
-  log("Sauvegarde des temps : ", dwork);
+  log("Sauvegarde de la session : ", dwork);
   runtime.updateWork(dwork);
   res.json({
     ok: true, 

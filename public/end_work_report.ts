@@ -1,10 +1,12 @@
-import type { Work } from "../work_client";
-import { listenBtn } from "../utils";
-import { DGet, stopEvent } from "./dom";
-import { Flash } from "./flash";
+import type { Work } from "./work_client";
+import { listenBtn } from "./utils";
+import { DGet, stopEvent } from "./js/dom";
+import { Flash } from "./js/flash";
 
 /**
  * RAPPORT DE FIN DE TÂCHE (ET DE DÉBUT DE TÂCHE FUTURE)
+ * Passage de témoin
+ * Bâton de relais — Relay Baton
  * 
  * Avant d'aller enregistrer le temps après un STOP de la tâche,
  * on présent à l'utilisateur une fenêtre qui lui permet d'indiquer
@@ -31,21 +33,39 @@ export class EndWorkReport {
    * Ouvre la boite de rapport de fin de travail pour le remplir.
    * 
    */
-  public open(){
+  public async writeReport(){
+    return new Promise((ok, ko) => {
+      this.ok = ok; 
+      this.ko = ko;
+      this.open();
+    })
+  }
+  private ok!: Function;
+  private ko!: Function;
+
+  private open(){
     this.inited || this.init();
     this.reset();
     this.show();
   }
+  private close(){
+    this.hide();
+  }
+
 
   /**
    * Pour enregistrer le rapport 
    * (normalement, ça doit être fait avec l'enregistrement du temps)
    */
   onSave(ev: MouseEvent){
+    this.close();
+    this.ok(this.getContent());
     return ev && stopEvent(ev);
   }
 
   onDontSave(ev: MouseEvent){
+    this.close();
+    this.ok(false);
     return ev && stopEvent(ev);
   }
 

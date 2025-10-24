@@ -7,7 +7,8 @@ import { ui } from "./ui.js";
 import { prefs } from "./prefs.js";
 import { help } from "./help.js";
 import { editor } from "./editing.js";
-import { EndWorkReport } from "./js/end_work_report.js";
+import { EndWorkReport } from "./end_work_report.js";
+import { markdown, postToServer } from "./utils.js";
 
 export class Work {
 
@@ -26,16 +27,48 @@ export class Work {
 
   public static currentWork: Work;
 
+  /**
+   * Ajout de la durée de travail +time+ au projet courant, mais
+   * seulement si ce temps excède la minute.
+   */
   public static async addTimeToCurrentWork(time: number){
-    const report = new EndWorkReport(this.currentWork);
-    report.open();
-    if (time) {
+    // if ( time ) {
+    if ( true ) {
       await this.currentWork.addTimeAndSave(time)
     } else {
-      Flash.error("Work time too short to save.")
+      Flash.error("Too short time to be saved.")
     }
   }
 
+
+  /**
+   * Méthode d'instance pour sauver le temps
+   */
+  public async addTimeAndSave(time: number): Promise<boolean> {
+    this.data.totalTime += time;
+    this.data.cycleTime += time;
+    this.data.restTime -= time;
+    if (this.data.restTime < 0) { this.data.restTime = 0; }
+    if ( this.data.cycleCount === 0 ) {
+      this.data.cycleCount = 1;
+      this.data.startedAt = clock.getStartTime();
+    }
+    this.data.lastWorkedAt = clock.getStartTime();
+    const stopReport = await new EndWorkReport(this).writeReport();
+    if (stopReport === undefined) { return false /* annulation */}
+    this.data.report = stopReport as string;
+    console.log("[addTimeAndSave] Enregistrement des temps et du rapport", this.data);
+    const result: RecType = await postToServer('work/save-session', this.data);
+    console.log("Retour save session: ", result);
+    // On actualise l'affichage pour apercevoir les nouveaux temps
+    // pendant 2 secondes puis on passe à la tâche suivante, qui a
+    // été remontée.
+    this.dispatchData();
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    Work.displayWork(result.next, result.options);
+    if (result.ok) { Flash.success("New times saved.");}
+    return true;
+  }
 
   private static get obj(){
     return this._obj || (this._obj = DGet('section#current-work-container')) as HTMLElement;
@@ -78,7 +111,7 @@ export class Work {
   constructor(
     private data: WorkType & RunTimeInfosType
   ){
-    console.log("this.data", this.data);
+    // console.log("this.data", this.data);
   }
 
   public get id(){ return this.data.id; }
@@ -87,42 +120,12 @@ export class Work {
   public get restTime(): number {return this.data.restTime}
 
   /**
-   * Méthode d'instance pour sauver le temps
-   */
-  public async addTimeAndSave(time: number): Promise<boolean> {
-    this.data.totalTime += time;
-    this.data.cycleTime += time;
-    this.data.restTime -= time;
-    if (this.data.restTime < 0) { this.data.restTime = 0; }
-    if ( this.data.cycleCount === 0 ) {
-      this.data.cycleCount = 1;
-      this.data.startedAt = clock.getStartTime();
-    }
-    this.data.lastWorkedAt = clock.getStartTime();
-    console.log("[addTimeAndSave] Enregistrement des temps")
-    const result: RecType = 
-      await fetch(HOST+'work/save-times', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(this.data)
-      })
-      .then( r => r.json() );
-    console.log("Retour save times: ", result);
-    // On actualise l'affichage pour apercevoir les nouveaux temps
-    // pendant 2 secondes puis on passe à la tâche suivante, qui a
-    // été remontée.
-    this.dispatchData();
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    Work.displayWork(result.next, result.options);
-    if (result.ok) { Flash.success("New times saved.");}
-    return true;
-  }
-
-  /**
    * Fonction appelée pour afficher le travail (courant)
    */
   display(options: {[x: string]: any}){
+    // Disptach des données
     this.dispatchData();
+    // Réglage des boutons
     ui.showButtons({
       Start: true,
       Restart: false,
@@ -142,6 +145,10 @@ export class Work {
           case 'cycleTime':
           case 'restTime':
             return clock.time2horloge(v);
+          case 'report':
+            if ( v ) {
+              return markdown("---\n\n# Last Session Report\n\n" + v);
+            } else { return v }
           default: 
             return v;
         }

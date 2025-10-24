@@ -180,12 +180,14 @@ export class RunTime {
       id TEXT PRIMARY KEY,
       totalTime INTEGER,
       cycleTime INTEGER,
+      sessionTime INTEGER,
       restTime INTEGER,
       cycleCount INTEGER,
       startedAt INTEGER,
       lastWorkedAt INTEGER,
       active INTEGER,
-      defaultRestTime INTEGER
+      defaultRestTime INTEGER,
+      report STRING
     );
     CREATE TABLE IF NOT EXISTS keypairs (
       k TEXT PRIMARY KEY,
@@ -207,7 +209,8 @@ export class RunTime {
         cycleTime = ?,
         restTime = ?,
         cycleCount = ?,
-        lastWorkedAt = ?
+        lastWorkedAt = ?,
+        report = ?
       WHERE
         id = ?
     `;
@@ -218,6 +221,7 @@ export class RunTime {
       dw.restTime,
       dw.cycleCount,
       dw.lastWorkedAt,
+      dw.report,
       dw.id
     ];
     this.db.run(request, data);
@@ -301,9 +305,9 @@ export class RunTime {
     INTO 
       works
     VALUES
-      (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `
-    this.db.run(request, [work.id, 0, 0, duration, 0, new Date().getTime(), null, 1, duration])
+    this.db.run(request, [work.id, 0, 0, duration, 0, new Date().getTime(), null, 1, duration, ""])
   }
 
   private get dbPath(){

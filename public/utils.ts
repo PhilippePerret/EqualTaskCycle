@@ -1,6 +1,11 @@
 import type { RecType } from "../lib/types";
 import { HOST } from "./js/constants";
 import { DGet } from "./js/dom";
+// Pour remark (Markdonw => HTML)
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import rehypeStringify from 'rehype-stringify';
 
 export async function postToServer(route: string, data: RecType){
   if (route.startsWith('/')){ route = route.substring(1, route.length)}
@@ -19,5 +24,20 @@ export async function postToServer(route: string, data: RecType){
  * La fonction doit être bindée
  */
 export function listenBtn(id: string, method: Function, container = document.body) {
-    DGet(`button.btn-${id}`, container).addEventListener("click", method);
-  }
+  DGet(`button.btn-${id}`, container).addEventListener("click", method);
+}
+
+export function markdown(md: string): string {
+  // Ajouter deux '#' à chaque titre
+  md = md.replace(/^(\#+?)/mg, '$1##');
+  const result = unified()
+    .use(remarkParse)
+    .use(remarkRehype)
+    .use(rehypeStringify)
+    .processSync(md);
+  
+  const html = String(result);
+
+  // console.log("Report corrigé", html);
+  return html; 
+}
