@@ -37,12 +37,12 @@ app.whenReady().then(() => {
     server.on('exit', (code) => console.log('SERVER EXITED WITH CODE:', code));
   }
 
-  const WITH_CONSOLE_DEV = true;
+  const WITH_CONSOLE_DEV = false;
   
   const win = new BrowserWindow({
     x: 10,
     y: WITH_CONSOLE_DEV ? 400 : 800,
-    height: WITH_CONSOLE_DEV ? 1000 : 600,
+    height: WITH_CONSOLE_DEV ? 1000 : 700,
     width: 800,
     // width: 1200, // Pour console
     icon: ICON_PATH,

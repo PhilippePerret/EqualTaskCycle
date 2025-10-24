@@ -13,6 +13,7 @@ div#current-work-id {
 section#current-work-container {
   position:relative;
   min-height: 200px;
+  height: 356px;
   padding: 1.5em;
   border-radius: 1.2em;
 }
@@ -23,6 +24,10 @@ body.light section#current-work-container {
   background: #b1b6c6;
 }
 
+div#current-work-description-container {
+  overflow: auto;
+  max-height: 280px;
+}
 
 section#current-work-container div#current-work-content {
   font-size: 18pt;
