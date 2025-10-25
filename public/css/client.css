@@ -9,8 +9,16 @@ body {
 .tiny {font-size: 0.8em;}
 .mono {font-family: monospace, 'Courier New', Courier}
 
+span[onclick] {
+  color: darkblue;
+  cursor: pointer;
+}
+
 section#help {
   margin-top: -2em;
+  background-color: whitesmoke;
+  padding: 1em 3em;
+  text-align: justify;
 }
 section#help div#help-content {
   font-size: 16pt;

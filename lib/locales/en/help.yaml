@@ -1,0 +1,123 @@
+help:
+  show: Show help
+  term:
+    title: Terminology
+    text: |
+      | Term | | Description |
+      | --- | --- | --- |
+      | Cycle | | A *c.* is a complete loop over all tasks to be performed. |
+      | Remaining time | | A *rem. t.* corresponds to the time left to complete the work within the current cycle. |
+      | Time spent | | The *spent t.* corresponds to the time dedicated to the work/project during the current cycle. |
+      | --- | ---| --- |
+  intro:
+    title: INTRODUCTION
+    text: |
+      Welcome to the modular help system of the ETC application
+      (Etcetera), which allows you to work on several tasks in parallel.
+
+      The operation of this application is radically different
+      from what you may be used to and is particularly well-suited
+      to situations where you have multiple projects running concurrently,
+      without neglecting any of them, by dedicating time each day
+      or each week to each one.
+  task_list:
+    title: Task list
+    text: |
+      The task list is the first thing to define in order to use
+      the application.
+
+      Simply click on the ✍🏽 button in the main window
+      to open the tasks and general data panel.
+      Then click the “+” button to add a task.
+      The process is intuitive, but let’s detail the various
+      properties you can define:
+
+      t(help.terminologie)
+
+      | Property | | Description |
+      | --- | --- | --- |
+      | Active/Inactive | | This menu lets you enable or disable a task. A disabled task will not appear in your work cycle. |
+      | Project | | The title of the project or work item. |
+      | Content | | This is where you specify what needs to be done, concretely. It is written in [Markdown](https://${pref.getLang()}.wikipedia.org/wiki/Markdown), so it can include simple formatting. |
+      | Folder | | The path to the folder. This information is crucial, as it allows the application to track activity on the task. |
+      | Script | | The strength of this app lies in allowing you to define a script to be executed at any time during the work process (often before). This script, written in any language, opens up unlimited possibilities. |
+      | Duration | | Defines a duration specific to the task. If not specified, the default duration is used. |
+      | Session duration | | Optionally, a session duration can be defined, different from the cycle duration. Subtle, yet clear once understood. See hlink(Cycle duration versus session duration, duree_cycle_vs_duree_sess) for details. |
+
+  durcycvsdursess:
+    title: Cycle duration versus session duration
+    text: |
+      When a session duration is defined (necessarily shorter
+      than the cycle duration), the application behaves differently
+      with the task: instead of waiting until the end of the task’s
+      “cycle duration” (or default duration) to terminate the current task,
+      it ends it once the *session duration* is reached (see the example below).
+
+      Concretely, this allows you to allocate more total time to a task
+      within a cycle while defining a standard work duration per session
+      (i.e., per day). Otherwise, the user must monitor the time manually—
+      that’s the key difference.
+
+      ## Examples
+
+      ### With identical durations
+
+      Imagine six tasks without defined durations. The cycle duration
+      will then match the session duration. If this is set to 2 hours,
+      the process will unfold as follows:
+
+      - Upon launching the application, an initial task (e.g., T4) is
+        randomly selected. The user works on it for 2 hours.
+      - After 2 hours, they are notified and another task (e.g., T2) is proposed.
+      - After another 2 hours, they are notified again and move on.
+      - At the end of an 8-hour day, four tasks will have been completed.
+      - The next day, the 5th (e.g., T1) and 6th (e.g., T3) tasks are proposed.
+        After about 4 hours, one full cycle will have been completed,
+        and a new one begins.
+
+      In this approach, all projects have equal importance
+      and receive equal working time.
+
+      In practice, however, some projects require more time. Hence the next method.
+
+      ### With different durations
+
+      In this scenario, task T2 requires twice as much work, and the user
+      decides to allocate twice as much time—4 hours per cycle.
+
+      - The day starts with task T6.
+      - After 2 hours, the application proposes the next task,
+        T2. If the user doesn’t want to work 4 hours straight, they can
+        stop after around 2 hours.
+      - The application records the work time and notes that
+        time remains on this project.
+      - It then proposes the next task.
+      - At the end of the day, as before, two tasks remain untouched,
+        and there are 2 hours left on T2.
+      - The next day, the app proposes those two tasks plus the remaining
+        2 hours on T2.
+
+      This approach is perfectly valid and convenient even if one
+      doesn’t know exactly how much time will be spent on T2 in a day—
+      perhaps there will be enough time and energy to do the full 4 hours.
+
+      But to better balance the workload, we use the third approach,
+      involving the *session duration*.
+
+      ### With session durations
+
+      This time, we specify that 4 hours should be devoted to T2 per cycle,
+      but only 2 hours per session (per day). We therefore set its
+      *session duration* to 2 hours.
+
+      - The day starts normally, for example with task T1.
+      - After 2 hours, the app suggests switching to T2.
+      - Two hours later—since that’s the defined *session duration*—
+        the app suggests moving on to the next task (though the user may
+        refuse and continue working on T2).
+      - The user moves on.
+      - And so on, until the next day.
+
+      Naturally, these examples only featured one task with varying durations,
+      but in reality, each task may have its own *cycle duration* and
+      *session duration* to accommodate any workflow.

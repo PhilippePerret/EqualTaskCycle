@@ -5,8 +5,6 @@ app:
 error:
   occurred: "Une erreur est survenue : _0_"
   unfound_field: "Champ introuvable : _0_"
-help:
-  show: Afficher l’aide
 locales:
   check: "Vérification des locales, merci de patienter…"
   report:

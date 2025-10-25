@@ -25,3 +25,14 @@ Explication des temps dans la base de données et le programme.
 | **`totalTime`**   | Oui         | Durée totale de travail sur le projet, tous cycles confondus. |
 | **`workedTime`**  | Non         | Durée déjà effectuée dans le cycle courant. On a donc `workedTime + restTime = cycleTime`. |
 
+## Locales
+
+Pour checker les locales, c’est-à-dire voir celles qui sont à ajouter, lancer : 
+
+~~~shell
+bun run check-locales
+~~~
+
+### Ajouter une langue
+
+Pour ajouter une langue, dupliquer un dossier de `lib/locales/, le renommer avec les deux lettres de la langue, puis corriger tous les textes.

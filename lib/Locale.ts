@@ -29,11 +29,23 @@ export function tf(fpath: string) {
   return loc.translateText(readFileSync(fpath, 'utf8'));
 }
 
+/**
+ * @api
+ * Permet de traduire tout un texte quand il contient des 
+ * balises de localisation (t(route)).
+ * 
+ * @param text Un texte contenant des balises de localisation
+ * @returns Le texte traduit
+ */
+export function tt(text: string){
+  return loc.translateText(text);
+}
+
 class Locale {
 
-  public getLocales(){
-    return this.locales;
-  }
+  private BASEFILES = ['messages', 'ui', 'help'];
+
+  public getLocales(){return this.locales}
 
   public translateText(texte: string){
     // console.log("-> Locale.translateText")
@@ -47,7 +59,7 @@ class Locale {
    */
   public translate(route: string): string {
     const translated = route.split('.').reduce((obj, key) => obj?.[key], this.locales) ;
-    return 'string' === typeof translated ? translated : `[UNFOUND: ${route}]`;
+    return 'string' === typeof translated ? translated : `[LOC: ${route}]`;
   }
 
 
@@ -65,7 +77,7 @@ class Locale {
     if ( typeof window === 'undefined' /* server side */) {
       this.locales = {}
       const folderLang = path.join(LOCALES_FOLDER, lang);
-      ['messages', 'ui'].forEach((base: string) => {
+      this.BASEFILES.forEach((base: string) => {
         const pathLocale = path.join(folderLang, `${base}.yaml`)
         Object.assign(this.locales, yaml.load(readFileSync(pathLocale, 'utf8')));
       })

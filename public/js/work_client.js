@@ -13820,8 +13820,12 @@ function t(route, params) {
     return loc.translate(route);
   }
 }
+function tt(text5) {
+  return loc.translateText(text5);
+}
 
 class Locale {
+  BASEFILES = ["messages", "ui", "help"];
   getLocales() {
     return this.locales;
   }
@@ -13830,7 +13834,7 @@ class Locale {
   }
   translate(route) {
     const translated = route.split(".").reduce((obj, key2) => obj?.[key2], this.locales);
-    return typeof translated === "string" ? translated : `[UNFOUND: ${route}]`;
+    return typeof translated === "string" ? translated : `[LOC: ${route}]`;
   }
   replacementMethod(tout, route) {
     return this.translate(route);
@@ -13839,7 +13843,7 @@ class Locale {
     if (typeof window === "undefined") {
       this.locales = {};
       const folderLang = path_default.join(LOCALES_FOLDER, lang);
-      ["messages", "ui"].forEach((base) => {
+      this.BASEFILES.forEach((base) => {
         const pathLocale = path_default.join(folderLang, `${base}.yaml`);
         Object.assign(this.locales, js_yaml_default.load(readFileSync(pathLocale, "utf8")));
       });
@@ -15597,17 +15601,39 @@ class Help {
   static inst;
   texts;
   async show(helpIds) {
-    ui.toggleHelp();
+    this.isOpened() || ui.toggleHelp();
     this.texts = helpIds.map((helpId) => {
-      return `<a name="${helpId}"></a>
+      let texte = HELP_TEXTS[helpId];
+      if (texte.indexOf("help(")) {
+        texte = texte.replace(/\bhelp\((.+?)\)/g, (_tout, liste) => {
+          return liste.split(",").map((hid) => {
+            hid = hid.trim();
+            return HELP_TEXTS[hid];
+          }).join(`
 
-` + HELP_TEXTS[helpId].trim().concat(`
+`);
+        });
+      }
+      console.log("texte = ", texte);
+      return `<a id="help-${helpId}" name="${helpId}"></a>
+
+` + this.finalizeText(tt(texte)).trim().concat(`
 
 ---`);
     });
-    this.timer = setInterval(this.writeText.bind(this), 500);
+    this.timer = setInterval(() => {
+      this.writeText.bind(this)();
+      DGet(`a#help-${helpIds[0]}`).scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 500);
   }
   timer;
+  finalizeText(text5) {
+    text5 = text5.replace(/\bhlink\((.+?)\)/g, (_tout, args) => {
+      const [tit, hid] = args.split(",").map((s) => s.trim());
+      return `<span onclick="help.show(['${hid}'])">${tit}</span>`;
+    });
+    return text5;
+  }
   writeText() {
     var text5;
     if (text5 = this.texts.shift()) {
@@ -15624,6 +15650,13 @@ class Help {
     this.content.insertAdjacentHTML("beforeend", text5);
     return true;
   }
+  isOpened() {
+    return !this.obj.classList.contains("hidden");
+  }
+  get obj() {
+    return this._obj || (this._obj = DGet("section#help"));
+  }
+  _obj;
   get content() {
     return this._content || (this._content = DGet("div#help-content", DGet("section#help")));
   }
@@ -15636,16 +15669,27 @@ var HELP_TEXTS, help;
 var init_help = __esm(() => {
   init_marked_esm();
   init_ui();
+  init_Locale();
   HELP_TEXTS = {
+    resume_home_page: `
+help(introduction, terminologie, task_list)
+  `,
     introduction: `
-### Introduction
+### t(help.intro.title)
 
-Bienvenue dans l'aide modulaire de l'application ETC (Etcétéra) qui vous permet de travailler parallèlement plusieurs tâches.
+t(help.intro.text)
 `,
-    tasks_file: `
-### Création d'un fichier de tâches
+    terminologie: `
+### t(help.term.title)
 
-Pour fonctionner, vous avez besoin d'un fichier de tâches. Ce fichier doit être défini conformément au format décrit dans la section [Format du fichier des tâches](#tasks_file_format).
+*(D'abord un peu de terminologie pour bien comprendre l'aide)*
+
+t(help.term.text)
+  `,
+    task_list: `
+### t(help.task_list.title)
+
+t(help.task_list.text)
 `,
     tasks_file_format: `
 ### Format du fichier des tâches
@@ -15661,10 +15705,16 @@ Le fichier des tâches est un fichier YAML composé de cette manière simple :
         project: L'autre projet de l'autre travail
         content: Le contenu de son travail, ce qu'il y a à faire
       # etc.
+`,
+    duree_cycle_vs_duree_sess: `
+# t(help.durcycvsdursess.title)
+
+t(help.durcycvsdursess.text)
 `
   };
   help = Help.getInstance();
   help.init();
+  window.help = help;
 });
 
 // lib/types.ts
@@ -15978,7 +16028,7 @@ class Work {
       prefs.init();
       editor.init();
       Flash.notice(`${t("app.is_ready")} <span id="mes123">(${t("help.show")})</span>`);
-      DGet("span#mes123").addEventListener("click", help.show.bind(help, ["introduction", "tasks_file", "tasks_file_format"]), { once: true, capture: true });
+      DGet("span#mes123").addEventListener("click", help.show.bind(help, ["resume_home_page"]), { once: true, capture: true });
     }
   }
   static currentWork;

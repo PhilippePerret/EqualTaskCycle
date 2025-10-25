@@ -1,0 +1,134 @@
+---
+help:
+  show: Afficher l’aide
+  term:
+    title: Terminologie
+    text: |
+      | Terme | | Description |
+      | --- | --- | --- |
+      | Cycle | | Un *c.* est une boucle complète sur tous les travaux à effectuer. |
+      | Temps restant | | Un *tps. r.* correspond au temps qui reste à accomplir sur le travail dans le cycle courant. |
+      | Temps effectué | | Le *tps. r.* correspond au temps consacré au travail/projet dans le cycle courant. |
+      | --- | ---| --- |
+  intro:
+    title: INTRODUCTION
+    text: |
+      Bienvenue dans l'aide modulaire de l'application ETC 
+      (Etcétéra) qui vous permet de travailler parallèlement plusieurs 
+      tâches.
+
+      Le fonctionnement de cette application est radicalement différent
+      de ceux que vous pouvez connaitre et s'adapte particulièrement aux
+      situations où vous avez des projets à mener de front, sans en oublier,
+      en leur consacrant un temps chaque jour ou chaque semaine.
+  task_list:
+    title: Liste des travaux
+    text: |
+      La liste des travaux est la première chose à définir pour pouvoir
+      utiliser l'application.
+
+      Il vous suffit de cliquer sur le bouton ✍🏽 de la fenêtre principale
+      pour rejoindre le panneau des tâches et données générales.
+      Là, cliquer sur le bouton « + » pour ajouter une tâche.
+      La suite est aussi intuitive. Détaillons tout de même les différentes
+      propriétés que vous pouvez définir :
+
+      t(help.terminologie)
+
+      | Propriété | | Description |
+      | --- | --- | --- |
+      | Actif/Inactif | | Avec ce menu, vous pouvez activer ou désactiver une tâche. Une tâche désactivée n'apparaitra pas dans votre cycle de travail. |
+      | Projet | | Le titre du projet, ou du travail |
+      | Contenu | | C’est ici que l’on définit ce que l’on doit faire, concrètement. C’est un texte [markdown](https://${pref.getLang()}.wikipedia.org/wiki/Markdown), donc qui peut contenir du formatage simple. |
+      | Dossier | | Le chemin d’accès au dossier. Cette information est très importante car c’est elle qui permettra de suivre l’activité sur le travail. |
+      | Script | | La force de cette app est de permettre de définir un script à exécuter n’importe quand au cours du travail (souvent avant). Ce script, qui peut être dans n’importe quel langage, permet d’ouvrir à tous les possibles. |
+      | Durée | | Pour fixer une durée propre au travail. Si cette valeur n’est pas définie, c’est la valeur par défaut qui est utilisée. |
+      | Durée session | | Optionnellement, on peut définir une durée pour la session différente de la durée pour le cycle. C’est subtile mais évident en fait. Pour bien comprendre consulter la partie hlink(Durée de cycle versus durée de session, duree_cycle_vs_duree_sess). |
+
+  durcycvsdursess:
+    title: Durée cycle versus durée session
+    text: |
+      Lorsqu’une durée de session est définie (nécessairement inférieure
+      à la durée de cycle), l’application se comporte différemment avec 
+      le travail : au lieu d’attendre la fin de la durée du cycle (“durée 
+      cycle” du travail, ou durée par défaut) pour mettre un terme au travail
+      courant, l’application y met un terme une fois la *durée session* 
+      atteinte (voir l’exemple concret plus bas). 
+      
+      Concrètement, cela permet de donner plus de volume de temps à un travail
+      à l’intérieur d’un cycle tout en définissant une durée de travail 
+      standard par session (c’est-à-dire par jour). Dans le cas contraire, le
+      travailleur est obligé de surveiller le temps (c’est là qu’est la 
+      différence majeure.)
+
+      ## Exemples
+
+      ### Avec des durées identiques
+
+      Imaginons 6 travaux qui ne définissent aucun temps. La valeur de durée
+      du cycle correspondra alors à la durée de travail de la session. Si la
+      valeur est réglée à 2 heures, alors les choses se passeront de cette 
+      manière : 
+
+      - À l'ouverture de l'application, un premier travail (T4 p.e.) sera
+        choisi (au hasard). Le travailleur travaillera 2 heures dessus.
+      - Au bout des 2 heures, il sera averti de la fin et un autre travail
+        (p.e. T2) lui sera proposé.
+      - Au bout des 2 heures, il sera averti et passera au suivant.
+      - À la fin de la journée de 8 heures, 4 travaux auront été effectués.
+      - Le lendemain, c’est le 5^e travail (p.e. T1) et le 6^e (p.e. T3) qui
+        lui seront proposé. Au bout de 4 heures environ, un premier cycle aura
+        été accompli et un nouveau cycle sera amorcé.
+
+      Dans cette façon de faire, chaque projet a la même importance et tous
+      ont le même temps qui leur est dévolu.
+
+      Mais dans la réalité, certains projets nécessitent plus de temps. D'où
+      la formule suivante.
+
+      ### Avec des durées différentes
+
+      Dans cette autre situation le travail T2 nécessite 2 fois plus de
+      travail et le travailleur décide de lui accorder 2 fois plus de temps
+      au cours d'un cycle. Il lui donne 4 heures.
+
+      - Au début de la journée, le travail T6 est proposé.
+      - Au bout de 2 heures, l'application propose le travail suivant, 
+        justement le travail T2. Ici, si le travailleur ne veut pas faire
+        ses 4 heures d’un seul coup, il doit surveiller le temps pour faire
+        un première arrêt à environ 2 heures de travail.
+      - L'application enregistre le temps de travail et enregistre surtout
+        qu'il restera du temps à faire sur ce projet.
+      - Et elle propose le travail suivant.
+      - À la fin de la journée, comme pour la configuration précédente, 2
+        travaux n'ont pas été abordés, et il reste deux heures de travail sur
+        le travail T2.
+      - Le lendemain, l'application propose de faire les deux travaux + les
+        2 heures restantes environ sur le travail T2.
+      
+      Cette façon de faire est tout à fait possible et sera très pratique
+      même si on ne sait pas combien de temps l’on veut consacrer dans la
+      journée à ce travail T2. Peut-être, après tout, auront-on le temps et
+      le courage de lui consacrer 4 heures d'un coup.
+
+      Mais si l'on désire mieux harmoniser les journées, on utilise la
+      troisième façon de procéder, avec la *durée session*.
+
+      ### Avec des durées-session
+
+      Cette fois, on définit que 4 heures doivent être consacrées à T2 par
+      cycle mais que par session (par jour), on ne lui consacrera que 2
+      heures. On règle donc sa *durée session* à 2 heures.
+
+      - La journée commence, normalement, avec par exemple le travail T1.
+      - Au bout de 2 heures, l'application propose de passer justement à T2.
+      - Deux heures plus tard, puisque c'est la *durée session* défini pour
+        le travail, l'app propose de passer au travail suivant (noter que 
+        le travailleur a tout loisir de refuser et de poursuivre sur T2).
+      - Le travailleur peut passer au travail suivant.
+      - Et ainsi de suite jusqu’au lendemain.
+
+      Bien entendu, les exemples présentés ici n'utilisait qu’un seul travail
+      avec des durées différentes mais dans la réalité, chaque travail peut
+      avoir sa propre *durée cycle* et sa propre *durée session* pour s'adapter
+      à toutes les situations.

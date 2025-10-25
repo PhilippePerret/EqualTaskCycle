@@ -28,7 +28,7 @@ export class Work {
       editor.init();
       Flash.notice(`${t('app.is_ready')} <span id="mes123">(${t('help.show')})</span>`)
       DGet('span#mes123').addEventListener('click', 
-        help.show.bind(help, ['introduction', 'tasks_file', 'tasks_file_format']),
+        help.show.bind(help, ['resume_home_page']),
         {once: true, capture: true}
       )
     }
