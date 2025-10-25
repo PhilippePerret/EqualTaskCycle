@@ -10,6 +10,19 @@ help:
       | Temps restant | | Un *tps. r.* correspond au temps qui reste à accomplir sur le travail dans le cycle courant. |
       | Temps effectué | | Le *tps. r.* correspond au temps consacré au travail/projet dans le cycle courant. |
       | --- | ---| --- |
+  task_data:
+    title: Données d’un travail
+    text: |
+      | Propriété | | Description |
+      | --- | --- | --- |
+      | Actif/Inactif | | Avec ce menu, vous pouvez activer ou désactiver une tâche. Une tâche désactivée n'apparaitra pas dans votre cycle de travail. |
+      | Projet | | Le titre du projet, ou du travail |
+      | Contenu | | C’est ici que l’on définit ce que l’on doit faire, concrètement. C’est un texte [markdown](https://${pref.getLang()}.wikipedia.org/wiki/Markdown), donc qui peut contenir du formatage simple. |
+      | Dossier | | Le chemin d’accès au dossier. Cette information est très importante car c’est elle qui permettra de suivre l’activité sur le travail. |
+      | Script | | La force de cette app est de permettre de définir un script à exécuter n’importe quand au cours du travail (souvent avant). Ce script, qui peut être dans n’importe quel langage, permet d’ouvrir à tous les possibles. |
+      | Durée | | Pour fixer une durée propre au travail. Si cette valeur n’est pas définie, c’est la valeur par défaut qui est utilisée. |
+      | Durée session | | Optionnellement, on peut définir une durée pour la session différente de la durée pour le cycle. C’est subtile mais évident en fait. Pour bien comprendre consulter la partie hlink(Durée de cycle versus durée de session, duree_cycle_vs_duree_sess). |
+
   intro:
     title: INTRODUCTION
     text: |
@@ -35,15 +48,7 @@ help:
 
       t(help.terminologie)
 
-      | Propriété | | Description |
-      | --- | --- | --- |
-      | Actif/Inactif | | Avec ce menu, vous pouvez activer ou désactiver une tâche. Une tâche désactivée n'apparaitra pas dans votre cycle de travail. |
-      | Projet | | Le titre du projet, ou du travail |
-      | Contenu | | C’est ici que l’on définit ce que l’on doit faire, concrètement. C’est un texte [markdown](https://${pref.getLang()}.wikipedia.org/wiki/Markdown), donc qui peut contenir du formatage simple. |
-      | Dossier | | Le chemin d’accès au dossier. Cette information est très importante car c’est elle qui permettra de suivre l’activité sur le travail. |
-      | Script | | La force de cette app est de permettre de définir un script à exécuter n’importe quand au cours du travail (souvent avant). Ce script, qui peut être dans n’importe quel langage, permet d’ouvrir à tous les possibles. |
-      | Durée | | Pour fixer une durée propre au travail. Si cette valeur n’est pas définie, c’est la valeur par défaut qui est utilisée. |
-      | Durée session | | Optionnellement, on peut définir une durée pour la session différente de la durée pour le cycle. C’est subtile mais évident en fait. Pour bien comprendre consulter la partie hlink(Durée de cycle versus durée de session, duree_cycle_vs_duree_sess). |
+      t(help.task_data.text)
 
   durcycvsdursess:
     title: Durée cycle versus durée session

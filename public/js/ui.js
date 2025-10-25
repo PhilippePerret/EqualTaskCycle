@@ -15379,20 +15379,10 @@ t(help.term.text)
 
 t(help.task_list.text)
 `,
-    tasks_file_format: `
-### Format du fichier des tâches
+    task_data: `
+### t(help.task_data.title)
 
-Le fichier des tâches est un fichier YAML composé de cette manière simple :
-
-    ---
-    works:
-      - id: travail1
-        project: Le projet du travail
-        content: Le contenu du travail à faire
-      - id: travail2
-        project: L'autre projet de l'autre travail
-        content: Le contenu de son travail, ce qu'il y a à faire
-      # etc.
+t(help.task_data.text)
 `,
     duree_cycle_vs_duree_sess: `
 # t(help.durcycvsdursess.title)

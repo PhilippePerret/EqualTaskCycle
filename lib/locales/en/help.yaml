@@ -9,6 +9,18 @@ help:
       | Remaining time | | A *rem. t.* corresponds to the time left to complete the work within the current cycle. |
       | Time spent | | The *spent t.* corresponds to the time dedicated to the work/project during the current cycle. |
       | --- | ---| --- |
+  task_data:
+    title: Task data
+    text: |
+      | Property | | Description |
+      | --- | --- | --- |
+      | Active/Inactive | | This menu allows you to enable or disable a task. A disabled task will not appear in your work cycle. |
+      | Project | | The title of the project or task. |
+      | Content | | Here you define what needs to be done, concretely. It is a [Markdown](https://${pref.getLang()}.wikipedia.org/wiki/Markdown) text, so it can include simple formatting. |
+      | Folder | | The path to the folder. This information is crucial as it allows tracking activity on the task. |
+      | Script | | The strength of this app lies in allowing you to define a script to be executed at any time during the work (often beforehand). This script, which can be in any language, opens up unlimited possibilities. |
+      | Duration | | Sets a duration specific to the task. If this value is not defined, the default duration is used. |
+      | Session duration | | Optionally, you can define a session duration different from the cycle duration. Subtle, yet clear in practice. For full understanding, consult hlink(Cycle duration versus session duration, duree_cycle_vs_duree_sess). |
   intro:
     title: INTRODUCTION
     text: |
