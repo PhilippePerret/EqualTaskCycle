@@ -8,6 +8,7 @@ ui:
     close: Close
     dont_save_time_and_report: Don’t save Time and Report
     finish: Finish
+    not_anymore: Not anymore
     open_min: open
     open_project: OPEN
     pause: PAUSE
@@ -17,6 +18,7 @@ ui:
     start: START
     stop: STOP
     use_template: Use template…
+    yes_still: Yes, still
   title:
     config_data: Config Data
     confirmation_required: Confirmation required

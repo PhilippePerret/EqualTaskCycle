@@ -57,11 +57,10 @@ export class ActivityTracker /* SERVER */ {
   private getDialog(){
     return new Dialog({
       title: t('ui.title.confirmation_required'),
-      message: "Are you still working on this task ?",
       message: t('ui.text.are_you_still_working'),
       buttons: [
-        {text: "No, stopped", onclick: this.onChooseActivityState.bind(this, false)},
-        {text: "Yes, still", onclick: this.onChooseActivityState.bind(this, true)}
+        {text: t('ui.button.not_anymore'), onclick: this.onChooseActivityState.bind(this, false)},
+        {text: t('ui.button.yes_still'), onclick: this.onChooseActivityState.bind(this, true)}
       ],
       timeout: 120,
       onTimeout: this.onChooseActivityState.bind(this, false),
