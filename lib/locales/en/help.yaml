@@ -8,7 +8,6 @@ help:
       | Cycle | | A *c.* is a complete loop over all tasks to be performed. |
       | Remaining time | | A *rem. t.* corresponds to the time left to complete the work within the current cycle. |
       | Time spent | | The *spent t.* corresponds to the time dedicated to the work/project during the current cycle. |
-      | --- | ---| --- |
   task_data:
     title: Task data
     text: |
@@ -44,7 +43,7 @@ help:
       The process is intuitive, but let’s detail the various
       properties you can define:
 
-      t(help.terminologie)
+      help(terminologie)
 
       | Property | | Description |
       | --- | --- | --- |

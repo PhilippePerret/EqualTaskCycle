@@ -2,7 +2,7 @@ import type { RecType } from "../lib/types";
 import { DGet } from "./js/dom";
 import { marked } from 'marked';
 import { ui } from "./ui";
-import { tt } from "../lib/Locale";
+import { loc, tt } from "../lib/Locale";
 import { listenBtn } from "./utils";
 
 /**
@@ -81,7 +81,7 @@ class Help {
         })
       }
 
-      console.log("texte = ", texte);
+      // console.log("texte = ", texte);
       return `<a id="help-${helpId}" name="${helpId}"></a>\n\n` 
       + this.finalizeText(tt(texte))
       .trim()
@@ -101,6 +101,7 @@ class Help {
       const [tit, hid] = args.split(',').map((s: string) => s.trim());
       return `<span onclick="help.show(['${hid}'])">${tit}</span>`;
     });
+    while(text.match(/\bt\(/)) { text = loc.translateText(text) }
     return text;
   }
 

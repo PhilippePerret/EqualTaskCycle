@@ -15314,7 +15314,6 @@ class Help {
 `);
         });
       }
-      console.log("texte = ", texte);
       return `<a id="help-${helpId}" name="${helpId}"></a>
 
 ` + this.finalizeText(tt(texte)).trim().concat(`
@@ -15332,6 +15331,9 @@ class Help {
       const [tit, hid] = args.split(",").map((s) => s.trim());
       return `<span onclick="help.show(['${hid}'])">${tit}</span>`;
     });
+    while (text5.match(/\bt\(/)) {
+      text5 = loc.translateText(text5);
+    }
     return text5;
   }
   writeText() {
