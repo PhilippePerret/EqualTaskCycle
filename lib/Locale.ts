@@ -12,7 +12,7 @@ const LOCALES_FOLDER = path.resolve(path.join(__dirname,'locales'));
  * 
  */
 export function t(route: string, params?: string[]): string {
-  console.log("route = '%s'", route, params);
+  // console.log("route = '%s'", route, params);
   if (params) {
     const template = loc.translate(route);
     for(var i in params){

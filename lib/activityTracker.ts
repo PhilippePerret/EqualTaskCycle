@@ -44,7 +44,7 @@ export class ActivityTracker /* SERVER */ {
 
   public async askUserIfWorking(){
     await this.askIfActifDialog.show();
-    return {userIsWorking: this.on === true}
+    return {ok: true, userIsWorking: this.on === true}
   }
 
   private get askIfActifDialog(){

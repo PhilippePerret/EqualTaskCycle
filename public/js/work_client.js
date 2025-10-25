@@ -10592,49 +10592,6 @@ var init_utils = __esm(() => {
   init_rehype_stringify();
 });
 
-// public/activityTracker.ts
-var ActivityTracker;
-var init_activityTracker = __esm(() => {
-  init_work_client();
-  init_ui();
-  init_utils();
-  ActivityTracker = class ActivityTracker {
-    static CHECK_INTERVAL = 5 * 60 * 1000;
-    static timer;
-    static inactiveUser;
-    static startControl() {
-      this.timer = setInterval(this.control.bind(this), this.CHECK_INTERVAL);
-    }
-    static stopControl() {
-      if (this.timer) {
-        clearInterval(this.timer);
-        delete this.timer;
-      }
-    }
-    static inactiveUserCorrection(workingTime) {
-      console.log("Working time : ", workingTime);
-      if (this.inactiveUser) {
-        console.log("Working time rectifié : ", workingTime - this.CHECK_INTERVAL / 2 / 1000);
-        return workingTime - this.CHECK_INTERVAL / 2 / 1000;
-      } else {
-        return workingTime;
-      }
-    }
-    static async control() {
-      const response = await postToServer("work/check-activity", {
-        projectFolder: Work.currentWork.folder,
-        lastCheck: Date.now() - this.CHECK_INTERVAL
-      });
-      const result = await response.json();
-      console.log("résultat du check:", result);
-      this.inactiveUser = result.userIsWorking === false;
-      if (this.inactiveUser) {
-        ui.onForceStop();
-      }
-    }
-  };
-});
-
 // public/js/flash.js
 var exports_flash = {};
 __export(exports_flash, {
@@ -13832,7 +13789,6 @@ var init_prefs = __esm(() => {
 // lib/Locale.ts
 var {readFileSync} = (() => ({}));
 function t(route, params) {
-  console.log("route = '%s'", route, params);
   if (params) {
     const template = loc.translate(route);
     for (var i2 in params) {
@@ -13897,6 +13853,55 @@ var init_Locale = __esm(() => {
   init_js_yaml();
   LOCALES_FOLDER = path_default.resolve(path_default.join(__dirname, "locales"));
   loc = Locale.getInstance();
+});
+
+// public/activityTracker.ts
+var ActivityTracker;
+var init_activityTracker = __esm(() => {
+  init_work_client();
+  init_ui();
+  init_utils();
+  init_flash();
+  init_Locale();
+  ActivityTracker = class ActivityTracker {
+    static CHECK_INTERVAL = 5 * 60 * 1000;
+    static timer;
+    static inactiveUser;
+    static startControl() {
+      this.timer = setInterval(this.control.bind(this), this.CHECK_INTERVAL);
+    }
+    static stopControl() {
+      if (this.timer) {
+        clearInterval(this.timer);
+        delete this.timer;
+      }
+    }
+    static inactiveUserCorrection(workingTime) {
+      console.log("Working time : ", workingTime);
+      if (this.inactiveUser) {
+        console.log("Working time rectifié : ", workingTime - this.CHECK_INTERVAL / 2 / 1000);
+        return workingTime - this.CHECK_INTERVAL / 2 / 1000;
+      } else {
+        return workingTime;
+      }
+    }
+    static async control() {
+      const result = await postToServer("work/check-activity", {
+        projectFolder: Work.currentWork.folder,
+        lastCheck: Date.now() - this.CHECK_INTERVAL
+      }).then((r) => r.json());
+      console.log("résultat du check:", result);
+      if (result.ok) {
+        this.inactiveUser = result.userIsWorking === false;
+        if (this.inactiveUser) {
+          ui.onForceStop();
+        }
+      } else {
+        console.error("An error has occurred: ", result.error);
+        Flash.error(t("error.occurred", [result.error]));
+      }
+    }
+  };
 });
 
 // public/ui.ts

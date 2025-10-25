@@ -33,20 +33,24 @@ function log(msg: string, data: any = undefined) {
 
 app.post('/work/check-activity', async (req, res) => {
   log("-> /work/check-activity");
-  const dreq = req.body;
-  const folder: string = dreq.projectFolder;
-  const lastCheck = dreq.lastCheck;
-  const isActive = await activTracker.watchActivity(folder, lastCheck);
-  console.log('isActive:', isActive, 'folder:', folder, 'lastCheck:', lastCheck, 'date', new Date(lastCheck));
   let response: RecType;
-  if (!isActive) {
-    console.log("-> Alerte pour demander de confirmer le travail.");
-    response = await activTracker.askUserIfWorking();
-    console.log("Réponse de l'utilisateur : ", response);
-  } else {
-    response = {userIsWorking: true};
+  try {
+    const dreq = req.body;
+    const folder: string = dreq.projectFolder;
+    const lastCheck = dreq.lastCheck;
+    const isActive = await activTracker.watchActivity(folder, lastCheck);
+    console.log('isActive:', isActive, 'folder:', folder, 'lastCheck:', lastCheck, 'date', new Date(lastCheck));
+    if (!isActive) {
+      console.log("-> Alerte pour demander de confirmer le travail.");
+      response = await activTracker.askUserIfWorking();
+      console.log("Réponse de l'utilisateur : ", response);
+    } else {
+      response = {ok: true, userIsWorking: true};
+    }
+  } catch (err) {
+    response = {ok: false, error: (err as any).message }
   }
-  res.json(response)
+  res.json(response);
 });
 
 app.post('/work/save-session', (req, res) => {

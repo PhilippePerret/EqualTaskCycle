@@ -14989,7 +14989,6 @@ var init_js_yaml = __esm(() => {
 // lib/Locale.ts
 var {readFileSync} = (() => ({}));
 function t(route, params) {
-  console.log("route = '%s'", route, params);
   if (params) {
     const template = loc.translate(route);
     for (var i2 in params) {
@@ -15495,6 +15494,8 @@ var init_activityTracker = __esm(() => {
   init_work_client();
   init_ui();
   init_utils();
+  init_flash();
+  init_Locale();
   ActivityTracker = class ActivityTracker {
     static CHECK_INTERVAL = 5 * 60 * 1000;
     static timer;
@@ -15518,15 +15519,19 @@ var init_activityTracker = __esm(() => {
       }
     }
     static async control() {
-      const response = await postToServer("work/check-activity", {
+      const result = await postToServer("work/check-activity", {
         projectFolder: Work.currentWork.folder,
         lastCheck: Date.now() - this.CHECK_INTERVAL
-      });
-      const result = await response.json();
+      }).then((r) => r.json());
       console.log("résultat du check:", result);
-      this.inactiveUser = result.userIsWorking === false;
-      if (this.inactiveUser) {
-        ui.onForceStop();
+      if (result.ok) {
+        this.inactiveUser = result.userIsWorking === false;
+        if (this.inactiveUser) {
+          ui.onForceStop();
+        }
+      } else {
+        console.error("An error has occurred: ", result.error);
+        Flash.error(t("error.occurred", [result.error]));
       }
     }
   };
