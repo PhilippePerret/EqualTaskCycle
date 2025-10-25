@@ -19,6 +19,7 @@ ui:
     use_template: Use template…
   title:
     config_data: Config Data
+    confirmation_required: Confirmation required
     content: Content
     help: Help
     preferences: Preferences
@@ -46,6 +47,7 @@ ui:
     light: light
     Light: Light
   text:
+    are_you_still_working: "Are you still working on this task?"
     baton_relais: Relay baton
     counter_mode: Counter Mode
     cycle: Cycle

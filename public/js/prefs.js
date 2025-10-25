@@ -15324,12 +15324,14 @@ class EndWorkReport {
   onSave(ev) {
     this.close();
     this.ok(this.getContent());
-    return ev && stopEvent(ev);
+    ev && stopEvent(ev);
+    return false;
   }
   onDontSave(ev) {
     this.close();
     this.ok(false);
-    return ev && stopEvent(ev);
+    ev && stopEvent(ev);
+    return false;
   }
   onTemplate(ev) {
     if (this.getContent().length) {
@@ -15437,7 +15439,7 @@ class Work {
     }
     this.data.lastWorkedAt = clock.getStartTime();
     const stopReport = await new EndWorkReport(this).writeReport();
-    if (stopReport === undefined) {
+    if (stopReport === false) {
       return false;
     }
     this.data.report = stopReport;
@@ -15589,7 +15591,6 @@ var init_activityTracker = __esm(() => {
         projectFolder: Work.currentWork.folder,
         lastCheck: Date.now() - this.CHECK_INTERVAL
       });
-      console.log("résultat du check:", result);
       if (result.ok) {
         this.inactiveUser = result.userIsWorking === false;
         if (this.inactiveUser) {

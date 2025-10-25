@@ -38,7 +38,7 @@ export class ActivityTracker /* CLIENT */ {
         projectFolder: Work.currentWork.folder,
         lastCheck: Date.now() - this.CHECK_INTERVAL
     });
-    console.log("résultat du check:", result);
+    // console.log("résultat du check:", result);
     if (result.ok) {
       this.inactiveUser = result.userIsWorking === false;
       if (this.inactiveUser) { ui.onForceStop() }

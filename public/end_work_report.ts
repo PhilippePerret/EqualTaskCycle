@@ -61,13 +61,15 @@ export class EndWorkReport {
   onSave(ev: MouseEvent){
     this.close();
     this.ok(this.getContent());
-    return ev && stopEvent(ev);
+    ev && stopEvent(ev);
+    return false;
   }
 
   onDontSave(ev: MouseEvent){
     this.close();
     this.ok(false);
-    return ev && stopEvent(ev);
+    ev && stopEvent(ev);
+    return false;
   }
 
   /**

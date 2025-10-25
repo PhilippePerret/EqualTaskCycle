@@ -19,6 +19,7 @@ ui:
     use_template: Utiliser modèle…
   title:
     config_data: Données de configuration
+    confirmation_required: Confirmation requise
     content: Contenu
     help: Aide
     preferences: Préférences

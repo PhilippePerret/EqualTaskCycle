@@ -7,6 +7,7 @@
 import fs from 'fs';
 import path from 'path';
 import { Dialog } from './Dialog';
+import { t } from '../lib/Locale';
 
 const fileWatcher = new Worker('./lib/ActivityTracker_worker.ts');
 
@@ -55,8 +56,9 @@ export class ActivityTracker /* SERVER */ {
 
   private getDialog(){
     return new Dialog({
-      title: "Confirmation required",
+      title: t('ui.title.confirmation_required'),
       message: "Are you still working on this task ?",
+      message: t('ui.text.are_you_still_working'),
       buttons: [
         {text: "No, stopped", onclick: this.onChooseActivityState.bind(this, false)},
         {text: "Yes, still", onclick: this.onChooseActivityState.bind(this, true)}
