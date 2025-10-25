@@ -16056,6 +16056,7 @@ class Work {
     this.data.lastWorkedAt = clock.getStartTime();
     const stopReport = await new EndWorkReport(this).writeReport();
     if (stopReport === false) {
+      await this.constructor().getCurrent();
       return false;
     }
     this.data.report = stopReport;

@@ -64,7 +64,10 @@ export class Work {
     }
     this.data.lastWorkedAt = clock.getStartTime();
     const stopReport = await new EndWorkReport(this).writeReport();
-    if (stopReport === false) { return false /* annulation */}
+    if (stopReport === false /* annulation */) {
+      await this.constructor().getCurrent();
+      return false
+    }
     this.data.report = stopReport as string;
     console.log("[addTimeAndSave] Enregistrement des temps et du rapport", this.data);
     const result: RecType = await postToServer('work/save-session', this.data);
@@ -90,7 +93,7 @@ export class Work {
    *  applique)
    */
   public static async getCurrent(): Promise<boolean> {
-    const retour: RecType = await fetch(HOST + 'task/current')
+    const retour: RecType = await fetch(HOST+'task/current')
     .then(r => r.json() as RecType);
     // console.log("retour:", retour);
     prefs.setData(retour.prefs);
