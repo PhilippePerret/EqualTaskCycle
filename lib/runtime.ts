@@ -117,7 +117,6 @@ export class RunTime {
       k = "lastChangedAt"
     `
     const result = this.db.query(request).all();
-    console.log("result sqlite = ", result);
     if (result.length) {
       return Number((result as any)[0]['val']) < this.startOfToday;
     } else {

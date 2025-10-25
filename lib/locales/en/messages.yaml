@@ -1,4 +1,5 @@
 ---
+space: ''
 app:
   is_ready: App is ready.
 error:
@@ -6,6 +7,14 @@ error:
   unfound_field: "Unfound field: _0_"
 help:
   show: Show help
+locales:
+  check: Checking locales, please wait…
+  report:
+    all_are_known: All locales are known.
+    count: Number of locales
+    loc_to_create: Locales to create
+    title: LOCALE CHECK REPORT
+    unknown_count: Number of unknown locales
 task:
   destroy: 'Destroy task _0_'
   any_active: No active task.

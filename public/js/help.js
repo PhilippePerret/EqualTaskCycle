@@ -12065,9 +12065,13 @@ var init_rehype_stringify = __esm(() => {
 // public/utils.ts
 var exports_utils = {};
 __export(exports_utils, {
+  subTitleize: () => subTitleize,
+  red: () => red,
   postToServer: () => postToServer,
   markdown: () => markdown,
-  listenBtn: () => listenBtn
+  listenBtn: () => listenBtn,
+  green: () => green,
+  blue: () => blue
 });
 async function postToServer(route, data) {
   if (route.startsWith("/")) {
@@ -12087,6 +12091,22 @@ function markdown(md) {
   const result = unified().use(remarkParse).use(remarkRehype).use(rehypeStringify).processSync(md);
   const html6 = String(result);
   return html6;
+}
+function red(msg) {
+  return colorize(msg, "31");
+}
+function green(msg) {
+  return colorize(msg, "32");
+}
+function blue(msg) {
+  return colorize(msg, "34");
+}
+function colorize(msg, color2) {
+  return `\x1B[${color2}m${msg}\x1B[0m`;
+}
+function subTitleize(titre, car = "-") {
+  return titre + `
+` + new Array(titre.length + 1).join(car);
 }
 var init_utils = __esm(() => {
   init_constants();
@@ -15083,7 +15103,6 @@ class Locale {
     return this.locales;
   }
   translateText(texte) {
-    console.log("-> Locale.translateText");
     return texte.replace(/\bt\((.+?)\)/g, this.replacementMethod.bind(this));
   }
   translate(route) {
@@ -15091,12 +15110,9 @@ class Locale {
     return typeof translated === "string" ? translated : `[UNFOUND: ${route}]`;
   }
   replacementMethod(tout, route) {
-    console.log("Tout = ", tout);
-    console.log("Traduction de %s = ", route, this.translate(route));
     return this.translate(route);
   }
   async init(lang) {
-    console.log("Initialisation des locales (%s)", lang);
     if (typeof window === "undefined") {
       this.locales = {};
       const folderLang = path_default.join(LOCALES_FOLDER, lang);
@@ -15115,7 +15131,6 @@ class Locale {
         Flash2.error("Impossible to load locales… I can only speaking english, sorry…");
       }
     }
-    console.log("Toutes les locales : ", this.locales);
   }
   locales;
   constructor() {}
@@ -15749,7 +15764,7 @@ var init_activityTracker = __esm(() => {
       const result = await postToServer("work/check-activity", {
         projectFolder: Work.currentWork.folder,
         lastCheck: Date.now() - this.CHECK_INTERVAL
-      }).then((r) => r.json());
+      });
       console.log("résultat du check:", result);
       if (result.ok) {
         this.inactiveUser = result.userIsWorking === false;

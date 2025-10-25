@@ -36,7 +36,7 @@ class Locale {
   }
 
   public translateText(texte: string){
-    console.log("-> Locale.translateText")
+    // console.log("-> Locale.translateText")
     return texte.replace(/\bt\((.+?)\)/g, this.replacementMethod.bind(this));
   }
 
@@ -52,8 +52,7 @@ class Locale {
 
 
   private replacementMethod(tout: string, route:string): string {
-    console.log("Tout = ", tout);
-    console.log("Traduction de %s = ", route, this.translate(route));
+    // console.log("Traduction de %s = ", route, this.translate(route));
     return this.translate(route);
   }
 
@@ -62,7 +61,7 @@ class Locale {
    * Consiste principalement à charger le fichier des locales
    */
   public async init(lang: string){
-    console.log("Initialisation des locales (%s)", lang);
+    // console.log("Initialisation des locales (%s)", lang);
     if ( typeof window === 'undefined' /* server side */) {
       this.locales = {}
       const folderLang = path.join(LOCALES_FOLDER, lang);
@@ -83,7 +82,7 @@ class Locale {
         Flash.error('Impossible to load locales… I can only speaking english, sorry…');
       }
     }
-    console.log("Toutes les locales : ", this.locales);
+    // console.log("Toutes les locales : ", this.locales);
   }
   private locales!: RecType;
 

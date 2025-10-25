@@ -55,7 +55,7 @@ ui:
     order: Order
     path_example: "required/path/to/project"
     shortest_tasks_first: Shortest tasks first
-    task_in_random_order: Tasks in random order
+    tasks_in_random_order: Tasks in random order
     temp_description: "Description of your project/task.Set active to true to active it."
     time_left: Time left
     to_add_a_task: To create a new task

@@ -41,3 +41,20 @@ export function markdown(md: string): string {
   // console.log("Report corrigé", html);
   return html; 
 }
+
+export function red(msg: string) {
+  return colorize(msg, '31');
+}
+export function green(msg: string){
+  return colorize(msg, '32');
+}
+export function blue(msg: string){
+  return colorize(msg, '34');
+}
+function colorize(msg: string, color: string){
+  return `\x1b[${color}m${msg}\x1b[0m`;
+}
+
+export function subTitleize(titre: string, car: string = '-'){
+  return titre + "\n" + (new Array(titre.length + 1)).join(car);
+}

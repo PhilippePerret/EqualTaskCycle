@@ -39,13 +39,14 @@ app.post('/work/check-activity', async (req, res) => {
     const folder: string = dreq.projectFolder;
     const lastCheck = dreq.lastCheck;
     const isActive = await activTracker.watchActivity(folder, lastCheck);
-    console.log('isActive:', isActive, 'folder:', folder, 'lastCheck:', lastCheck, 'date', new Date(lastCheck));
+    log('Données:', {isActive, folder, lastCheck, date: new Date(lastCheck)});
     if (!isActive) {
-      console.log("-> Alerte pour demander de confirmer le travail.");
+      log("-> Alerte pour demander de confirmer le travail.");
       response = await activTracker.askUserIfWorking();
-      console.log("Réponse de l'utilisateur : ", response);
+      // response = {ok: true, userIsWorking: true}; // pour essayer sans l'appel
+      log("Réponse de l'utilisateur : ", response);
     } else {
-      response = {ok: true, userIsWorking: true};
+      response = {ok: true, userIsWorking: true, raison: 'acitivity in folder'};
     }
   } catch (err) {
     response = {ok: false, error: (err as any).message }

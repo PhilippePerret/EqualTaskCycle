@@ -55,7 +55,7 @@ ui:
     order: Ordre
     path_example: "chemin/vers/projet/requis"
     shortest_tasks_first: Les plus courtes d’abord
-    task_in_random_order: Tâches au hasard
+    tasks_in_random_order: Tâches au hasard
     temp_description: "Description de votre projet/tâche. Mettre en actif pour l'activer."
     time_left: Temps restant
     to_add_a_task: "Pour ajouter/créer une tâche"

@@ -21,7 +21,7 @@ app.name = "Equal Task Cycle";
 app.whenReady().then(() => {
   app.dock.setIcon(ICON_PATH);
   const serverPath = path.join(__dirname, '..', 'server.ts');
-  server = spawn('bun', ['run', serverPath], {
+  server = spawn('bun', ['--no-cache', 'run', serverPath], {
     cwd: path.join(__dirname, '..'),
     env: { 
       ...process.env, 
@@ -34,7 +34,13 @@ app.whenReady().then(() => {
     server.stdout.on('data', (data) => console.log(`SERVER STDOUT: ${data}`));
     server.stderr.on('data', (data) => console.error(`SERVER STDERR: ${data}`));
     server.on('error', (err) => console.error('SERVER FAILED TO START:', err));
-    server.on('exit', (code) => console.log('SERVER EXITED WITH CODE:', code));
+    server.on('exit', (code, signal) => {
+      console.log('SERVER EXITED - code:', code, 'signal:', signal);
+    });
+    server.on('close', (code, signal) => {
+      console.log('SERVER CLOSED - code:', code, 'signal:', signal);
+    });
+    
   }
 
   const WITH_CONSOLE_DEV = false;
@@ -69,6 +75,9 @@ app.whenReady().then(() => {
     win.focus();
   }
 
+  
+  win.webContents.session.clearCache();
+
   setTimeout(() => win.loadURL(HOST), 1000);
 
   // setTimeout(() => bringToFront(), 5000);
@@ -80,6 +89,7 @@ app.whenReady().then(() => {
  * quitter le processus Bun de l'application (le serveur).
  */
 app.on('before-quit', () => {
+  console.log('BEFORE QUIT - killing server');
   if (server && server.pid) {
     try {
       // Tuer le groupe de processus entier

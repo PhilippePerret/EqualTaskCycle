@@ -1,4 +1,5 @@
 ---
+space: ' '
 app:
   is_ready: L'application est prête.
 error:
@@ -6,6 +7,14 @@ error:
   unfound_field: "Champ introuvable : _0_"
 help:
   show: Afficher l’aide
+locales:
+  check: "Vérification des locales, merci de patienter…"
+  report:
+    all_are_known: Toutes les locales sont connues.
+    count: Nombre de locales
+    loc_to_create: Locales à créer
+    title: RAPPORT DU CHECK DES LOCALES
+    unknown_count: Nombre de locales inconnues
 task:
   destroy: 'Destruction de la tâche _0_'
   any_active: Aucune tâche active.
