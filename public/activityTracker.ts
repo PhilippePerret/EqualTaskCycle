@@ -3,6 +3,7 @@ import { ui } from "./ui";
 import { postToServer } from "./utils";
 import { Flash } from "./js/flash";
 import { t } from '../lib/Locale';
+import type { RecType } from "../lib/types";
 
 export class ActivityTracker /* CLIENT */ {
 
@@ -36,7 +37,7 @@ export class ActivityTracker /* CLIENT */ {
     const result = await postToServer('work/check-activity',{
         projectFolder: Work.currentWork.folder,
         lastCheck: Date.now() - this.CHECK_INTERVAL
-    }).then(r => r.json());
+    });
     console.log("résultat du check:", result);
     if (result.ok) {
       this.inactiveUser = result.userIsWorking === false;
