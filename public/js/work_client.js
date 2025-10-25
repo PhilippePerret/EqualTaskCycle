@@ -16130,7 +16130,7 @@ class Work {
 
 ` + v3);
             } else {
-              return v3;
+              return "";
             }
           default:
             return v3;

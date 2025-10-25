@@ -160,7 +160,7 @@ export class Work {
           case 'report':
             if ( v ) {
               return markdown(`---\n\n# ${t('ui.title.stop_report')}\n\n` + v);
-            } else { return v }
+            } else { return '' }
           default: 
             return v;
         }
