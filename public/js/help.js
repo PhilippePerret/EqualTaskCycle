@@ -15622,7 +15622,6 @@ class Work {
     this.data.report = stopReport;
     console.log("[addTimeAndSave] Enregistrement des temps et du rapport", this.data);
     const result = await postToServer("work/save-session", this.data);
-    console.log("Retour save session: ", result);
     this.dispatchData();
     await new Promise((resolve2) => setTimeout(resolve2, 2000));
     Work.displayWork(result.next, result.options);
@@ -15769,7 +15768,6 @@ var init_activityTracker = __esm(() => {
         projectFolder: Work.currentWork.folder,
         lastCheck: Date.now() - this.CHECK_INTERVAL
       });
-      console.log("résultat du check:", result);
       if (result.ok) {
         this.inactiveUser = result.userIsWorking === false;
         if (this.inactiveUser) {
@@ -15875,7 +15873,7 @@ class UI {
   async onChange(ev) {
     ev && stopEvent2(ev);
     const curwork = Work.currentWork;
-    const result = await postToServer("task/change", { workId: curwork.id }).then((res) => res.json());
+    const result = await postToServer("task/change", { workId: curwork.id });
     if (result.ok === false) {
       Flash.error(t("error.occurred", [result.error]));
     }
@@ -15884,7 +15882,7 @@ class UI {
   async onRunScript(ev) {
     ev && stopEvent2(ev);
     const curwork = Work.currentWork;
-    const result = await postToServer("task/run-script", { workId: curwork.id, script: curwork.script }).then((res) => res.json());
+    const result = await postToServer("task/run-script", { workId: curwork.id, script: curwork.script });
     if (result.ok) {
       Flash.success(t("script.ran_successfully"));
     } else {
@@ -15895,7 +15893,7 @@ class UI {
   async onOpenFolder(ev) {
     ev && stopEvent2(ev);
     const curwork = Work.currentWork;
-    const result = await postToServer("task/open-folder", { workId: curwork.id, folder: curwork.folder }).then((res) => res.json());
+    const result = await postToServer("task/open-folder", { workId: curwork.id, folder: curwork.folder });
     if (result.ok) {
       Flash.success(t("folder.opened_in_finder"));
     } else {

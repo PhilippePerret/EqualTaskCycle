@@ -160,8 +160,7 @@ export class UI {
   private async onChange(ev: Event){
     ev && stopEvent(ev);
     const curwork: Work = Work.currentWork;
-    const result = await postToServer('task/change', {workId: curwork.id})
-    .then(res => res.json());
+    const result = await postToServer('task/change', {workId: curwork.id});
     if ( result.ok === false ) {
       Flash.error(t('error.occurred', [result.error]));
     }
@@ -172,8 +171,7 @@ export class UI {
   private async onRunScript(ev: Event){
     ev && stopEvent(ev);
     const curwork: Work = Work.currentWork;
-    const result = await postToServer('task/run-script', {workId: curwork.id, script: curwork.script})
-    .then(res => res.json());
+    const result = await postToServer('task/run-script', {workId: curwork.id, script: curwork.script});
     if ( result.ok ) {
       Flash.success(t('script.ran_successfully'))
     } else {
@@ -186,8 +184,7 @@ export class UI {
   private async onOpenFolder(ev: Event){
     ev && stopEvent(ev);
     const curwork: Work = Work.currentWork;
-    const result = await postToServer('task/open-folder', {workId: curwork.id, folder: curwork.folder})
-    .then(res => res.json());
+    const result = await postToServer('task/open-folder', {workId: curwork.id, folder: curwork.folder});
     if ( result.ok ) {
       Flash.success(t('folder.opened_in_finder'))
     } else {
