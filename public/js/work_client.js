@@ -10573,11 +10573,23 @@ async function postToServer(route, data) {
   if (route.startsWith("/")) {
     route = route.substring(1, route.length);
   }
-  return await fetch(HOST + route, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  }).then((r) => r.json());
+  const controller = new AbortController;
+  const timeoutId = setTimeout(() => controller.abort(), 30 * 60 * 1000);
+  let response;
+  try {
+    response = await fetch(HOST + route, {
+      method: "POST",
+      signal: controller.signal,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    }).then((r) => r.json());
+  } catch (err) {
+    console.error(err);
+    response = { ok: false, error: `ERREUR postToServer: ${err.message}` };
+  } finally {
+    clearTimeout(timeoutId);
+  }
+  return response;
 }
 function listenBtn(id, method, container = document.body) {
   DGet(`button.btn-${id}`, container).addEventListener("click", method);
@@ -13909,6 +13921,7 @@ var init_activityTracker = __esm(() => {
         projectFolder: Work.currentWork.folder,
         lastCheck: Date.now() - this.CHECK_INTERVAL
       });
+      console.log("résultat du check:", result);
       if (result.ok) {
         this.inactiveUser = result.userIsWorking === false;
         if (this.inactiveUser) {

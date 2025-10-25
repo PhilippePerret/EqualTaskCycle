@@ -33,6 +33,8 @@ function log(msg: string, data: any = undefined) {
 
 app.post('/work/check-activity', async (req, res) => {
   log("-> /work/check-activity");
+  req.setTimeout(30 * 60 * 1000);
+  res.setTimeout(30 * 60 * 1000);
   let response: RecType;
   try {
     const dreq = req.body;
@@ -49,6 +51,7 @@ app.post('/work/check-activity', async (req, res) => {
       response = {ok: true, userIsWorking: true, raison: 'acitivity in folder'};
     }
   } catch (err) {
+    console.error("ERREURS IN /work/check-activity", err);
     response = {ok: false, error: (err as any).message }
   }
   res.json(response);

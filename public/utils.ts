@@ -9,11 +9,23 @@ import rehypeStringify from 'rehype-stringify';
 
 export async function postToServer(route: string, data: RecType){
   if (route.startsWith('/')){ route = route.substring(1, route.length)}
-  return await fetch(HOST+route, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  }).then(r => r.json());
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30 * 60 * 1000);
+  let response;
+  try {
+    response = await fetch(HOST+route, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(r => r.json());
+  } catch(err) {
+    console.error(err);
+    response = {ok: false, error: `ERREUR postToServer: ${(err as any).message}`}
+  } finally {
+    clearTimeout(timeoutId);
+  }
+  return response;
 }
 
 /**
