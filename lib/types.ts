@@ -30,4 +30,5 @@ export interface PrefsDataType {
   random: boolean;
   shortest: boolean; 
   counter: 'clock' | 'countdown';
+  lang: 'fr' | 'en';
 }

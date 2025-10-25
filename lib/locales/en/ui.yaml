@@ -1,4 +1,5 @@
 ---
+lang: en
 appName: "Equal Task Cycle"
 
 ui:
@@ -7,6 +8,8 @@ ui:
     dont_save_time_and_report: Don’t save Time and Report
     finish: Finish
     open_min: open
+    open_project: OPEN
+    run: RUN
     save: Save
     use_template: Use template…
   title:
@@ -41,6 +44,7 @@ ui:
     cycle: Cycle
     default_duration: Default duration
     elapsed_time: Elapsed time
+    lang: Lang
     order: Order
     path_example: "chemin/vers/projet"
     shortest_tasks_first: Shortest tasks first

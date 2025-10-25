@@ -1,13 +1,19 @@
 ---
-err:
-  error_occured: "Une erreur est survenue : _0_"
+error:
+  occurred: "Une erreur est survenue : _0_"
   unfound_field: "Champ introuvable : _0_"
 task:
   saved: "Tâche enregistrée avec succès !"
   destroy: 'Destruction de la tâche _0_'
+times:
+  dont_add_and_save: "Je n'ai pas ajouté et sauvé les temps"
 report:
   empty_content: "Par prudence, videz le contenu avant d'application le modèle."
 data_file:
   open_with_sucess: "Fichier de données ouvert avec succès."
 prefs:
   saved: "Préférences enregistrées."
+folder:
+  opened_in_finder: "Dossier ouvert dans le Finder."
+script:
+  ran_successfully: "Script joué avec succès."

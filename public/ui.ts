@@ -4,6 +4,8 @@ import { ActivityTracker } from "./activityTracker";
 import { HOST } from "./js/constants";
 import { DGet } from "./js/dom";
 import { Flash } from "./js/flash";
+import { t } from '../lib/Locale';
+import { postToServer } from "./utils";
 
 function stopEvent(ev: Event){
   ev.stopPropagation();
@@ -54,7 +56,7 @@ export class UI {
     ActivityTracker.stopControl();
     // console.log("ev", ev);
     if (ev && (ev.shiftKey || ev.metaKey)) {
-      Flash.notice('I don’t add & save time');
+      Flash.notice(t('times.dont_add_and_save'));
     } else {
       const workTime: number =  ActivityTracker.inactiveUserCorrection(clock.stop());
       Work.addTimeToCurrentWork(Math.round(workTime / 60));
@@ -120,12 +122,6 @@ export class UI {
    * ATTENTION : eList n'est pas une liste d'HTMLElements mais une
    * list d'instance possédant un obj.
    */
-  // public hide(eList: any[]) {
-  //   eList.forEach(e => e.obj.classList.add('hidden'));
-  // }
-  // public show(eList: any[]) {
-  //   eList.forEach(e => e.obj.classList.remove('hidden'));
-  // }
   public mask(eList: any[]){
     eList.forEach(e => e.obj.classList.add('hidden'));
   }
@@ -165,14 +161,10 @@ export class UI {
   private async onChange(ev: Event){
     ev && stopEvent(ev);
     const curwork: Work = Work.currentWork;
-    const result = await fetch(HOST+'task/change', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({workId: curwork.id})
-    })
+    const result = await postToServer('task/change', {workId: curwork.id})
     .then(res => res.json());
     if ( result.ok === false ) {
-      Flash.error('An error occurred: ' + result.error);
+      Flash.error(t('error.occurred', [result.error]));
     }
     return false;
   }
@@ -181,16 +173,12 @@ export class UI {
   private async onRunScript(ev: Event){
     ev && stopEvent(ev);
     const curwork: Work = Work.currentWork;
-    const result = await fetch(HOST+'task/run-script', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({workId: curwork.id, script: curwork.script})
-    })
+    const result = await postToServer('task/run-script', {workId: curwork.id, script: curwork.script})
     .then(res => res.json());
     if ( result.ok ) {
-      Flash.success('Script played with success.')
+      Flash.success(t('script.ran_successfully'))
     } else {
-      Flash.error('An error occurred: ' + result.error);
+      Flash.error(t('error.occurred', [result.error]));
     }
     return false;
   }
@@ -199,16 +187,12 @@ export class UI {
   private async onOpenFolder(ev: Event){
     ev && stopEvent(ev);
     const curwork: Work = Work.currentWork;
-    const result = await fetch(HOST+'task/open-folder', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({workId: curwork.id, folder: curwork.folder})
-    })
+    const result = await postToServer('task/open-folder', {workId: curwork.id, folder: curwork.folder})
     .then(res => res.json());
     if ( result.ok ) {
-      Flash.success('Folder opened in Finder.')
+      Flash.success(t('folder.opened_in_finder'))
     } else {
-      Flash.error('An error occurred: ' + result.error);
+      Flash.error(t('error.occurred', [result.error]));
     }
     return false;
   }
@@ -228,6 +212,7 @@ export class UI {
   }; private _buttons!: Button[];
 
   private instancieButtons(){
+    console.log("-> Instanciation des boutons");
     this._buttons = this.DATA_BUTTONS.map((bdata: any[]) => {
       let id: string, name: string, onclick: Function, hidden: boolean, row: 1 | 2, title: string;
       [id, name, onclick, hidden, row, title] = bdata;
@@ -235,22 +220,29 @@ export class UI {
       return (this as any)[`btn${id}`];
     });
   } 
-  DATA_BUTTONS: [string, string, Function, boolean, 1 | 2, string][] = [
-    ['runScript', 'RUN', this.onRunScript.bind(this), false, 2,
-      "Pour lancer le script défini au démarrage"],
-    ['openFolder', 'OPEN', this.onOpenFolder.bind(this), false, 2,
-      "Pour ouvrir le dossier défini dans les données"],
-    ['Change', 'CHANGE', this.onChange.bind(this), false, 2,
-      "Pour changer de tâche (mais attention : une seule fois par session !"],
-    ['Stop', 'STOP', this.onStop.bind(this), true, 1, 
-        "Pour arrêter la tâche et passer à la suivante (éviter…)"],
-    ['Pause', 'PAUSE', this.onPause.bind(this), true, 1,
-          "Pour mettre le travail en pause."],
-    ['Start', 'START', this.onStart.bind(this), false, 1,
-      "Pour démarrer le travail sur cette tâche."],
-    ['Restart', 'RESTART', this.onRestart.bind(this), true, 1,
-      "Pour redémarrer le travail sur cette tâche."]
-  ];
+
+  private get DATA_BUTTONS(): [string, string, Function, boolean, 1 | 2, string][]{
+    return this.databuts || (this.databuts = this.getDataButtons()) }
+  private databuts!: [string, string, Function, boolean, 1 | 2, string][];
+
+  private getDataButtons(): [string, string, Function, boolean, 1 | 2, string][]{
+    return [
+      ['runScript', t('ui.button.run'), this.onRunScript.bind(this), false, 2,
+        "Pour lancer le script défini au démarrage"],
+      ['openFolder', t('ui.button.open_project'), this.onOpenFolder.bind(this), false, 2,
+        "Pour ouvrir le dossier défini dans les données"],
+      ['Change', 'CHANGE', this.onChange.bind(this), false, 2,
+        "Pour changer de tâche (mais attention : une seule fois par session !"],
+      ['Stop', 'STOP', this.onStop.bind(this), true, 1, 
+          "Pour arrêter la tâche et passer à la suivante (éviter…)"],
+      ['Pause', 'PAUSE', this.onPause.bind(this), true, 1,
+            "Pour mettre le travail en pause."],
+      ['Start', 'START', this.onStart.bind(this), false, 1,
+        "Pour démarrer le travail sur cette tâche."],
+      ['Restart', 'RESTART', this.onRestart.bind(this), true, 1,
+        "Pour redémarrer le travail sur cette tâche."]
+      ];
+  }
 }
 
 class Button {

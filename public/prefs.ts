@@ -11,17 +11,17 @@ export class Prefs {
   private data!: PrefsDataType;
   private fieldsReady: boolean = false;
 
-  private static instance: Prefs;
+  private static inst: Prefs;
   private constructor(){}
   public static getInstance(){
-    return this.instance || (this.instance = new Prefs())
+    return this.inst || (this.inst = new Prefs())
   }
 
   public init(){
     this.observeButtons();
   }
 
-  public getLang(){ return 'fr' } /* <=========== TODO */
+  public getLang(){ return this.data.lang || 'en' } /* <=========== TODO */
 
   /**
    * Pour ouvrir le fichier des données
@@ -32,7 +32,7 @@ export class Prefs {
       filePath: this.getValue('file')
     })
     if (result.ok) { Flash.success(t('data_file.open_with_sucess')) } 
-    else { Flash.error(t('err.error_occured', result.error)) }
+    else { Flash.error(t('error.occurred', result.error)) }
   }
 
   /**
@@ -107,7 +107,7 @@ export class Prefs {
   }
 
   private field(key: string){
-    return DGet(`#prefs-${key}`) || console.error(t('err.unfound_field', [`prefs-${key}`]));
+    return DGet(`#prefs-${key}`) || console.error(t('error.unfound_field', [`prefs-${key}`]));
   }
 
   private close(){ 

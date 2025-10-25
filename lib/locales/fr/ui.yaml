@@ -1,4 +1,5 @@
 ---
+lang: fr
 appName: "Equal Task Cycle"
 
 ui:
@@ -7,6 +8,8 @@ ui:
     dont_save_time_and_report: Ne sauver ni temps ni rapport
     finish: Finir
     open_min: ouvrir
+  open_project: PROJET
+    run: SCRIPT
     save: Enregistrer
     use_template: Utiliser modèle…
   title:
@@ -41,6 +44,7 @@ ui:
     cycle: Cycle
     default_duration: Durée par défaut
     elapsed_time: Temps accompli
+    lang: Langue
     order: Ordre
     path_example: "REQUIRED/PROJECT/FOLDER/PATH"
     shortest_tasks_first: Les plus courtes d’abord

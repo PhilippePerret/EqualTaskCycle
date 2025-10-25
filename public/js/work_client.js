@@ -10732,448 +10732,6 @@ class FlashMessage {
 }
 var init_flash = () => {};
 
-// public/ui.ts
-function stopEvent2(ev) {
-  ev.stopPropagation();
-  ev.preventDefault();
-  return false;
-}
-
-class UI {
-  static instance;
-  constructor() {}
-  static getInstance() {
-    return UI.instance || (UI.instance = new UI);
-  }
-  onStart(ev) {
-    this.mask([this.btnStart]);
-    clock.start(Work.currentWork);
-    this.reveal([this.btnStop, this.btnPause]);
-    ActivityTracker.startControl();
-  }
-  onRestart(ev) {
-    this.mask([this.btnRestart]);
-    clock.restart();
-    this.reveal([this.btnStop, this.btnPause]);
-    ActivityTracker.startControl();
-  }
-  onStop(ev) {
-    this.mask([this.btnStop, this.btnPause, this.btnRestart]);
-    this.reveal([this.btnStart]);
-    ActivityTracker.stopControl();
-    if (ev && (ev.shiftKey || ev.metaKey)) {
-      Flash.notice("I don’t add & save time");
-    } else {
-      const workTime = ActivityTracker.inactiveUserCorrection(clock.stop());
-      Work.addTimeToCurrentWork(Math.round(workTime / 60));
-    }
-  }
-  onPause(ev) {
-    this.mask([this.btnPause]);
-    this.reveal([this.btnRestart]);
-    ActivityTracker.stopControl();
-    clock.pause();
-  }
-  setUITheme(theme) {
-    document.body.className = theme;
-  }
-  setBackgroundColorAt(color2) {
-    document.body.style.backgroundColor = color2;
-  }
-  resetBackgroundColor() {
-    document.body.style.backgroundColor = "";
-  }
-  SECTIONS = ["work", "help", "prefs", "editing"];
-  toggleSection(name) {
-    this.SECTIONS.forEach((section) => {
-      if (name === section) {
-        this.openSection(section);
-      } else {
-        this.closeSection(section);
-      }
-    });
-  }
-  toggleHelp() {
-    if (this.isSectionOpen("help")) {
-      this.toggleSection("work");
-    } else {
-      this.toggleSection("help");
-    }
-  }
-  isSectionOpen(name) {
-    return !DGet("section#" + name).classList.contains("hidden");
-  }
-  mask(eList) {
-    eList.forEach((e) => e.obj.classList.add("hidden"));
-  }
-  reveal(eList) {
-    eList.forEach((e) => e.obj.classList.remove("hidden"));
-  }
-  showButtons(states) {
-    this.buttons.forEach((bouton) => bouton.setState(states[bouton.id]));
-  }
-  closeSection(name) {
-    DGet("section#" + name).classList.add("hidden");
-  }
-  openSection(name) {
-    DGet("section#" + name).classList.remove("hidden");
-  }
-  onForceStop() {
-    this.onStop(undefined);
-  }
-  async onChange(ev) {
-    ev && stopEvent2(ev);
-    const curwork = Work.currentWork;
-    const result = await fetch(HOST + "task/change", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ workId: curwork.id })
-    }).then((res) => res.json());
-    if (result.ok === false) {
-      Flash.error("An error occurred: " + result.error);
-    }
-    return false;
-  }
-  async onRunScript(ev) {
-    ev && stopEvent2(ev);
-    const curwork = Work.currentWork;
-    const result = await fetch(HOST + "task/run-script", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ workId: curwork.id, script: curwork.script })
-    }).then((res) => res.json());
-    if (result.ok) {
-      Flash.success("Script played with success.");
-    } else {
-      Flash.error("An error occurred: " + result.error);
-    }
-    return false;
-  }
-  async onOpenFolder(ev) {
-    ev && stopEvent2(ev);
-    const curwork = Work.currentWork;
-    const result = await fetch(HOST + "task/open-folder", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ workId: curwork.id, folder: curwork.folder })
-    }).then((res) => res.json());
-    if (result.ok) {
-      Flash.success("Folder opened in Finder.");
-    } else {
-      Flash.error("An error occurred: " + result.error);
-    }
-    return false;
-  }
-  btnStart;
-  btnRestart;
-  btnPause;
-  btnStop;
-  btnChange;
-  btnRunScript;
-  btnOpenFolder;
-  get buttons() {
-    this._buttons || this.instancieButtons();
-    return this._buttons;
-  }
-  _buttons;
-  instancieButtons() {
-    this._buttons = this.DATA_BUTTONS.map((bdata) => {
-      let id, name, onclick, hidden, row, title;
-      [id, name, onclick, hidden, row, title] = bdata;
-      this[`btn${id}`] = new Button({ id, name, onclick, hidden, row, title }).build();
-      return this[`btn${id}`];
-    });
-  }
-  DATA_BUTTONS = [
-    [
-      "runScript",
-      "RUN",
-      this.onRunScript.bind(this),
-      false,
-      2,
-      "Pour lancer le script défini au démarrage"
-    ],
-    [
-      "openFolder",
-      "OPEN",
-      this.onOpenFolder.bind(this),
-      false,
-      2,
-      "Pour ouvrir le dossier défini dans les données"
-    ],
-    [
-      "Change",
-      "CHANGE",
-      this.onChange.bind(this),
-      false,
-      2,
-      "Pour changer de tâche (mais attention : une seule fois par session !"
-    ],
-    [
-      "Stop",
-      "STOP",
-      this.onStop.bind(this),
-      true,
-      1,
-      "Pour arrêter la tâche et passer à la suivante (éviter…)"
-    ],
-    [
-      "Pause",
-      "PAUSE",
-      this.onPause.bind(this),
-      true,
-      1,
-      "Pour mettre le travail en pause."
-    ],
-    [
-      "Start",
-      "START",
-      this.onStart.bind(this),
-      false,
-      1,
-      "Pour démarrer le travail sur cette tâche."
-    ],
-    [
-      "Restart",
-      "RESTART",
-      this.onRestart.bind(this),
-      true,
-      1,
-      "Pour redémarrer le travail sur cette tâche."
-    ]
-  ];
-}
-
-class Button {
-  data;
-  static get container() {
-    return this._container || (this._container = document.body.querySelector("div#buttons-container"));
-  }
-  static _container;
-  _obj;
-  constructor(data) {
-    this.data = data;
-  }
-  setState(state) {
-    this[state ? "show" : "hide"]();
-  }
-  onClick(ev) {
-    this.data.onclick(ev);
-    return stopEvent2(ev);
-  }
-  build() {
-    const o = document.createElement("BUTTON");
-    o.innerHTML = this.data.name;
-    o.id = `btn-${this.id}`;
-    o.setAttribute("title", this.data.title);
-    o.addEventListener("click", this.onClick.bind(this));
-    Button.container.querySelector(`div#row${this.data.row}`).appendChild(o);
-    this._obj = o;
-    if (this.data.hidden) {
-      this.hide();
-    } else {
-      this.show();
-    }
-    return this;
-  }
-  show() {
-    this.obj.classList.remove("hidden");
-  }
-  hide() {
-    this.obj.classList.add("hidden");
-  }
-  get id() {
-    return this.data.id;
-  }
-  get obj() {
-    return this._obj;
-  }
-}
-var ui;
-var init_ui = __esm(() => {
-  init_Clock();
-  init_work_client();
-  init_activityTracker();
-  init_constants();
-  init_flash();
-  ui = UI.getInstance();
-});
-
-// lib/Clock.ts
-class Clock {
-  static getInstance() {
-    return this._instance || (this._instance = new Clock);
-  }
-  static _instance;
-  constructor() {}
-  counterMode;
-  time2horloge(mn) {
-    let hrs = Math.floor(mn / 60);
-    let mns = Math.round(mn % 60);
-    let horloge = [];
-    horloge.push(`${hrs}`);
-    horloge.push(`${mns > 9 ? "" : "0"}${mns}’`);
-    return horloge.join(" h ");
-  }
-  get clockContainer() {
-    return this._clockcont || (this._clockcont = DGet("div#clock-container"));
-  }
-  _clockcont;
-  setClockStyle(style) {
-    this.clockContainer.classList.add(style);
-  }
-  setCounterMode(mode = "clock") {
-    this.counterMode = mode;
-  }
-  currentWork;
-  timer;
-  startTime;
-  totalTime;
-  currentTimeSegment;
-  timeSegments = [];
-  getTime() {
-    return Math.round(new Date().getTime() / 1000);
-  }
-  start(currentWork) {
-    this.currentWork = currentWork;
-    this.timeSegments = [];
-    this.clockContainer.classList.remove("hidden");
-    this.clockObj.innerHTML = this.startClockPerCounterMode();
-    this.createTimeSegment();
-    this.calcTotalRecTime();
-    this.startTimer();
-  }
-  startClockPerCounterMode() {
-    if (this.counterMode === "clock") {
-      return "0:00:00";
-    } else {
-      return this.s2h(this.currentWork.restTime * 60);
-    }
-  }
-  get totalRestTimeSeconds() {
-    return this._totresttime || (this._totresttime = this.currentWork.restTime * 60);
-  }
-  _totresttime;
-  calcTotalRecTime() {
-    this.totalTime = this.timeSegments.filter((segTime) => !!segTime.laps).reduce((accu, segTime) => accu + segTime.laps, 0);
-  }
-  restart() {
-    this.createTimeSegment();
-    this.clockContainer.classList.remove("hidden");
-    this.startTimer();
-  }
-  startTimer() {
-    this.startTime = this.getTime();
-    this.timer = setInterval(this.run.bind(this), 1000);
-  }
-  createTimeSegment() {
-    this.currentTimeSegment = { beg: this.getTime(), end: undefined, laps: undefined };
-  }
-  endCurrentTimeSegment() {
-    const end = this.getTime();
-    const laps = end - this.currentTimeSegment.beg;
-    Object.assign(this.currentTimeSegment, { end, laps });
-    this.timeSegments.push(this.currentTimeSegment);
-    delete this.currentTimeSegment;
-    this.calcTotalRecTime();
-  }
-  getStartTime() {
-    return this.startTime;
-  }
-  pause() {
-    this.endCurrentTimeSegment();
-    clearInterval(this.timer);
-    this.clockContainer.classList.add("hidden");
-  }
-  stop() {
-    clearInterval(this.timer);
-    delete this.timer;
-    this.endCurrentTimeSegment();
-    this.clockContainer.classList.add("hidden");
-    return this.totalTime;
-  }
-  run() {
-    const secondesOfWork = this.totalTime + this.lapsFromStart();
-    let displayedSeconds;
-    if (this.counterMode === "clock") {
-      displayedSeconds = secondesOfWork;
-    } else {
-      displayedSeconds = this.totalRestTimeSeconds - secondesOfWork;
-    }
-    const restTime = this.taskRestTime(secondesOfWork);
-    this.clockObj.innerHTML = this.s2h(displayedSeconds);
-    if (secondesOfWork % 60 === 0) {
-      const thisMinute = Math.round(secondesOfWork / 60);
-      const elapsedMinutes = this.currentWork.cycleTime + thisMinute;
-      const totalMinutes = this.currentWork.totalTime + thisMinute;
-      this.restTimeField.innerHTML = this.time2horloge(restTime);
-      this.cycleTimeField.innerHTML = this.time2horloge(elapsedMinutes);
-      this.totalTimeField.innerHTML = this.time2horloge(totalMinutes);
-    }
-    if (restTime < 10 && this.alerte10minsDone === false) {
-      this.donneAlerte10mins();
-    } else if (this.alerte10minsDone) {
-      if (this.alerteWorkDone === false && restTime < 0) {
-        this.donneAlerteWorkDone();
-      }
-    }
-  }
-  get restTimeField() {
-    return this._restfield || (this._restfield = DGet("span#current-work-restTime"));
-  }
-  get cycleTimeField() {
-    return this._cycledurfield || (this._cycledurfield = DGet("span#current-work-cycleTime"));
-  }
-  get totalTimeField() {
-    return this._totalfield || (this._totalfield = DGet("span#current-work-totalTime"));
-  }
-  alerte10minsDone = false;
-  alerteWorkDone = false;
-  donneAlerte10mins() {
-    ui.setBackgroundColorAt("orange");
-    this.bringAppToFront();
-    Flash.notice("10 minutes of work remaining");
-    this.alerte10minsDone = true;
-  }
-  donneAlerteWorkDone() {
-    this.bringAppToFront();
-    Flash.notice("Work time is over. Please move on to the next task.");
-    this.alerteWorkDone = true;
-  }
-  taskRestTime(minutesOfWork) {
-    minutesOfWork = minutesOfWork / 60;
-    return this.currentWork.restTime - minutesOfWork;
-  }
-  lapsFromStart() {
-    return Math.round(this.getTime() - this.startTime);
-  }
-  get clockObj() {
-    return this._clockobj || (this._clockobj = DGet("#clock"));
-  }
-  _clockobj;
-  s2h(s) {
-    let h = Math.floor(s / 3600);
-    s = s % 3600;
-    let m = Math.floor(s / 60);
-    const mstr = m < 10 ? `0${m}` : String(m);
-    s = s % 60;
-    const sstr = s < 10 ? `0${s}` : String(s);
-    return `${h}:${mstr}:${sstr}`;
-  }
-  bringAppToFront() {
-    window.electronAPI.bringToFront();
-  }
-  _restfield;
-  _cycledurfield;
-  _totalfield;
-}
-var clock;
-var init_Clock = __esm(() => {
-  init_ui();
-  init_flash();
-  clock = Clock.getInstance();
-});
-
 // node:path
 function assertPath3(path) {
   if (typeof path !== "string")
@@ -14141,76 +13699,6 @@ var init_js_yaml = __esm(() => {
   js_yaml_default = jsYaml;
 });
 
-// lib/Locale.ts
-var {readFileSync} = (() => ({}));
-function t(route, params) {
-  console.log("route = '%s'", route, params);
-  if (params) {
-    const template = loc.translate(route);
-    for (var i2 in params) {
-      const regexp = new RegExp(`_${i2}_`, "g");
-      template.replace(regexp, params[i2]);
-    }
-    return template;
-  } else {
-    return loc.translate(route);
-  }
-}
-
-class Locale {
-  getLocales() {
-    return this.locales;
-  }
-  translateText(texte) {
-    console.log("-> Locale.translateText");
-    return texte.replace(/\bt\((.+?)\)/g, this.replacementMethod.bind(this));
-  }
-  translate(route) {
-    const translated = route.split(".").reduce((obj, key2) => obj?.[key2], this.locales);
-    return typeof translated === "string" ? translated : `[UNFOUND: ${route}]`;
-  }
-  replacementMethod(tout, route) {
-    console.log("Tout = ", tout);
-    console.log("Traduction de %s = ", route, this.translate(route));
-    return this.translate(route);
-  }
-  async init(lang) {
-    console.log("Initialisation des locales (%s)", lang);
-    if (typeof window === "undefined") {
-      this.locales = {};
-      const folderLang = path_default.join(LOCALES_FOLDER, lang);
-      ["messages", "ui"].forEach((base) => {
-        const pathLocale = path_default.join(folderLang, `${base}.yaml`);
-        Object.assign(this.locales, js_yaml_default.load(readFileSync(pathLocale, "utf8")));
-      });
-    } else {
-      const { postToServer: postToServer2 } = await Promise.resolve().then(() => (init_utils(), exports_utils));
-      const { prefs } = await Promise.resolve().then(() => (init_prefs(), exports_prefs));
-      const { Flash: Flash2 } = await Promise.resolve().then(() => (init_flash(), exports_flash));
-      const retour = await postToServer2("localization/get-all", { lang: prefs.getLang() });
-      if (retour.ok) {
-        this.locales = retour.locales;
-      } else {
-        Flash2.error("Impossible to load locales… I can only speaking english, sorry…");
-      }
-    }
-    console.log("Toutes les locales : ", this.locales);
-  }
-  locales;
-  constructor() {}
-  static getInstance() {
-    return this.inst || (this.inst = new Locale);
-  }
-  static inst;
-}
-var __dirname = "/Users/philippeperret/Programmes/EqualTaskCycle/lib", LOCALES_FOLDER, loc;
-var init_Locale = __esm(() => {
-  init_path();
-  init_js_yaml();
-  LOCALES_FOLDER = path_default.resolve(path_default.join(__dirname, "locales"));
-  loc = Locale.getInstance();
-});
-
 // public/prefs.ts
 var exports_prefs = {};
 __export(exports_prefs, {
@@ -14221,16 +13709,16 @@ __export(exports_prefs, {
 class Prefs {
   data;
   fieldsReady = false;
-  static instance;
+  static inst;
   constructor() {}
   static getInstance() {
-    return this.instance || (this.instance = new Prefs);
+    return this.inst || (this.inst = new Prefs);
   }
   init() {
     this.observeButtons();
   }
   getLang() {
-    return "fr";
+    return this.data.lang || "en";
   }
   async onOpenDataFile(ev) {
     stopEvent(ev);
@@ -14240,7 +13728,7 @@ class Prefs {
     if (result.ok) {
       Flash.success(t("data_file.open_with_sucess"));
     } else {
-      Flash.error(t("err.error_occured", result.error));
+      Flash.error(t("error.occurred", result.error));
     }
   }
   async onSave(ev) {
@@ -14308,7 +13796,7 @@ class Prefs {
     }
   }
   field(key2) {
-    return DGet(`#prefs-${key2}`) || console.error(t("err.unfound_field", [`prefs-${key2}`]));
+    return DGet(`#prefs-${key2}`) || console.error(t("error.unfound_field", [`prefs-${key2}`]));
   }
   close() {
     ui.openSection("work");
@@ -14339,6 +13827,514 @@ var init_prefs = __esm(() => {
   init_utils();
   init_Locale();
   prefs = Prefs.getInstance();
+});
+
+// lib/Locale.ts
+var {readFileSync} = (() => ({}));
+function t(route, params) {
+  console.log("route = '%s'", route, params);
+  if (params) {
+    const template = loc.translate(route);
+    for (var i2 in params) {
+      const regexp = new RegExp(`_${i2}_`, "g");
+      template.replace(regexp, params[i2]);
+    }
+    return template;
+  } else {
+    return loc.translate(route);
+  }
+}
+
+class Locale {
+  getLocales() {
+    return this.locales;
+  }
+  translateText(texte) {
+    console.log("-> Locale.translateText");
+    return texte.replace(/\bt\((.+?)\)/g, this.replacementMethod.bind(this));
+  }
+  translate(route) {
+    const translated = route.split(".").reduce((obj, key2) => obj?.[key2], this.locales);
+    return typeof translated === "string" ? translated : `[UNFOUND: ${route}]`;
+  }
+  replacementMethod(tout, route) {
+    console.log("Tout = ", tout);
+    console.log("Traduction de %s = ", route, this.translate(route));
+    return this.translate(route);
+  }
+  async init(lang) {
+    console.log("Initialisation des locales (%s)", lang);
+    if (typeof window === "undefined") {
+      this.locales = {};
+      const folderLang = path_default.join(LOCALES_FOLDER, lang);
+      ["messages", "ui"].forEach((base) => {
+        const pathLocale = path_default.join(folderLang, `${base}.yaml`);
+        Object.assign(this.locales, js_yaml_default.load(readFileSync(pathLocale, "utf8")));
+      });
+    } else {
+      const { postToServer: postToServer2 } = await Promise.resolve().then(() => (init_utils(), exports_utils));
+      const { prefs: prefs2 } = await Promise.resolve().then(() => (init_prefs(), exports_prefs));
+      const { Flash: Flash2 } = await Promise.resolve().then(() => (init_flash(), exports_flash));
+      const retour = await postToServer2("localization/get-all", { lang: prefs2.getLang() });
+      if (retour.ok) {
+        this.locales = retour.locales;
+      } else {
+        Flash2.error("Impossible to load locales… I can only speaking english, sorry…");
+      }
+    }
+    console.log("Toutes les locales : ", this.locales);
+  }
+  locales;
+  constructor() {}
+  static getInstance() {
+    return this.inst || (this.inst = new Locale);
+  }
+  static inst;
+}
+var __dirname = "/Users/philippeperret/Programmes/EqualTaskCycle/lib", LOCALES_FOLDER, loc;
+var init_Locale = __esm(() => {
+  init_path();
+  init_js_yaml();
+  LOCALES_FOLDER = path_default.resolve(path_default.join(__dirname, "locales"));
+  loc = Locale.getInstance();
+});
+
+// public/ui.ts
+function stopEvent2(ev) {
+  ev.stopPropagation();
+  ev.preventDefault();
+  return false;
+}
+
+class UI {
+  static instance;
+  constructor() {}
+  static getInstance() {
+    return UI.instance || (UI.instance = new UI);
+  }
+  onStart(ev) {
+    this.mask([this.btnStart]);
+    clock.start(Work.currentWork);
+    this.reveal([this.btnStop, this.btnPause]);
+    ActivityTracker.startControl();
+  }
+  onRestart(ev) {
+    this.mask([this.btnRestart]);
+    clock.restart();
+    this.reveal([this.btnStop, this.btnPause]);
+    ActivityTracker.startControl();
+  }
+  onStop(ev) {
+    this.mask([this.btnStop, this.btnPause, this.btnRestart]);
+    this.reveal([this.btnStart]);
+    ActivityTracker.stopControl();
+    if (ev && (ev.shiftKey || ev.metaKey)) {
+      Flash.notice(t("times.dont_add_and_save"));
+    } else {
+      const workTime = ActivityTracker.inactiveUserCorrection(clock.stop());
+      Work.addTimeToCurrentWork(Math.round(workTime / 60));
+    }
+  }
+  onPause(ev) {
+    this.mask([this.btnPause]);
+    this.reveal([this.btnRestart]);
+    ActivityTracker.stopControl();
+    clock.pause();
+  }
+  setUITheme(theme) {
+    document.body.className = theme;
+  }
+  setBackgroundColorAt(color2) {
+    document.body.style.backgroundColor = color2;
+  }
+  resetBackgroundColor() {
+    document.body.style.backgroundColor = "";
+  }
+  SECTIONS = ["work", "help", "prefs", "editing"];
+  toggleSection(name) {
+    this.SECTIONS.forEach((section) => {
+      if (name === section) {
+        this.openSection(section);
+      } else {
+        this.closeSection(section);
+      }
+    });
+  }
+  toggleHelp() {
+    if (this.isSectionOpen("help")) {
+      this.toggleSection("work");
+    } else {
+      this.toggleSection("help");
+    }
+  }
+  isSectionOpen(name) {
+    return !DGet("section#" + name).classList.contains("hidden");
+  }
+  mask(eList) {
+    eList.forEach((e) => e.obj.classList.add("hidden"));
+  }
+  reveal(eList) {
+    eList.forEach((e) => e.obj.classList.remove("hidden"));
+  }
+  showButtons(states) {
+    this.buttons.forEach((bouton) => bouton.setState(states[bouton.id]));
+  }
+  closeSection(name) {
+    DGet("section#" + name).classList.add("hidden");
+  }
+  openSection(name) {
+    DGet("section#" + name).classList.remove("hidden");
+  }
+  onForceStop() {
+    this.onStop(undefined);
+  }
+  async onChange(ev) {
+    ev && stopEvent2(ev);
+    const curwork = Work.currentWork;
+    const result = await postToServer("task/change", { workId: curwork.id }).then((res) => res.json());
+    if (result.ok === false) {
+      Flash.error(t("error.occurred", [result.error]));
+    }
+    return false;
+  }
+  async onRunScript(ev) {
+    ev && stopEvent2(ev);
+    const curwork = Work.currentWork;
+    const result = await postToServer("task/run-script", { workId: curwork.id, script: curwork.script }).then((res) => res.json());
+    if (result.ok) {
+      Flash.success(t("script.ran_successfully"));
+    } else {
+      Flash.error(t("error.occurred", [result.error]));
+    }
+    return false;
+  }
+  async onOpenFolder(ev) {
+    ev && stopEvent2(ev);
+    const curwork = Work.currentWork;
+    const result = await postToServer("task/open-folder", { workId: curwork.id, folder: curwork.folder }).then((res) => res.json());
+    if (result.ok) {
+      Flash.success(t("folder.opened_in_finder"));
+    } else {
+      Flash.error(t("error.occurred", [result.error]));
+    }
+    return false;
+  }
+  btnStart;
+  btnRestart;
+  btnPause;
+  btnStop;
+  btnChange;
+  btnRunScript;
+  btnOpenFolder;
+  get buttons() {
+    this._buttons || this.instancieButtons();
+    return this._buttons;
+  }
+  _buttons;
+  instancieButtons() {
+    console.log("-> Instanciation des boutons");
+    this._buttons = this.DATA_BUTTONS.map((bdata) => {
+      let id, name, onclick, hidden, row, title;
+      [id, name, onclick, hidden, row, title] = bdata;
+      this[`btn${id}`] = new Button({ id, name, onclick, hidden, row, title }).build();
+      return this[`btn${id}`];
+    });
+  }
+  get DATA_BUTTONS() {
+    return this.databuts || (this.databuts = this.getDataButtons());
+  }
+  databuts;
+  getDataButtons() {
+    return [
+      [
+        "runScript",
+        t("ui.button.run"),
+        this.onRunScript.bind(this),
+        false,
+        2,
+        "Pour lancer le script défini au démarrage"
+      ],
+      [
+        "openFolder",
+        t("ui.button.open_project"),
+        this.onOpenFolder.bind(this),
+        false,
+        2,
+        "Pour ouvrir le dossier défini dans les données"
+      ],
+      [
+        "Change",
+        "CHANGE",
+        this.onChange.bind(this),
+        false,
+        2,
+        "Pour changer de tâche (mais attention : une seule fois par session !"
+      ],
+      [
+        "Stop",
+        "STOP",
+        this.onStop.bind(this),
+        true,
+        1,
+        "Pour arrêter la tâche et passer à la suivante (éviter…)"
+      ],
+      [
+        "Pause",
+        "PAUSE",
+        this.onPause.bind(this),
+        true,
+        1,
+        "Pour mettre le travail en pause."
+      ],
+      [
+        "Start",
+        "START",
+        this.onStart.bind(this),
+        false,
+        1,
+        "Pour démarrer le travail sur cette tâche."
+      ],
+      [
+        "Restart",
+        "RESTART",
+        this.onRestart.bind(this),
+        true,
+        1,
+        "Pour redémarrer le travail sur cette tâche."
+      ]
+    ];
+  }
+}
+
+class Button {
+  data;
+  static get container() {
+    return this._container || (this._container = document.body.querySelector("div#buttons-container"));
+  }
+  static _container;
+  _obj;
+  constructor(data) {
+    this.data = data;
+  }
+  setState(state) {
+    this[state ? "show" : "hide"]();
+  }
+  onClick(ev) {
+    this.data.onclick(ev);
+    return stopEvent2(ev);
+  }
+  build() {
+    const o = document.createElement("BUTTON");
+    o.innerHTML = this.data.name;
+    o.id = `btn-${this.id}`;
+    o.setAttribute("title", this.data.title);
+    o.addEventListener("click", this.onClick.bind(this));
+    Button.container.querySelector(`div#row${this.data.row}`).appendChild(o);
+    this._obj = o;
+    if (this.data.hidden) {
+      this.hide();
+    } else {
+      this.show();
+    }
+    return this;
+  }
+  show() {
+    this.obj.classList.remove("hidden");
+  }
+  hide() {
+    this.obj.classList.add("hidden");
+  }
+  get id() {
+    return this.data.id;
+  }
+  get obj() {
+    return this._obj;
+  }
+}
+var ui;
+var init_ui = __esm(() => {
+  init_Clock();
+  init_work_client();
+  init_activityTracker();
+  init_flash();
+  init_Locale();
+  init_utils();
+  ui = UI.getInstance();
+});
+
+// lib/Clock.ts
+class Clock {
+  static getInstance() {
+    return this._instance || (this._instance = new Clock);
+  }
+  static _instance;
+  constructor() {}
+  counterMode;
+  time2horloge(mn) {
+    let hrs = Math.floor(mn / 60);
+    let mns = Math.round(mn % 60);
+    let horloge = [];
+    horloge.push(`${hrs}`);
+    horloge.push(`${mns > 9 ? "" : "0"}${mns}’`);
+    return horloge.join(" h ");
+  }
+  get clockContainer() {
+    return this._clockcont || (this._clockcont = DGet("div#clock-container"));
+  }
+  _clockcont;
+  setClockStyle(style) {
+    this.clockContainer.classList.add(style);
+  }
+  setCounterMode(mode = "clock") {
+    this.counterMode = mode;
+  }
+  currentWork;
+  timer;
+  startTime;
+  totalTime;
+  currentTimeSegment;
+  timeSegments = [];
+  getTime() {
+    return Math.round(new Date().getTime() / 1000);
+  }
+  start(currentWork) {
+    this.currentWork = currentWork;
+    this.timeSegments = [];
+    this.clockContainer.classList.remove("hidden");
+    this.clockObj.innerHTML = this.startClockPerCounterMode();
+    this.createTimeSegment();
+    this.calcTotalRecTime();
+    this.startTimer();
+  }
+  startClockPerCounterMode() {
+    if (this.counterMode === "clock") {
+      return "0:00:00";
+    } else {
+      return this.s2h(this.currentWork.restTime * 60);
+    }
+  }
+  get totalRestTimeSeconds() {
+    return this._totresttime || (this._totresttime = this.currentWork.restTime * 60);
+  }
+  _totresttime;
+  calcTotalRecTime() {
+    this.totalTime = this.timeSegments.filter((segTime) => !!segTime.laps).reduce((accu, segTime) => accu + segTime.laps, 0);
+  }
+  restart() {
+    this.createTimeSegment();
+    this.clockContainer.classList.remove("hidden");
+    this.startTimer();
+  }
+  startTimer() {
+    this.startTime = this.getTime();
+    this.timer = setInterval(this.run.bind(this), 1000);
+  }
+  createTimeSegment() {
+    this.currentTimeSegment = { beg: this.getTime(), end: undefined, laps: undefined };
+  }
+  endCurrentTimeSegment() {
+    const end = this.getTime();
+    const laps = end - this.currentTimeSegment.beg;
+    Object.assign(this.currentTimeSegment, { end, laps });
+    this.timeSegments.push(this.currentTimeSegment);
+    delete this.currentTimeSegment;
+    this.calcTotalRecTime();
+  }
+  getStartTime() {
+    return this.startTime;
+  }
+  pause() {
+    this.endCurrentTimeSegment();
+    clearInterval(this.timer);
+    this.clockContainer.classList.add("hidden");
+  }
+  stop() {
+    clearInterval(this.timer);
+    delete this.timer;
+    this.endCurrentTimeSegment();
+    this.clockContainer.classList.add("hidden");
+    return this.totalTime;
+  }
+  run() {
+    const secondesOfWork = this.totalTime + this.lapsFromStart();
+    let displayedSeconds;
+    if (this.counterMode === "clock") {
+      displayedSeconds = secondesOfWork;
+    } else {
+      displayedSeconds = this.totalRestTimeSeconds - secondesOfWork;
+    }
+    const restTime = this.taskRestTime(secondesOfWork);
+    this.clockObj.innerHTML = this.s2h(displayedSeconds);
+    if (secondesOfWork % 60 === 0) {
+      const thisMinute = Math.round(secondesOfWork / 60);
+      const elapsedMinutes = this.currentWork.cycleTime + thisMinute;
+      const totalMinutes = this.currentWork.totalTime + thisMinute;
+      this.restTimeField.innerHTML = this.time2horloge(restTime);
+      this.cycleTimeField.innerHTML = this.time2horloge(elapsedMinutes);
+      this.totalTimeField.innerHTML = this.time2horloge(totalMinutes);
+    }
+    if (restTime < 10 && this.alerte10minsDone === false) {
+      this.donneAlerte10mins();
+    } else if (this.alerte10minsDone) {
+      if (this.alerteWorkDone === false && restTime < 0) {
+        this.donneAlerteWorkDone();
+      }
+    }
+  }
+  get restTimeField() {
+    return this._restfield || (this._restfield = DGet("span#current-work-restTime"));
+  }
+  get cycleTimeField() {
+    return this._cycledurfield || (this._cycledurfield = DGet("span#current-work-cycleTime"));
+  }
+  get totalTimeField() {
+    return this._totalfield || (this._totalfield = DGet("span#current-work-totalTime"));
+  }
+  alerte10minsDone = false;
+  alerteWorkDone = false;
+  donneAlerte10mins() {
+    ui.setBackgroundColorAt("orange");
+    this.bringAppToFront();
+    Flash.notice("10 minutes of work remaining");
+    this.alerte10minsDone = true;
+  }
+  donneAlerteWorkDone() {
+    this.bringAppToFront();
+    Flash.notice("Work time is over. Please move on to the next task.");
+    this.alerteWorkDone = true;
+  }
+  taskRestTime(minutesOfWork) {
+    minutesOfWork = minutesOfWork / 60;
+    return this.currentWork.restTime - minutesOfWork;
+  }
+  lapsFromStart() {
+    return Math.round(this.getTime() - this.startTime);
+  }
+  get clockObj() {
+    return this._clockobj || (this._clockobj = DGet("#clock"));
+  }
+  _clockobj;
+  s2h(s) {
+    let h = Math.floor(s / 3600);
+    s = s % 3600;
+    let m = Math.floor(s / 60);
+    const mstr = m < 10 ? `0${m}` : String(m);
+    s = s % 60;
+    const sstr = s < 10 ? `0${s}` : String(s);
+    return `${h}:${mstr}:${sstr}`;
+  }
+  bringAppToFront() {
+    window.electronAPI.bringToFront();
+  }
+  _restfield;
+  _cycledurfield;
+  _totalfield;
+}
+var clock;
+var init_Clock = __esm(() => {
+  init_ui();
+  init_flash();
+  clock = Clock.getInstance();
 });
 
 // node_modules/marked/lib/marked.esm.js
@@ -15956,11 +15952,11 @@ var init_end_work_report = __esm(() => {
 class Work {
   data;
   static async init() {
+    console.log("-> Initialisation de Work");
     const res = await this.getCurrent();
     if (res === true) {
       prefs.init();
       editor.init();
-      await loc.init(prefs.getLang());
       Flash.notice(`App is ready. <span id="mes123">(Show help)</span>`);
       DGet("span#mes123").addEventListener("click", help.show.bind(help, ["introduction", "tasks_file", "tasks_file_format"]), { once: true, capture: true });
     }
@@ -16006,6 +16002,7 @@ class Work {
   static async getCurrent() {
     const retour = await fetch(HOST + "task/current").then((r) => r.json());
     prefs.setData(retour.prefs);
+    await loc.init(prefs.getLang());
     clock.setClockStyle(retour.prefs.clock);
     clock.setCounterMode(retour.prefs.counter);
     ui.setUITheme(retour.prefs.theme);

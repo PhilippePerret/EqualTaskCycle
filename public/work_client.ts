@@ -13,12 +13,19 @@ import { loc } from "../lib/Locale.js";
 
 export class Work {
 
+  /**
+   * @main
+   * @api
+   * 
+   * Point d'entrée de l'application au niveau client.
+   * 
+   */
   public static async init(){
+    console.log("-> Initialisation de Work")
     const res = await this.getCurrent();
     if (res === true) {
       prefs.init();
       editor.init();
-      await loc.init(prefs.getLang());
       Flash.notice(`App is ready. <span id="mes123">(Show help)</span>`)
       DGet('span#mes123').addEventListener('click', 
         help.show.bind(help, ['introduction', 'tasks_file', 'tasks_file_format']),
@@ -87,6 +94,7 @@ export class Work {
     .then(r => r.json() as RecType);
     // console.log("retour:", retour);
     prefs.setData(retour.prefs);
+    await loc.init(prefs.getLang());
     clock.setClockStyle(retour.prefs.clock);
     clock.setCounterMode(retour.prefs.counter);
     ui.setUITheme(retour.prefs.theme);
