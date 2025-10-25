@@ -64,9 +64,9 @@ export class Work {
     }
     this.data.lastWorkedAt = clock.getStartTime();
     const stopReport = await new EndWorkReport(this).writeReport();
-    if (stopReport === false /* annulation */) {
-      await this.constructor().getCurrent();
-      return false
+    if (!stopReport /* annulation */) {
+      await Work.getCurrent();
+      return false;
     }
     this.data.report = stopReport as string;
     console.log("[addTimeAndSave] Enregistrement des temps et du rapport", this.data);

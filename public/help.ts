@@ -3,6 +3,7 @@ import { DGet } from "./js/dom";
 import { marked } from 'marked';
 import { ui } from "./ui";
 import { tt } from "../lib/Locale";
+import { listenBtn } from "./utils";
 
 /**
  * Module pour la gestion de l'aide
@@ -135,6 +136,7 @@ class Help {
 
   public init(){
     DGet('button.btn-close-help').addEventListener('click', this.close.bind(this));
+    listenBtn('help-toggle', this.show.bind(this, ['resume_home_page']));
   }
 }
 

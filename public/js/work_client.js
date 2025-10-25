@@ -15674,6 +15674,7 @@ class Help {
   _content;
   init() {
     DGet("button.btn-close-help").addEventListener("click", this.close.bind(this));
+    listenBtn("help-toggle", this.show.bind(this, ["resume_home_page"]));
   }
 }
 var HELP_TEXTS, help;
@@ -15681,6 +15682,7 @@ var init_help = __esm(() => {
   init_marked_esm();
   init_ui();
   init_Locale();
+  init_utils();
   HELP_TEXTS = {
     resume_home_page: `
 help(introduction, terminologie, task_list)
@@ -16055,8 +16057,8 @@ class Work {
     }
     this.data.lastWorkedAt = clock.getStartTime();
     const stopReport = await new EndWorkReport(this).writeReport();
-    if (stopReport === false) {
-      await this.constructor().getCurrent();
+    if (!stopReport) {
+      await Work.getCurrent();
       return false;
     }
     this.data.report = stopReport;
