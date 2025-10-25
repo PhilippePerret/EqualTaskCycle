@@ -1,7 +1,6 @@
 import { clock } from "../lib/Clock";
 import { Work } from "./work_client";
 import { ActivityTracker } from "./activityTracker";
-import { HOST } from "./js/constants";
 import { DGet } from "./js/dom";
 import { Flash } from "./js/flash";
 import { t } from '../lib/Locale';
@@ -228,19 +227,19 @@ export class UI {
   private getDataButtons(): [string, string, Function, boolean, 1 | 2, string][]{
     return [
       ['runScript', t('ui.button.run'), this.onRunScript.bind(this), false, 2,
-        "Pour lancer le script défini au démarrage"],
+        t('ui.text.to_run_script')],
       ['openFolder', t('ui.button.open_project'), this.onOpenFolder.bind(this), false, 2,
-        "Pour ouvrir le dossier défini dans les données"],
-      ['Change', 'CHANGE', this.onChange.bind(this), false, 2,
-        "Pour changer de tâche (mais attention : une seule fois par session !"],
-      ['Stop', 'STOP', this.onStop.bind(this), true, 1, 
-          "Pour arrêter la tâche et passer à la suivante (éviter…)"],
-      ['Pause', 'PAUSE', this.onPause.bind(this), true, 1,
-            "Pour mettre le travail en pause."],
-      ['Start', 'START', this.onStart.bind(this), false, 1,
-        "Pour démarrer le travail sur cette tâche."],
-      ['Restart', 'RESTART', this.onRestart.bind(this), true, 1,
-        "Pour redémarrer le travail sur cette tâche."]
+        t('ui.text.to_open_project_folder')],
+      ['Change', t('ui.button.change'), this.onChange.bind(this), false, 2,
+        t('ui.text.to_choose_another_task')],
+      ['Stop', t('ui.button.stop'), this.onStop.bind(this), true, 1, 
+        t('ui.text.to_stop_and_next')],
+      ['Pause', t('ui.button.pause'), this.onPause.bind(this), true, 1,
+        t('ui.text.to_pause_the_task')],
+      ['Start', t('ui.button.start'), this.onStart.bind(this), false, 1,
+        t('ui.text.to_start_working_on_task')],
+      ['Restart', t('ui.button.restart'), this.onRestart.bind(this), true, 1,
+        t('ui.text.to_restart_work_on_task')]
       ];
   }
 }

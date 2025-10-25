@@ -9,7 +9,7 @@ import { help } from "./help.js";
 import { editor } from "./editing.js";
 import { EndWorkReport } from "./end_work_report.js";
 import { markdown, postToServer } from "./utils.js";
-import { loc } from "../lib/Locale.js";
+import { loc, t } from "../lib/Locale.js";
 
 export class Work {
 
@@ -26,7 +26,7 @@ export class Work {
     if (res === true) {
       prefs.init();
       editor.init();
-      Flash.notice(`App is ready. <span id="mes123">(Show help)</span>`)
+      Flash.notice(`${t('app.is_ready')} <span id="mes123">(${t('help.show')})</span>`)
       DGet('span#mes123').addEventListener('click', 
         help.show.bind(help, ['introduction', 'tasks_file', 'tasks_file_format']),
         {once: true, capture: true}
@@ -41,11 +41,11 @@ export class Work {
    * seulement si ce temps excède la minute.
    */
   public static async addTimeToCurrentWork(time: number){
-    // if ( time ) {
-    if ( true ) {
+    if ( time ) {
+    // if ( true ) {
       await this.currentWork.addTimeAndSave(time)
     } else {
-      Flash.error("Too short time to be saved.")
+      Flash.error(t('times.to_short_to_be_saved'))
     }
   }
 
@@ -75,7 +75,7 @@ export class Work {
     this.dispatchData();
     await new Promise(resolve => setTimeout(resolve, 2000));
     Work.displayWork(result.next, result.options);
-    if (result.ok) { Flash.success("New times saved.");}
+    if (result.ok) { Flash.success(t('times.saved'));}
     return true;
   }
 
@@ -100,7 +100,7 @@ export class Work {
     ui.setUITheme(retour.prefs.theme);
     if (retour.task.ok === false) {
       // <= il n'y aucune tâche active
-      Flash.error('No active task. Set the task list.');
+      Flash.error(t('task.any_active'));
       return false;
     } else {
       ui.resetBackgroundColor();
@@ -159,7 +159,7 @@ export class Work {
             return clock.time2horloge(v);
           case 'report':
             if ( v ) {
-              return markdown("---\n\n# Last Session Report\n\n" + v);
+              return markdown(`---\n\n# ${t('ui.title.stop_report')}\n\n` + v);
             } else { return v }
           default: 
             return v;

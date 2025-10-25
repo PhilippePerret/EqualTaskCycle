@@ -14052,7 +14052,7 @@ class UI {
         this.onRunScript.bind(this),
         false,
         2,
-        "Pour lancer le script défini au démarrage"
+        t("ui.text.to_run_script")
       ],
       [
         "openFolder",
@@ -14060,47 +14060,47 @@ class UI {
         this.onOpenFolder.bind(this),
         false,
         2,
-        "Pour ouvrir le dossier défini dans les données"
+        t("ui.text.to_open_project_folder")
       ],
       [
         "Change",
-        "CHANGE",
+        t("ui.button.change"),
         this.onChange.bind(this),
         false,
         2,
-        "Pour changer de tâche (mais attention : une seule fois par session !"
+        t("ui.text.to_choose_another_task")
       ],
       [
         "Stop",
-        "STOP",
+        t("ui.button.stop"),
         this.onStop.bind(this),
         true,
         1,
-        "Pour arrêter la tâche et passer à la suivante (éviter…)"
+        t("ui.text.to_stop_and_next")
       ],
       [
         "Pause",
-        "PAUSE",
+        t("ui.button.pause"),
         this.onPause.bind(this),
         true,
         1,
-        "Pour mettre le travail en pause."
+        t("ui.text.to_pause_the_task")
       ],
       [
         "Start",
-        "START",
+        t("ui.button.start"),
         this.onStart.bind(this),
         false,
         1,
-        "Pour démarrer le travail sur cette tâche."
+        t("ui.text.to_start_working_on_task")
       ],
       [
         "Restart",
-        "RESTART",
+        t("ui.button.restart"),
         this.onRestart.bind(this),
         true,
         1,
-        "Pour redémarrer le travail sur cette tâche."
+        t("ui.text.to_restart_work_on_task")
       ]
     ];
   }
@@ -15957,15 +15957,17 @@ class Work {
     if (res === true) {
       prefs.init();
       editor.init();
-      Flash.notice(`App is ready. <span id="mes123">(Show help)</span>`);
+      Flash.notice(`${t("app.is_ready")} <span id="mes123">(${t("help.show")})</span>`);
       DGet("span#mes123").addEventListener("click", help.show.bind(help, ["introduction", "tasks_file", "tasks_file_format"]), { once: true, capture: true });
     }
   }
   static currentWork;
   static async addTimeToCurrentWork(time) {
-    if (true) {
+    if (time) {
       await this.currentWork.addTimeAndSave(time);
-    } else {}
+    } else {
+      Flash.error(t("times.to_short_to_be_saved"));
+    }
   }
   async addTimeAndSave(time) {
     this.data.totalTime += time;
@@ -15991,7 +15993,7 @@ class Work {
     await new Promise((resolve2) => setTimeout(resolve2, 2000));
     Work.displayWork(result.next, result.options);
     if (result.ok) {
-      Flash.success("New times saved.");
+      Flash.success(t("times.saved"));
     }
     return true;
   }
@@ -16007,7 +16009,7 @@ class Work {
     clock.setCounterMode(retour.prefs.counter);
     ui.setUITheme(retour.prefs.theme);
     if (retour.task.ok === false) {
-      Flash.error("No active task. Set the task list.");
+      Flash.error(t("task.any_active"));
       return false;
     } else {
       ui.resetBackgroundColor();
@@ -16064,7 +16066,7 @@ class Work {
             if (v3) {
               return markdown(`---
 
-# Last Session Report
+# ${t("ui.title.stop_report")}
 
 ` + v3);
             } else {

@@ -4,19 +4,26 @@ appName: "Equal Task Cycle"
 
 ui:
   button:
+    change: UNE AUTRE
     close: Fermer
     dont_save_time_and_report: Ne sauver ni temps ni rapport
     finish: Finir
     open_min: ouvrir
-  open_project: PROJET
+    open_project: PROJET
+    pause: ⏸
+    restart: ⏯
     run: SCRIPT
     save: Enregistrer
+    start: ▶
+    stop: ⏹
     use_template: Utiliser modèle…
   title:
     config_data: Données de configuration
     content: Contenu
+    help: Aide
     preferences: Préférences
     project: Projet
+    stop_report: Rapport de fin
     task_editing: Édition des tâches
     tasks: Tâches
   thing:
@@ -46,11 +53,25 @@ ui:
     elapsed_time: Temps accompli
     lang: Langue
     order: Ordre
-    path_example: "REQUIRED/PROJECT/FOLDER/PATH"
+    path_example: "chemin/vers/projet/requis"
     shortest_tasks_first: Les plus courtes d’abord
     task_in_random_order: Tâches au hasard
     temp_description: "Description de votre projet/tâche. Mettre en actif pour l'activer."
     time_left: Temps restant
+    to_add_a_task: "Pour ajouter/créer une tâche"
+    to_choose_another_task: "Pour changer de tâche (mais attention : une seule fois par session !"
+    to_destroy: Pour détruire définitivement
+    to_edit_tasks_and_data: Pour éditer les tâches et les données générales
+    to_find_help: Pour obtenir de l'aide
+    to_move_up: Pour remonter
+    to_move_down: Pour descendre
+    to_open_preferences: Pour ouvrir et modifier les préférences
+    to_open_project_folder: Pour ouvrir le dossier du projet
+    to_pause_the_task: Pour faire un break avant de reprendre
+    to_restart_work_on_task: Pour reprendre le travail sur cette tâche
+    to_run_script: Pour lancer le script associé à la tâche
+    to_start_working_on_task: To start working on the task
+    to_stop_and_next: Pour arrêter la tâche et passer à la suivante
     total_duration: Durée totale
     ui_theme: Thème interface
     your_project: "Votre projet/Tâche"
@@ -59,4 +80,4 @@ ui:
       Description de ce qu'il faudra faire à la prochaine session.
 
       En précisant bien les points importants, les choses à noter, les implémentations particulières du projet, surtout s'il s'agit de programmation.
-    description_stop_report : "This report is meant to help start the next work session more quickly and efficiently. It’s your baton for the next session."
+    description_stop_report : "Ce rapport doit servir à commencer la prochaine session de travail plus rapidement et plus efficacement. C’est votre baton de relais pour la prochaine session."

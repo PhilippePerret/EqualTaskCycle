@@ -4,19 +4,26 @@ appName: "Equal Task Cycle"
 
 ui:
   button:
+    change: CHANGE
     close: Close
     dont_save_time_and_report: Don’t save Time and Report
     finish: Finish
     open_min: open
     open_project: OPEN
+    pause: PAUSE
+    restart: RESTART
     run: RUN
     save: Save
+    start: START
+    stop: STOP
     use_template: Use template…
   title:
     config_data: Config Data
     content: Content
+    help: Help
     preferences: Preferences
     project: Project
+    stop_report: STOP Report
     task_editing: Task Editing
     tasks: Tasks
   thing:
@@ -46,11 +53,25 @@ ui:
     elapsed_time: Elapsed time
     lang: Lang
     order: Order
-    path_example: "chemin/vers/projet"
+    path_example: "required/path/to/project"
     shortest_tasks_first: Shortest tasks first
     task_in_random_order: Tasks in random order
     temp_description: "Description of your project/task.Set active to true to active it."
     time_left: Time left
+    to_add_a_task: To create a new task
+    to_choose_another_task: "To change task (but be careful: only once per session!)"
+    to_destroy: To destroy
+    to_edit_tasks_and_data: To edit tasks and general data
+    to_find_help: To get help
+    to_move_up: To move up
+    to_move_down: To move down
+    to_open_preferences: To open and edit preferences
+    to_open_project_folder: To open project folder
+    to_pause_the_task: To take a break before resuming
+    to_restart_work_on_task: To resume working on this task
+    to_run_script: To run the script associated with the task
+    to_start_working_on_task: Pour commencer à travailler sur la tâche
+    to_stop_and_next: To stop the task and move to the next one
     total_duration: Total duration
     ui_theme: UI Theme
     your_project: "Your project/Task"
@@ -59,4 +80,4 @@ ui:
       Description of what will need to be done in the next session.
 
       Be sure to specify the key points, important notes, and any particular project implementations, especially if it involves programming.
-    description_stop_report : "Ce rapport doit servir à commencer la prochaine session de travail plus rapidement et plus efficacement. C’est votre baton de relais pour la prochaine session."
+    description_stop_report : "This report is meant to help start the next work session more quickly and efficiently. It’s your baton for the next session."
