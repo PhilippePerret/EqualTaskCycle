@@ -5,6 +5,8 @@ app:
 error:
   occurred: "Une erreur est survenue : _0_"
   unfound_field: "Champ introuvable : _0_"
+files:
+  unfound_at_path: "Fichier _0_ introuvable à '_1_'"
 locales:
   check: "Vérification des locales, merci de patienter…"
   report:
@@ -14,6 +16,7 @@ locales:
     title: RAPPORT DU CHECK DES LOCALES
     unknown_count: Nombre de locales inconnues
 task:
+  very_first_one: "Vous devez éditer les préférences en cliquant sur le bouton ⚙️ et commencer par définir où mettre le fichier des tâches (il peut rester à sa place dans le dossier Documents).\n\nEnsuite, vous pouvez cliquer sur le bouton ✍🏽 pour créer vos premiers travaux."
   destroy: 'Destruction de la tâche _0_'
   any_active: Aucune tâche active.
   saved: "Tâche enregistrée avec succès !"

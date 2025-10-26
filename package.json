@@ -1,19 +1,27 @@
 {
   "name": "equaltasktime",
+  "productName": "ETC_dev",
+  "description": "Application de gestion cyclique de travaux",
+  "author": "Philicare<philippe.perret@yahoo.fr>",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "main.js",
+  "main": "electron/main.js",
   "devDependencies": {
+    "@electron/rebuild": "^4.0.1",
     "@types/better-sqlite3": "^7.6.13",
     "@types/bun": "latest",
     "@types/express": "^5.0.3",
-    "@types/js-yaml": "^4.0.9"
+    "@types/js-yaml": "^4.0.9",
+    "electron-builder": "^26.0.12"
   },
   "scripts": {
     "reset": "sudo pkill -f \"bun.*server\"",
     "watch_ts": "bun build ./public/work_client.ts --outfile=./public/js/work_client.js --target=browser --watch & bun build ./public/ui.ts --outfile=./public/js/ui.js --target=browser --watch & bun build ./public/prefs.ts --outfile=./public/js/prefs.js --target=browser --watch & bun build ./public/help.ts --outfile=./public/js/help.js --target=browser --watch",
     "start": "bun pm cache rm && npx electron .",
-    "check-locales": "bun run scripts/check_locales.ts"
+    "check-locales": "bun run scripts/check_locales.ts",
+    "build": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -30,5 +38,32 @@
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
     "unified": "^11.0.5"
+  },
+  "build": {
+    "appId": "com.philippeperret.equaltaskcycle",
+    "productName": "ETC",
+    "mac": {
+      "target": "dmg",
+      "icon": "electron/icon.png",
+      "identity": null
+    },
+    "extraResources": [
+      {
+        "from": "/opt/homebrew/bin/bun",
+        "to": "bun"
+      }
+    ],
+    "asarUnpack": [
+      "server.ts",
+      "public/**/*", 
+      "lib/**/*"
+    ],
+    "files": [
+      "electron/**/*",
+      "public/**/*",
+      "lib/**/*",
+      "server.ts",
+      "node_modules/**/*"
+    ]
   }
 }

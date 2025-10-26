@@ -1,8 +1,10 @@
+import os from 'os';
+import path from 'path';
 import yaml from 'js-yaml';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import type { RecType, WorkType } from './types';
-import path from 'path';
 import { prefs } from './prefs_server_side';
+import { t } from '../lib/Locale';
 
 
 export class DataManager {
@@ -22,28 +24,30 @@ export class DataManager {
     writeFileSync(backupPath, readFileSync(this.dataPath, 'utf8'), {encoding: 'utf8'});
   }
 
-  // Relever les données du fichier ou des données par défaut
-  public getData(){
+  /**
+   * Relever les données du fichier ou des données par défaut
+   * 
+   * Note : Au tout premier lancement de l'application, le fichier des
+   * travaux n'existe pas.
+   */
+  public getData(): WorkType[] {
     if (existsSync(this.dataPath as string)) {
-      this._data = yaml.load(readFileSync(this.dataPath, 'utf8')) as RecType;
+      return yaml.load(readFileSync(this.dataPath, 'utf8')) as WorkType[];
     } else {
-      this._data = {
-        duration: 120,
-        works: [{
-          id: 'init',
-          project: "Init the app",
-          content: "Build a _TASKS_.yaml file with data.",
-          folder: path.resolve('.'),
-        } as WorkType]
-      }
+      return this.defaultData;
     }
-    return this._data;
   }
 
-  public getDefaultDuration(): number {
-    return this._data.duration || 120;
+  public get defaultData(){return [{
+      id: 'start',
+      active: true,
+      project: "ETC",
+      content: t('task.very_first_one'),
+      folder: path.join(os.homedir(), 'Documents'),
+    } as WorkType]
   }
 
+  public getDefaultDuration(): number {return prefs.data.duree}
   private get dataPath(){ return prefs.data.file as string}
 
 }

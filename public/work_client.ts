@@ -23,6 +23,7 @@ export class Work {
   public static async init(){
     console.log("-> Initialisation de Work")
     const res = await this.getCurrent();
+    console.log("Retour de getCurrent:", res);
     if (res === true) {
       prefs.init();
       editor.init();
@@ -96,9 +97,9 @@ export class Work {
    *  applique)
    */
   public static async getCurrent(): Promise<boolean> {
-    const retour: RecType = await fetch(HOST+'/task/current')
-    .then(r => r.json() as RecType);
-    // console.log("retour:", retour);
+    const retour: RecType = await postToServer('/task/current', {process: 'Work::getCurrent'});
+    console.log("retour:", retour);
+    if (retour.ok === false) { return false}
     prefs.setData(retour.prefs);
     await loc.init(prefs.getLang());
     clock.setClockStyle(retour.prefs.clock);

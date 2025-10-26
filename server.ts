@@ -69,15 +69,21 @@ app.post('/work/save-session', (req, res) => {
   });
 });
 
-app.get('/task/current', (req, res) => {
+app.post('/task/current', (req, res) => {
   log("-> /task/current");
-  res.json({
-    task: Work.getCurrentWork(),
-    options: {
-      canChange: runtime.lastChangeIsFarEnough()
-    },
-    prefs: prefs.load()
-  });
+  let result = {ok: true, error: ''};
+  try {
+    const dprefs = prefs.load();
+    existsSync(dprefs.file) || Work.buildPrimoFile();
+    Object.assign(result, {
+      task: Work.getCurrentWork(),
+      options: { canChange: runtime.lastChangeIsFarEnough()},
+      prefs: dprefs
+    });
+  } catch(err) {
+    result = {ok: false, error: (err as any).message}
+  }
+  res.json(result);
 });
 
 app.post('/task/open-folder', (req, res) => {

@@ -136,7 +136,7 @@ div.buttons {
   margin-bottom: 0.5em;
 }
 .row-flex label {
-  flex: 0 0 140px;
+  flex: 0 0 160px;
 }
 .row label:first-child {
   display:inline-block;

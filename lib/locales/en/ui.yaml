@@ -38,6 +38,7 @@ ui:
     minutes: minutes
     Folder: Folder
     Theme: Theme
+    works_file: Works File
   adj:
     active_m: active
     Active_m: Active

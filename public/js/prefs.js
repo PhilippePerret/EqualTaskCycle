@@ -39,12 +39,6 @@ function stopEvent(ev) {
   return false;
 }
 
-// public/js/constants.js
-var PORT = 3002, HOST;
-var init_constants = __esm(() => {
-  HOST = `http://localhost:${PORT}`;
-});
-
 // public/js/flash.js
 var exports_flash = {};
 __export(exports_flash, {
@@ -4339,6 +4333,12 @@ var init_js_yaml = __esm(() => {
     safeDump
   };
   js_yaml_default = jsYaml;
+});
+
+// public/js/constants.js
+var PORT = 3002, HOST;
+var init_constants = __esm(() => {
+  HOST = `http://localhost:${PORT}`;
 });
 
 // node_modules/bail/index.js
@@ -14876,12 +14876,19 @@ async function postToServer(route, data) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
     }).then((r) => {
+      console.log("r = ", r);
       switch (r.status) {
         case 500:
           return {
             ok: false,
             error: `Internal Server Error (route: /${route}, process: ${data.process || "inconnu (add it to data)"})`,
             process: "fetch"
+          };
+        case 404:
+          return {
+            ok: false,
+            error: `Route not found: ${route}`,
+            process: data.process
           };
         default:
           return r.json();
@@ -15428,6 +15435,7 @@ class Work {
   static async init() {
     console.log("-> Initialisation de Work");
     const res = await this.getCurrent();
+    console.log("Retour de getCurrent:", res);
     if (res === true) {
       prefs.init();
       editor.init();
@@ -15476,7 +15484,11 @@ class Work {
   }
   static _obj;
   static async getCurrent() {
-    const retour = await fetch(HOST + "/task/current").then((r) => r.json());
+    const retour = await postToServer("/task/current", { process: "Work::getCurrent" });
+    console.log("retour:", retour);
+    if (retour.ok === false) {
+      return false;
+    }
     prefs.setData(retour.prefs);
     await loc.init(prefs.getLang());
     clock.setClockStyle(retour.prefs.clock);
@@ -15562,7 +15574,6 @@ class Work {
 }
 var init_work_client = __esm(() => {
   init_Clock();
-  init_constants();
   init_flash();
   init_ui();
   init_prefs();

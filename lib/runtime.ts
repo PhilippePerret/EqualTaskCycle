@@ -59,6 +59,11 @@ export class RunTime { /* singleton */
    * 
    */
   public getCandidateWorks(options: RecType | undefined = {}): string[] {
+    // Avant toutes choses, on doit s'assurer que le fichier des travaux
+    // existe.
+    if ( 4 === 2 + 2 /* TODO REMPLACER PAR "LE WORKS FILE N'EXISTE PAS/PLUS */) {
+      return []; // really ?
+    }
     let condition: string[] | string = []
     condition.push('active = 1');
     condition.push('leftTime > 0');

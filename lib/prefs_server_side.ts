@@ -1,7 +1,9 @@
 import path from "path";
+import os from 'os';
 import type { PrefsDataType, RecType } from "./types";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { userDataPath } from "./constants_server";
+import { t, tf } from '../lib/Locale';
 
 
 type ReportType = {
@@ -10,10 +12,12 @@ type ReportType = {
 }
 
 
-class Prefs {
+class Prefs { /* singleton */
 
   private DEFAULT_DATA:PrefsDataType = {
-    file:   '', // not undefined
+    lang:   'en',
+    duree:  120,
+    file:   path.join(os.homedir(), 'Documents', 'ETC_Tasks.yaml'),
     clock:  'big',
     theme:  'dark',
     random: true,
@@ -21,10 +25,10 @@ class Prefs {
     shortest: false // => les plus longues d'abord
   }
 
-  private static instance: Prefs;
+  private static inst: Prefs;
   private constructor(){}
   public static getInstance(){
-    return this.instance || (this.instance = new Prefs());
+    return this.inst || (this.inst = new Prefs());
   }
 
   public get data(): PrefsDataType {
@@ -43,7 +47,6 @@ class Prefs {
   save(data: RecType){
     // Sauvegarde du fichier de données des tâches
     const report: ReportType = {ok: true, errors: []};
-    this.checkWorksFileValidity(data.file, report, data);
     // Todo Faire ici les autres checks nécessaires
 
     writeFileSync(this.fpath, JSON.stringify(data));
@@ -54,16 +57,6 @@ class Prefs {
     report.ok = errorCount === 0;
 
     return report;
-  }
-
-  private checkWorksFileValidity(pth: string, report: ReportType, data: RecType){
-    if (!existsSync(pth)) {
-      Object.assign(data, {file: undefined});
-      (report.errors as string[]).push("Unfound works file at " + pth);
-    } else {
-      // Todo vérifier si le fichier est bien formé ?
-    }
-
   }
 
   private get fpath(){

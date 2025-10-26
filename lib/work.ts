@@ -2,6 +2,7 @@ import { DataManager } from "./data_manager";
 import { prefs } from "./prefs_server_side";
 import { runtime } from "./runtime";
 import type { RecType, WorkType } from "./types";
+import { t } from '../lib/Locale';
 
 export class Work {
   public static defaultDuration: number = 120;
@@ -13,8 +14,8 @@ export class Work {
    * Initialisation de l'application (au niveau des travaux)
    */
   public static init() {
-    const works = this.dataManager.getData().works;
-    this.defaultDuration = this.dataManager.getDefaultDuration();
+    const works: WorkType[] = this.dataManager.getData();
+    this.defaultDuration = prefs.data.duree;
     this.table = {};
     works.forEach((wdata: WorkType) => {
       const w = new Work(wdata)
@@ -27,6 +28,13 @@ export class Work {
     return this.table[workId] as Work;
   }
 
+  /**
+   * Crée le tout premier fichier, à l'ouverture de l'app
+   */
+  public static buildPrimoFile(){
+    this.saveAllData(this.dataManager.defaultData);
+  }
+  
   /**
    * Retourne le travail courant
    */
@@ -55,7 +63,7 @@ export class Work {
     } else {
       // Pas de candidats. Ça ne peut arriver que si aucune
       // tâche active n'est défini.
-      return {ok: false, error: "No task."}
+      return {ok: false, error: t('task.any_active')}
     }
   }
 

@@ -20,13 +20,19 @@ export async function postToServer(route: string, data: RecType){
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     }).then(r => {
-      // console.log("r = ", r);
+      console.log("r = ", r);
       switch(r.status) {
         case 500:
           return {
             ok: false, 
             error: `Internal Server Error (route: /${route}, process: ${data.process || 'inconnu (add it to data)'})`, 
             process: 'fetch'
+          }
+        case 404:
+          return {
+            ok: false,
+            error: `Route not found: ${route}`,
+            process: data.process
           }
         default:
           return r.json();

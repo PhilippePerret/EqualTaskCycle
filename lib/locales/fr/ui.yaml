@@ -38,6 +38,7 @@ ui:
     minutes: minutes
     Folder: Dossier
     Theme: Thème
+    works_file: Fichier des travaux
   adj:
     active_m: actif
     Active_m: Actif
