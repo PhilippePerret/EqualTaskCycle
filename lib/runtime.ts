@@ -59,11 +59,6 @@ export class RunTime { /* singleton */
    * 
    */
   public getCandidateWorks(options: RecType | undefined = {}): string[] {
-    // Avant toutes choses, on doit s'assurer que le fichier des travaux
-    // existe.
-    if ( 4 === 2 + 2 /* TODO REMPLACER PAR "LE WORKS FILE N'EXISTE PAS/PLUS */) {
-      return []; // really ?
-    }
     let condition: string[] | string = []
     condition.push('active = 1');
     condition.push('leftTime > 0');
@@ -179,7 +174,7 @@ export class RunTime { /* singleton */
         works
       SET
         cycleTime = 0,
-        leftTime = defaultRestTime
+        leftTime = defaultLeftTime
       WHERE
         active = 1
       `
@@ -213,7 +208,7 @@ export class RunTime { /* singleton */
       startedAt INTEGER,
       lastWorkedAt INTEGER,
       active INTEGER,
-      defaultRestTime INTEGER,
+      defaultLeftTime INTEGER,
       report STRING
     );
     CREATE TABLE IF NOT EXISTS keypairs (
@@ -292,7 +287,7 @@ export class RunTime { /* singleton */
     SET
       cycleCount = cycleCount + 1,
       cycleTime = 0,
-      leftTime = defaultRestTime
+      leftTime = defaultLeftTime
     WHERE
       active = 1
     `
@@ -310,7 +305,7 @@ export class RunTime { /* singleton */
     const allIds = this.db.query('SELECT id FROM works').all().map((row: any) => row.id);
     // console.log("retour", allIds);
     works.forEach(work => {
-      if (allIds.find((id) => id === work.id)) { return ; }
+      if (allIds.find((id) => id === work.id)) { return }
       // Nouveau travail
       this.initRuntimeForWork(work, defaultDuration);
     });
@@ -335,7 +330,7 @@ export class RunTime { /* singleton */
     VALUES
       (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `
-    this.db.run(request, [work.id, 0, 0, duration, 0, 0, new Date().getTime(), null, 1, duration, ""])
+    this.db.run(request, [work.id, 0, 0, 0, duration, 0, new Date().getTime(), null, 1, duration, ""])
   }
 
   private get dbPath(){

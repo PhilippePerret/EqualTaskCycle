@@ -12,7 +12,7 @@ export class DataManager {
 
   public setData(allData: WorkType[]){
     console.log("[DataManager] Je dois sauvegarder : ", allData);
-    this.backupDataFile()
+    existsSync(this.dataPath) && this.backupDataFile()
     writeFileSync(this.dataPath, yaml.dump(allData), {encoding: 'utf8'});
   }
 

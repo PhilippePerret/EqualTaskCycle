@@ -36,11 +36,12 @@ div#clock {
 }
 div#clock-container.big div#mask-clock {
   position: fixed;
-  top: 0;
-  left: 0;
+  top: 46px;
+  left: 44px;
   display: flex;
-  width: 100vw;
-  height: 100vw;
+  width: 89vw;
+  border-radius: 1em;
+  height: 51.1vw;
   background-color: white;
   opacity: 0.6;
   z-index: 10;
@@ -48,12 +49,12 @@ div#clock-container.big div#mask-clock {
 div#clock-container:not(.big) div#mask-clock { display:none;}
 
 div#clock-container.big div#clock {
-  height: 100vw;
-  line-height: calc(50vw + 30pt);
   letter-spacing: -14px;
-  vertical-align: middle;
+  vertical-align: top;
   font-size: 140pt;
   z-index: 10;
+  top: 120px;
+  position: absolute;
 }
 
 div#clock-container.medium div#clock {

@@ -5,7 +5,7 @@ import type { RecType, WorkType } from "./types";
 import { t } from '../lib/Locale';
 
 export class Work {
-  public static defaultDuration: number = 120;
+  public static defaultDuration: number;
 
   // private static works: Work[] = [];
   private static table: {[x:string]: Work} = {};
@@ -32,9 +32,10 @@ export class Work {
    * Crée le tout premier fichier, à l'ouverture de l'app
    */
   public static buildPrimoFile(){
+    console.log("-> buildPrimoFile")
     this.saveAllData(this.dataManager.defaultData);
   }
-  
+
   /**
    * Retourne le travail courant
    */

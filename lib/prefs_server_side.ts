@@ -11,7 +11,6 @@ type ReportType = {
   errors: string[] | string;
 }
 
-
 class Prefs { /* singleton */
 
   private DEFAULT_DATA:PrefsDataType = {
@@ -40,22 +39,18 @@ class Prefs { /* singleton */
     if (existsSync(this.fpath)) {
       return Object.assign(data, JSON.parse(readFileSync(this.fpath,'utf8')));
     } else {
+      this.save(data);
       return data;
     }
   }
 
   save(data: RecType){
-    // Sauvegarde du fichier de données des tâches
     const report: ReportType = {ok: true, errors: []};
-    // Todo Faire ici les autres checks nécessaires
-
     writeFileSync(this.fpath, JSON.stringify(data));
-
     // Rapport de retour
     const errorCount = report.errors.length;
     report.errors = (report.errors as any).join(', ');
     report.ok = errorCount === 0;
-
     return report;
   }
 

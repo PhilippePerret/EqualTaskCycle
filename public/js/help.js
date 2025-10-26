@@ -15381,6 +15381,7 @@ class Prefs {
   }
   observeFields() {
     Object.keys(this.data).forEach((prop) => {
+      console.log("Traitement de la propriété '%s'", prop);
       this.field(prop).addEventListener("change", this.onChangePref.bind(this, prop));
     });
     this.fieldsReady = true;

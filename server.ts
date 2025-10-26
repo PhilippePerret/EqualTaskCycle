@@ -75,6 +75,9 @@ app.post('/task/current', (req, res) => {
   try {
     const dprefs = prefs.load();
     existsSync(dprefs.file) || Work.buildPrimoFile();
+    if (false === existsSync(dprefs.file)) {
+      throw new Error('Tasks File doesn’t exist, again...');
+    }
     Object.assign(result, {
       task: Work.getCurrentWork(),
       options: { canChange: runtime.lastChangeIsFarEnough()},
