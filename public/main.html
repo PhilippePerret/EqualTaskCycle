@@ -105,30 +105,8 @@
 
   -->
   <section id="editing" class="hidden">
-    <h2>t(ui.title.task_editing)</h2>
-    <div id="editing-config-container">
+    <h2>t(ui.title.task_editing) <span class="small">(<span id="tasks-count">---</span>)</span></h2>
 
-
-      <h3>t(ui.title.config_data)</h3>
-      <!-- Pour mettre les données générales, comme le temps d'édition par défaut -->
-      
-      <div class="row-flex">
-        <label>t(ui.text.default_duration)</label>
-        <input id="config-data-duration" type="number" max="1000" min="15" default="120">
-        <label>t(ui.thing.minutes)</label>
-      </div>
-
-      <div class="row-flex">
-        <label>t(ui.text.ui_theme)</label>
-        <select id="config-data-theme">
-          <option value="dark">t(ui.adj.Dark)</option>
-          <option value="light">t(ui.adj.Light)</option>
-        </select>
-      </div>
-
-    </div>
-
-    <h3>t(ui.title.tasks) <span class="small">(<span id="tasks-count">---</span>)</span></h3>
     <div id="editing-tasks-container">
       <!-- Container pour afficher et éditer les tâches -->
     </div>
