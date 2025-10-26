@@ -6,9 +6,10 @@ import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import rehypeStringify from 'rehype-stringify';
+import { t } from "../lib/Locale.js";
+import { Flash } from "./js/flash";
 
 export async function postToServer(route: string, data: RecType){
-  if (route.startsWith('/')){ route = route.substring(1, route.length)}
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 30 * 60 * 1000);
   let response;
@@ -18,12 +19,27 @@ export async function postToServer(route: string, data: RecType){
       signal: controller.signal,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
-    }).then(r => r.json());
+    }).then(r => {
+      // console.log("r = ", r);
+      switch(r.status) {
+        case 500:
+          return {
+            ok: false, 
+            error: `Internal Server Error (route: /${route}, process: ${data.process || 'inconnu (add it to data)'})`, 
+            process: 'fetch'
+          }
+        default:
+          return r.json();
+      }
+    });
   } catch(err) {
     console.error(err);
-    response = {ok: false, error: `ERREUR postToServer: ${(err as any).message}`}
+    response = {ok: false, process: 'fetch', error: `ERREUR postToServer: ${(err as any).message}`}
   } finally {
     clearTimeout(timeoutId);
+  }
+  if (response.ok === false) {
+    Flash.error(`[${response.process}] ${t('error.occurred', [response.error])}`);
   }
   return response;
 }

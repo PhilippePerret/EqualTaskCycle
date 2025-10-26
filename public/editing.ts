@@ -97,7 +97,7 @@ class Editing {
     ui.toggleSection('editing');
     const container = this.taskContainer;
     container.innerHTML = '';
-    const retour: RecType = await postToServer('tasks/all', {dataPath: prefs.getValue('file')});
+    const retour: RecType = await postToServer('/tasks/all', {dataPath: prefs.getValue('file')});
     if (retour.ok === false ) { return Flash.error(retour.error) }
     // --- Données de configuration (générales) ---
     this.setConfigData(retour.data);

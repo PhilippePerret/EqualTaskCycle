@@ -5,20 +5,20 @@ import { Flash } from "./js/flash";
 import { ui } from "./ui";
 import { listenBtn, postToServer } from "./utils";
 import { t } from '../lib/Locale';
+import { tools } from "./tools";
 
-export class Prefs {
+export class Prefs { /* singleton */
 
   private data!: PrefsDataType;
   private fieldsReady: boolean = false;
 
   private static inst: Prefs;
   private constructor(){}
-  public static getInstance(){
-    return this.inst || (this.inst = new Prefs())
-  }
+  public static getInstance(){return this.inst || (this.inst = new Prefs())}
 
   public init(){
     this.observeButtons();
+    tools.init();
   }
 
   public getLang(){ return this.data.lang || 'en' } /* <=========== TODO */
@@ -28,7 +28,7 @@ export class Prefs {
    */
   async onOpenDataFile(ev: MouseEvent){
     stopEvent(ev);
-    const result = await postToServer('prefs/open-data-file', {
+    const result = await postToServer('/prefs/open-data-file', {
       filePath: this.getValue('file')
     })
     if (result.ok) { Flash.success(t('data_file.open_with_sucess')) } 
@@ -40,7 +40,7 @@ export class Prefs {
    */
   async onSave(ev: MouseEvent){
     stopEvent(ev);
-    const result: RecType = await postToServer('prefs/save', this.getData());
+    const result: RecType = await postToServer('/prefs/save', this.getData());
     // console.log("result = ", result);
     if (result.ok) {
       this.close();
@@ -65,7 +65,8 @@ export class Prefs {
     }
   }
   onOpen(ev: MouseEvent){
-    this.open();    
+    tools.build(); // first time only
+    this.open();
     return stopEvent(ev);
   }
   onClose(ev: MouseEvent){

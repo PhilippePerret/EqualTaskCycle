@@ -1546,7 +1546,7 @@ var init_Clock = __esm(() => {
 // public/js/constants.js
 var PORT = 3002, HOST;
 var init_constants = __esm(() => {
-  HOST = `http://localhost:${PORT}/`;
+  HOST = `http://localhost:${PORT}`;
 });
 
 // node_modules/bail/index.js
@@ -12062,72 +12062,6 @@ var init_rehype_stringify = __esm(() => {
   init_lib15();
 });
 
-// public/utils.ts
-var exports_utils = {};
-__export(exports_utils, {
-  subTitleize: () => subTitleize,
-  red: () => red,
-  postToServer: () => postToServer,
-  markdown: () => markdown,
-  listenBtn: () => listenBtn,
-  green: () => green,
-  blue: () => blue
-});
-async function postToServer(route, data) {
-  if (route.startsWith("/")) {
-    route = route.substring(1, route.length);
-  }
-  const controller = new AbortController;
-  const timeoutId = setTimeout(() => controller.abort(), 30 * 60 * 1000);
-  let response;
-  try {
-    response = await fetch(HOST + route, {
-      method: "POST",
-      signal: controller.signal,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    }).then((r) => r.json());
-  } catch (err) {
-    console.error(err);
-    response = { ok: false, error: `ERREUR postToServer: ${err.message}` };
-  } finally {
-    clearTimeout(timeoutId);
-  }
-  return response;
-}
-function listenBtn(id, method, container = document.body) {
-  DGet(`button.btn-${id}`, container).addEventListener("click", method);
-}
-function markdown(md) {
-  md = md.replace(/^(\#+?)/mg, "$1##");
-  const result = unified().use(remarkParse).use(remarkRehype).use(rehypeStringify).processSync(md);
-  const html6 = String(result);
-  return html6;
-}
-function red(msg) {
-  return colorize(msg, "31");
-}
-function green(msg) {
-  return colorize(msg, "32");
-}
-function blue(msg) {
-  return colorize(msg, "34");
-}
-function colorize(msg, color2) {
-  return `\x1B[${color2}m${msg}\x1B[0m`;
-}
-function subTitleize(titre, car = "-") {
-  return titre + `
-` + new Array(titre.length + 1).join(car);
-}
-var init_utils = __esm(() => {
-  init_constants();
-  init_unified();
-  init_remark_parse();
-  init_remark_rehype();
-  init_rehype_stringify();
-});
-
 // node:path
 function assertPath3(path) {
   if (typeof path !== "string")
@@ -15099,10 +15033,10 @@ var init_js_yaml = __esm(() => {
 var {readFileSync} = (() => ({}));
 function t(route, params) {
   if (params) {
-    const template = loc.translate(route);
+    let template = loc.translate(route);
     for (var i2 in params) {
       const regexp = new RegExp(`_${i2}_`, "g");
-      template.replace(regexp, params[i2]);
+      template = template.replace(regexp, params[i2]);
     }
     return template;
   } else {
@@ -15137,10 +15071,10 @@ class Locale {
         Object.assign(this.locales, js_yaml_default.load(readFileSync(pathLocale, "utf8")));
       });
     } else {
-      const { postToServer: postToServer2 } = await Promise.resolve().then(() => (init_utils(), exports_utils));
+      const { postToServer } = await Promise.resolve().then(() => (init_utils(), exports_utils));
       const { prefs } = await Promise.resolve().then(() => (init_prefs(), exports_prefs));
       const { Flash: Flash2 } = await Promise.resolve().then(() => (init_flash(), exports_flash));
-      const retour = await postToServer2("localization/get-all", { lang: prefs.getLang() });
+      const retour = await postToServer("/localization/get-all", { lang: prefs.getLang() });
       if (retour.ok) {
         this.locales = retour.locales;
       } else {
@@ -15163,6 +15097,145 @@ var init_Locale = __esm(() => {
   loc = Locale.getInstance();
 });
 
+// public/utils.ts
+var exports_utils = {};
+__export(exports_utils, {
+  subTitleize: () => subTitleize,
+  red: () => red,
+  postToServer: () => postToServer,
+  markdown: () => markdown,
+  listenBtn: () => listenBtn,
+  green: () => green,
+  blue: () => blue
+});
+async function postToServer(route, data) {
+  const controller = new AbortController;
+  const timeoutId = setTimeout(() => controller.abort(), 30 * 60 * 1000);
+  let response;
+  try {
+    response = await fetch(HOST + route, {
+      method: "POST",
+      signal: controller.signal,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    }).then((r) => {
+      switch (r.status) {
+        case 500:
+          return {
+            ok: false,
+            error: `Internal Server Error (route: /${route}, process: ${data.process || "inconnu (add it to data)"})`,
+            process: "fetch"
+          };
+        default:
+          return r.json();
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    response = { ok: false, process: "fetch", error: `ERREUR postToServer: ${err.message}` };
+  } finally {
+    clearTimeout(timeoutId);
+  }
+  if (response.ok === false) {
+    Flash.error(`[${response.process}] ${t("error.occurred", [response.error])}`);
+  }
+  return response;
+}
+function listenBtn(id, method, container = document.body) {
+  DGet(`button.btn-${id}`, container).addEventListener("click", method);
+}
+function markdown(md) {
+  md = md.replace(/^(\#+?)/mg, "$1##");
+  const result = unified().use(remarkParse).use(remarkRehype).use(rehypeStringify).processSync(md);
+  const html6 = String(result);
+  return html6;
+}
+function red(msg) {
+  return colorize(msg, "31");
+}
+function green(msg) {
+  return colorize(msg, "32");
+}
+function blue(msg) {
+  return colorize(msg, "34");
+}
+function colorize(msg, color2) {
+  return `\x1B[${color2}m${msg}\x1B[0m`;
+}
+function subTitleize(titre, car = "-") {
+  return titre + `
+` + new Array(titre.length + 1).join(car);
+}
+var init_utils = __esm(() => {
+  init_constants();
+  init_unified();
+  init_remark_parse();
+  init_remark_rehype();
+  init_rehype_stringify();
+  init_Locale();
+  init_flash();
+});
+
+// public/tools.ts
+class Tools {
+  get TOOLS_DATA() {
+    return [
+      {
+        name: t("ui.tool.reset_cycle.name"),
+        description: t("ui.tool.reset_cycle.desc"),
+        method: this.tool_ResetCycle.bind(this)
+      }
+    ];
+  }
+  async tool_ResetCycle(ev) {
+    ev && stopEvent(ev);
+    const retour = await postToServer("/tool/reset-cycle", { process: t("ui.tool.reset_cycle.name") });
+    if (retour.ok) {
+      Flash.success(t("tool.cycle_reset"));
+    }
+  }
+  run_ResetCycle(data, response) {
+    console.log("Je passe par run_ResetCycle");
+    response.json({ ok: false, process: data.process, error: "Je ne fais rien, encore" });
+  }
+  init() {}
+  build() {
+    if (this.built)
+      return;
+    const cont = this.container;
+    this.TOOLS_DATA.forEach((dtool) => {
+      const o = document.createElement("DIV");
+      o.className = "tool-container";
+      const a = document.createElement("A");
+      a.innerHTML = dtool.name;
+      const d = document.createElement("DIV");
+      d.innerHTML = dtool.description;
+      d.className = "explication";
+      o.appendChild(a);
+      o.appendChild(d);
+      cont.appendChild(o);
+      a.addEventListener("click", dtool.method);
+    });
+    this.built = true;
+  }
+  get container() {
+    return DGet("#tools-container");
+  }
+  built = false;
+  static getInstance() {
+    return this.inst || (this.inst = new Tools);
+  }
+  constructor() {}
+  static inst;
+}
+var tools;
+var init_tools = __esm(() => {
+  init_Locale();
+  init_flash();
+  init_utils();
+  tools = Tools.getInstance();
+});
+
 // public/prefs.ts
 var exports_prefs = {};
 __export(exports_prefs, {
@@ -15180,13 +15253,14 @@ class Prefs {
   }
   init() {
     this.observeButtons();
+    tools.init();
   }
   getLang() {
     return this.data.lang || "en";
   }
   async onOpenDataFile(ev) {
     stopEvent(ev);
-    const result = await postToServer("prefs/open-data-file", {
+    const result = await postToServer("/prefs/open-data-file", {
       filePath: this.getValue("file")
     });
     if (result.ok) {
@@ -15197,7 +15271,7 @@ class Prefs {
   }
   async onSave(ev) {
     stopEvent(ev);
-    const result = await postToServer("prefs/save", this.getData());
+    const result = await postToServer("/prefs/save", this.getData());
     if (result.ok) {
       this.close();
       Flash.success(t("prefs.saved"));
@@ -15222,6 +15296,7 @@ class Prefs {
     }
   }
   onOpen(ev) {
+    tools.build();
     this.open();
     return stopEvent(ev);
   }
@@ -15290,6 +15365,7 @@ var init_prefs = __esm(() => {
   init_ui();
   init_utils();
   init_Locale();
+  init_tools();
   prefs = Prefs.getInstance();
 });
 
@@ -15372,7 +15448,7 @@ class Editing {
     ui.toggleSection("editing");
     const container = this.taskContainer;
     container.innerHTML = "";
-    const retour = await postToServer("tasks/all", { dataPath: prefs.getValue("file") });
+    const retour = await postToServer("/tasks/all", { dataPath: prefs.getValue("file") });
     if (retour.ok === false) {
       return Flash.error(retour.error);
     }
@@ -15636,7 +15712,7 @@ class Work {
     }
     this.data.report = stopReport;
     console.log("[addTimeAndSave] Enregistrement des temps et du rapport", this.data);
-    const result = await postToServer("work/save-session", this.data);
+    const result = await postToServer("/work/save-session", this.data);
     this.dispatchData();
     await new Promise((resolve2) => setTimeout(resolve2, 2000));
     Work.displayWork(result.next, result.options);
@@ -15650,7 +15726,7 @@ class Work {
   }
   static _obj;
   static async getCurrent() {
-    const retour = await fetch(HOST + "task/current").then((r) => r.json());
+    const retour = await fetch(HOST + "/task/current").then((r) => r.json());
     prefs.setData(retour.prefs);
     await loc.init(prefs.getLang());
     clock.setClockStyle(retour.prefs.clock);
@@ -15779,7 +15855,7 @@ var init_activityTracker = __esm(() => {
       }
     }
     static async control() {
-      const result = await postToServer("work/check-activity", {
+      const result = await postToServer("/work/check-activity", {
         projectFolder: Work.currentWork.folder,
         lastCheck: Date.now() - this.CHECK_INTERVAL
       });
@@ -15888,7 +15964,7 @@ class UI {
   async onChange(ev) {
     ev && stopEvent2(ev);
     const curwork = Work.currentWork;
-    const result = await postToServer("task/change", { workId: curwork.id });
+    const result = await postToServer("/task/change", { workId: curwork.id });
     if (result.ok === false) {
       Flash.error(t("error.occurred", [result.error]));
     }
@@ -15897,7 +15973,7 @@ class UI {
   async onRunScript(ev) {
     ev && stopEvent2(ev);
     const curwork = Work.currentWork;
-    const result = await postToServer("task/run-script", { workId: curwork.id, script: curwork.script });
+    const result = await postToServer("/task/run-script", { workId: curwork.id, script: curwork.script });
     if (result.ok) {
       Flash.success(t("script.ran_successfully"));
     } else {
@@ -15908,7 +15984,7 @@ class UI {
   async onOpenFolder(ev) {
     ev && stopEvent2(ev);
     const curwork = Work.currentWork;
-    const result = await postToServer("task/open-folder", { workId: curwork.id, folder: curwork.folder });
+    const result = await postToServer("/task/open-folder", { workId: curwork.id, folder: curwork.folder });
     if (result.ok) {
       Flash.success(t("folder.opened_in_finder"));
     } else {

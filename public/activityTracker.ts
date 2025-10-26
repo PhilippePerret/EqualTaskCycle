@@ -34,7 +34,7 @@ export class ActivityTracker /* CLIENT */ {
   }
 
   private static async control(){
-    const result = await postToServer('work/check-activity',{
+    const result = await postToServer('/work/check-activity',{
         projectFolder: Work.currentWork.folder,
         lastCheck: Date.now() - this.CHECK_INTERVAL
     });

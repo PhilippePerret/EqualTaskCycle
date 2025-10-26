@@ -188,6 +188,15 @@ app.post('/localization/get-all', (req, res) => {
   res.json(retour);
 });
 
+app.post('/tool/reset-cycle', async (req, res) => {
+  console.log("-> /tool/reset-cycle")
+  const data = req.body;
+  res.json(Object.assign(data, {ok: false, error: 'Pour faire une erreur'}))
+  // const { tools } = await require('public/tools.ts');
+  // console.log("Module tools chargé")
+  // tools.run_ResetCycle(req.body, res);
+})
+
 
 app.listen(PORT, () => {
   console.log(`Server running on ${HOST}`);

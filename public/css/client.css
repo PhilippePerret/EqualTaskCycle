@@ -223,3 +223,18 @@ div#ETR-container div.buttons {
   background-color: #2a3e3e;
   padding: 8px 1em;
 }
+
+div#tools-container {
+  border: 1px solid #DDDDDD;
+}
+div#tools-container div.tool-container {
+  margin-bottom: 0.5em;
+}
+div#tools-container div.tool-container > a {
+  display: block;
+  cursor: pointer;
+}
+div#tools-container div.tool-container > div.explication {
+  font-size: 0.75em;
+  margin-left: 1em;
+}

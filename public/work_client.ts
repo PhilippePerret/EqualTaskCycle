@@ -70,7 +70,7 @@ export class Work {
     }
     this.data.report = stopReport as string;
     console.log("[addTimeAndSave] Enregistrement des temps et du rapport", this.data);
-    const result: RecType = await postToServer('work/save-session', this.data);
+    const result: RecType = await postToServer('/work/save-session', this.data);
     // console.log("Retour save session: ", result);
     // On actualise l'affichage pour apercevoir les nouveaux temps
     // pendant 2 secondes puis on passe à la tâche suivante, qui a
@@ -93,7 +93,7 @@ export class Work {
    *  applique)
    */
   public static async getCurrent(): Promise<boolean> {
-    const retour: RecType = await fetch(HOST+'task/current')
+    const retour: RecType = await fetch(HOST+'/task/current')
     .then(r => r.json() as RecType);
     // console.log("retour:", retour);
     prefs.setData(retour.prefs);

@@ -29,6 +29,7 @@ ui:
     stop_report: Rapport de fin
     task_editing: Édition des tâches
     tasks: Tâches
+    tools: Outils
   thing:
     Clock: Horloge
     Countdown: Compte à rebours
@@ -84,3 +85,9 @@ ui:
 
       En précisant bien les points importants, les choses à noter, les implémentations particulières du projet, surtout s'il s'agit de programmation.
     description_stop_report : "Ce rapport doit servir à commencer la prochaine session de travail plus rapidement et plus efficacement. C’est votre baton de relais pour la prochaine session."
+
+  # TOOLS
+  tool:
+    reset_cycle:
+      name: Réinitialiser le cycle
+      desc: Permet de réinitialiser les valeurs temporelles du cycle courant, c’est-à-dire, simplement, de remettre tous les temps à zéro.

@@ -14,10 +14,10 @@ const LOCALES_FOLDER = path.resolve(path.join(__dirname,'locales'));
 export function t(route: string, params?: string[]): string {
   // console.log("route = '%s'", route, params);
   if (params) {
-    const template = loc.translate(route);
+    let template = loc.translate(route);
     for(var i in params){
       const regexp = new RegExp(`_${i}_`, 'g');
-      template.replace(regexp, params[i] as string);
+      template = template.replace(regexp, params[i] as string);
     }
     return template;
   } else {
@@ -87,7 +87,7 @@ class Locale {
       const { prefs } = await import("../public/prefs");
       const { Flash } = await import("../public/js/flash");
 
-      const retour = await postToServer('localization/get-all', {lang: prefs.getLang()});
+      const retour = await postToServer('/localization/get-all', {lang: prefs.getLang()});
       if (retour.ok) {
         this.locales = retour.locales;
       } else {

@@ -21,6 +21,8 @@ times:
   dont_add_and_save: "I don’t add & save time"
   saved: New times recorded
   to_short_to_be_saved: Time too short to be recorded
+tool:
+  cycle_reset: Cycle reset.
 report:
   empty_content: "Empty content before apply template. (prudence)"
 data_file:

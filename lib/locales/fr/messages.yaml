@@ -21,6 +21,8 @@ times:
   dont_add_and_save: Je n'ai pas ajouté et sauvé les temps
   saved: Nouveaux temps enregistrés
   to_short_to_be_saved: Temps trop court pour être enregistré.
+tool:
+  cycle_reset: Cycle réinitialisé avec succès.
 report:
   empty_content: "Par prudence, videz le contenu avant d'application le modèle."
 data_file:
