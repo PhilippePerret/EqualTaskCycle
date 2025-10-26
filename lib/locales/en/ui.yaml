@@ -87,7 +87,15 @@ ui:
       Be sure to specify the key points, important notes, and any particular project implementations, especially if it involves programming.
     description_stop_report : "This report is meant to help start the next work session more quickly and efficiently. It’s your baton for the next session."
 
+  # TOOLS
   tool:
     reset_cycle:
-      name: Reset Cycle
-      desc: Permet de réinitialiser les valeurs temporelles du cycle courant, c’est-à-dire, simplement, de remettre tous les temps à zéro.
+      name: Reset cycle
+      desc: Allows resetting the time values of the current cycle, that is, simply setting all times to zero.
+    manual:
+      produce:
+        name: Produce manual
+        desc: By activating this tool, you generate the manual in your language (the one defined in the preferences above).
+      open:
+        name: Open manual
+        desc: This tool allows you to open the application manual in your language, in PDF format.

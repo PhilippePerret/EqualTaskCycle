@@ -16067,27 +16067,49 @@ class Tools {
       {
         name: t("ui.tool.reset_cycle.name"),
         description: t("ui.tool.reset_cycle.desc"),
-        method: this.tool_ResetCycle.bind(this)
+        method: this.resetCycle.bind(this)
+      },
+      {
+        name: t("ui.tool.manual.open.name"),
+        description: t("ui.tool.manual.open.desc"),
+        method: this.openManual.bind(this)
+      },
+      {
+        name: t("ui.tool.manual.produce.name"),
+        description: t("ui.tool.manual.produce.desc"),
+        method: this.produceManual.bind(this)
       }
     ];
   }
-  async tool_ResetCycle(ev) {
+  async resetCycle(ev) {
     ev && stopEvent(ev);
     const retour = await postToServer("/tool/reset-cycle", { process: t("ui.tool.reset_cycle.name") });
     if (retour.ok) {
       Flash.success(t("tool.cycle_reset"));
     }
   }
-  run_ResetCycle(data, response) {
-    console.log("Je passe par run_ResetCycle");
-    response.json({ ok: false, process: data.process, error: "Je ne fais rien, encore" });
+  async openManual(ev) {
+    stopEvent(ev);
+  }
+  async openManual_server(data, response) {
+    let ok3 = true, error = undefined;
+    response.json(Object.assign(data, { ok: ok3, error }));
+  }
+  async produceManual(ev) {
+    stopEvent(ev);
+  }
+  async produceManual_server(data, response) {
+    let ok3 = true, error = undefined;
+    response.json(Object.assign(data, { ok: ok3, error }));
   }
   init() {}
   build() {
-    if (this.built)
+    if (this.built) {
       return;
+    }
     const cont = this.container;
     this.TOOLS_DATA.forEach((dtool) => {
+      console.log("Construction de l'outil : ", dtool);
       const o = document.createElement("DIV");
       o.className = "tool-container";
       const a = document.createElement("A");
@@ -16100,7 +16122,6 @@ class Tools {
       cont.appendChild(o);
       a.addEventListener("click", dtool.method);
     });
-    this.built = true;
   }
   get container() {
     return DGet("#tools-container");

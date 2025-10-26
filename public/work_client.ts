@@ -68,6 +68,9 @@ export class Work {
       await Work.getCurrent();
       return false;
     }
+
+
+    
     this.data.report = stopReport as string;
     console.log("[addTimeAndSave] Enregistrement des temps et du rapport", this.data);
     const result: RecType = await postToServer('/work/save-session', this.data);

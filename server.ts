@@ -190,8 +190,10 @@ app.post('/localization/get-all', (req, res) => {
 
 app.post('/tool/reset-cycle', async (req, res) => {
   console.log("-> /tool/reset-cycle")
-  const { tools } = await require('./public/tools.ts');
-  tools.run_ResetCycle(req.body, res);
+  const data = req.body;
+  const {ok, error} = runtime.resetCycle();
+  res.json(Object.assign(data, {ok, error}));
+
 })
 
 

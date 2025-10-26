@@ -91,3 +91,10 @@ ui:
     reset_cycle:
       name: Réinitialiser le cycle
       desc: Permet de réinitialiser les valeurs temporelles du cycle courant, c’est-à-dire, simplement, de remettre tous les temps à zéro.
+    manual:
+      produce:
+        name: Produire le manuel
+        desc: En activant cette outil, vous produisez le manuel dans votre langue (celle définie dans les préférences ci-dessus).
+      open:
+        name: Ouvrir le manuel
+        desc: Cet outil vous permet d'ouvrir le manuel de l'application, dans votre langue, au format PDF.

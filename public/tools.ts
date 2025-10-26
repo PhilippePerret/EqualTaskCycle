@@ -15,26 +15,49 @@ class Tools { /* singleton */
     {
       name: t('ui.tool.reset_cycle.name'), 
       description: t('ui.tool.reset_cycle.desc'), 
-      method: this.tool_ResetCycle.bind(this)
+      method: this.resetCycle.bind(this)
+    },
+    {
+      name: t('ui.tool.manual.open.name'),
+      description: t('ui.tool.manual.open.desc'),
+      method: this.openManual.bind(this)
+    },
+    {
+      name: t('ui.tool.manual.produce.name'),
+      description: t('ui.tool.manual.produce.desc'),
+      method: this.produceManual.bind(this)
     }
   ]}
 
   // -------- TOOLS ----------
 
   /* Client-side */
-  private async tool_ResetCycle(ev: Event) {
+  private async resetCycle(ev: Event) {
     ev && stopEvent(ev);
     const retour = await postToServer('/tool/reset-cycle', {process: t('ui.tool.reset_cycle.name')});
     if (retour.ok){
       Flash.success(t('tool.cycle_reset'))
     }
   }
-  /* Server-side */
-  public async run_ResetCycle(data:any, response: any) {
-    console.log("Je passe par run_ResetCycle");
-    const { runtime } = require('../lib/runtime.ts');
-    const {ok, error} = runtime.resetCycle();
-    response.json(Object.assign(data, {ok, error}));
+
+  // --- //
+
+  private async openManual(ev: Event){
+    stopEvent(ev);
+  }
+  public async openManual_server(data: any, response: any){
+    let ok = true, error = undefined;
+    response.json(Object.assign(data, {ok, error}))
+  }
+
+  // --- //
+
+  private async produceManual(ev: Event){
+    stopEvent(ev);
+  }
+  public async produceManual_server(data: any, response: any){
+    let ok = true, error = undefined;
+    response.json(Object.assign(data, {ok, error}))
   }
 
   // -------- /TOOLS ----------
@@ -48,9 +71,10 @@ class Tools { /* singleton */
    * (seulement si on ouvre le panneau — cf. Prefs)
    */
   build(): void {
-    if (this.built) return;
+    if (this.built) { return }
     const cont = this.container;
     this.TOOLS_DATA.forEach((dtool: ToolType) => {
+      console.log("Construction de l'outil : ", dtool);
       const o = document.createElement('DIV');
       o.className = 'tool-container';
       const a = document.createElement('A');
@@ -64,7 +88,7 @@ class Tools { /* singleton */
       // Observation
       a.addEventListener('click', dtool.method);
     })
-    this.built = true;
+    // this.built = true;
   }
   
   private get container(){return DGet('#tools-container')}
