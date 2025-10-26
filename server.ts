@@ -156,7 +156,7 @@ app.post('/tasks/all', (req, res) => {
   let retour: RecType = {ok: true, error: ''}
   const dataPath = dreq.dataPath;
   if (existsSync(dataPath)) {
-    retour = {ok: true, data: yaml.load(readFileSync(dataPath,'utf8'))};
+    retour = {ok: true, works: yaml.load(readFileSync(dataPath,'utf8'))};
   } else {
     retour = {ok: false, error: 'Data File Unfound : ' + dataPath};
   }

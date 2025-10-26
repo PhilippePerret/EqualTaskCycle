@@ -1,9 +1,9 @@
 {
   "name": "equaltasktime",
-  "productName": "ETC_dev",
+  "productName": "ETC",
   "description": "Application de gestion cyclique de travaux",
   "author": "Philicare<philippe.perret@yahoo.fr>",
-  "version": "0.1.0",
+  "version": "0.2.2",
   "private": true,
   "type": "module",
   "main": "electron/main.js",

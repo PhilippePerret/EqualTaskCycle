@@ -15381,7 +15381,6 @@ class Prefs {
   }
   observeFields() {
     Object.keys(this.data).forEach((prop) => {
-      console.log("Traitement de la propriété '%s'", prop);
       this.field(prop).addEventListener("change", this.onChangePref.bind(this, prop));
     });
     this.fieldsReady = true;
@@ -15427,30 +15426,6 @@ class Editing {
     return this._configcont || (this._configcont = DGet("#editing-config-container", this.section));
   }
   _configcont;
-  getAllData() {
-    const AllData = this.collectConfigData();
-    Object.assign(AllData, { works: this.collectTaskData() });
-    return AllData;
-  }
-  collectConfigData() {
-    const configData = {
-      duration: Number(this.getConfProp("duration")),
-      theme: this.getConfProp("theme")
-    };
-    return configData;
-  }
-  getConfProp(prop) {
-    return DGet(`#config-data-${prop}`, this.configContainer).value;
-  }
-  setConfigData(data) {
-    ConfigProperties.forEach((paire) => {
-      const [prop, defaultValue] = paire;
-      this.setConfProp(prop, data[prop] || defaultValue);
-    });
-  }
-  setConfProp(prop, value) {
-    DGet(`#config-data-${prop}`, this.configContainer).value = value;
-  }
   collectTaskData() {
     const newTaskData = [];
     this.taskContainer.querySelectorAll(".editing-form-task").forEach((form) => {
@@ -15481,8 +15456,7 @@ class Editing {
     if (retour.ok === false) {
       return Flash.error(retour.error);
     }
-    this.setConfigData(retour.data);
-    const works = retour.data.works;
+    const works = retour.works;
     DGet("span#tasks-count", this.section).innerHTML = works.length;
     works.forEach((work) => {
       this.createNewTask(work);
@@ -15556,7 +15530,7 @@ class Editing {
     owork.scrollIntoView({ behavior: "smooth", block: "start" });
   }
   onSaveData() {
-    postToServer("/tasks/save", this.getAllData());
+    postToServer("/tasks/save", this.collectTaskData());
   }
   stopEditing() {
     ui.toggleSection("work");

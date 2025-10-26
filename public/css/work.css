@@ -92,7 +92,8 @@ body.light div.editing-form-task input.form-task-project {
 }
 
 div.editing-form-task textarea.form-task-content {
-  height: 40px;
+  height: 80px;
+  font-family: Georgia, serif, 'Times New Roman', Times;
 }
 div.editing-form-task textarea.form-task-content:focus {
   font-size: 1.1em;

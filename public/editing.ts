@@ -29,40 +29,6 @@ class Editing {
   }; private _configcont!: HTMLDivElement;
 
   /**
-   * Fonction retourne toutes les données pour les enregistrer
-   * 
-   */
-  getAllData(): AllDataType{
-    const AllData = this.collectConfigData();
-    Object.assign(AllData, {works: this.collectTaskData()})
-    return AllData as AllDataType;
-  }
-
-  /**
-   * Fonction qui relève et revoie les données de configuration générale
-   */
-  collectConfigData(): ConfigDataType {
-    const configData: ConfigDataType = {
-      duration: Number(this.getConfProp('duration')),
-      theme: this.getConfProp('theme')
-    }
-    return configData;
-  }
-  private getConfProp(prop: string): string {
-    return DGet(`#config-data-${prop}`, this.configContainer).value;
-  }
-
-  private setConfigData(data: RecType){
-    ConfigProperties.forEach((paire: [string, any]) => {
-      const [prop, defaultValue] = paire;
-      this.setConfProp(prop, data[prop] || defaultValue);
-    })
-  }
-  private setConfProp(prop: string, value: any): void {
-    DGet(`#config-data-${prop}`, this.configContainer).value = value;
-  }
-
-  /**
    * Fonction qui relève (et renvoie) les données des tâches dans 
    * la liste.
    */
@@ -99,10 +65,8 @@ class Editing {
     container.innerHTML = '';
     const retour: RecType = await postToServer('/tasks/all', {dataPath: prefs.getValue('file')});
     if (retour.ok === false ) { return Flash.error(retour.error) }
-    // --- Données de configuration (générales) ---
-    this.setConfigData(retour.data);
     // --- TACHES/WORKS ---
-    const works = retour.data.works;
+    const works = retour.works;
     // Indiquer le nombre de tâches
     DGet('span#tasks-count', this.section).innerHTML = works.length;
     // Créer tous les formulaires pour les tâches
@@ -184,9 +148,8 @@ class Editing {
   }
 
   onSaveData(){
-    postToServer('/tasks/save', this.getAllData());
+    postToServer('/tasks/save', this.collectTaskData());
   }
-
 
   // Pour finir l'édition et revenir au panneau principal
   stopEditing(){
