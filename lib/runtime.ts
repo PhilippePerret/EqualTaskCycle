@@ -286,7 +286,7 @@ export class RunTime { /* singleton */
       works
     SET
       cycleCount = cycleCount + 1,
-      cycleTime = 0
+      cycleTime = 0,
       leftTime = defaultRestTime
     WHERE
       active = 1
@@ -328,9 +328,9 @@ export class RunTime { /* singleton */
     INTO 
       works
     VALUES
-      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `
-    this.db.run(request, [work.id, 0, 0, duration, 0, new Date().getTime(), null, 1, duration, ""])
+    this.db.run(request, [work.id, 0, 0, duration, 0, 0, new Date().getTime(), null, 1, duration, ""])
   }
 
   private get dbPath(){
