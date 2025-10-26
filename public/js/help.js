@@ -15232,7 +15232,6 @@ class Tools {
     }
     const cont = this.container;
     this.TOOLS_DATA.forEach((dtool) => {
-      console.log("Construction de l'outil : ", dtool);
       const o = document.createElement("DIV");
       o.className = "tool-container";
       const a = document.createElement("A");
@@ -15245,6 +15244,7 @@ class Tools {
       cont.appendChild(o);
       a.addEventListener("click", dtool.method);
     });
+    this.built = true;
   }
   get container() {
     return DGet("#tools-container");

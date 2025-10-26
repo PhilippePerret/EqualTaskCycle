@@ -74,7 +74,6 @@ class Tools { /* singleton */
     if (this.built) { return }
     const cont = this.container;
     this.TOOLS_DATA.forEach((dtool: ToolType) => {
-      console.log("Construction de l'outil : ", dtool);
       const o = document.createElement('DIV');
       o.className = 'tool-container';
       const a = document.createElement('A');
@@ -88,7 +87,7 @@ class Tools { /* singleton */
       // Observation
       a.addEventListener('click', dtool.method);
     })
-    // this.built = true;
+    this.built = true;
   }
   
   private get container(){return DGet('#tools-container')}
