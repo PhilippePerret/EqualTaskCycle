@@ -140,7 +140,7 @@ div.buttons {
 }
 .row label:first-child {
   display:inline-block;
-  width: 140px;
+  width: 160px;
 }
 .row label:first-child + input {
   margin-left: -5px;
