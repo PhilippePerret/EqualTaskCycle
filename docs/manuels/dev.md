@@ -21,9 +21,9 @@ Explication des temps dans la base de données et le programme.
 | ----------------- | ----------- | ------------------------------------------------------------ |
 | **`cycleTime`**   | Oui         | Définit la durée de travail qu’il faut avoir effectué pour considérer que le travail a couvert un cycle. Parfois, ça peut se faire en plusieurs sessions (grâce à `sessionTime`). |
 | **`sessionTime`** | Oui         | Détermine la durée que doit avoir une session de travail pour le travail donné. Souvent, cette durée sera égale à la durée pour un cycle de travail. Mais lorsqu’elle est inférieure (elle ne peut être qu’inférieur, sinon le travail ne serait jamais fini).<br />Noter que quelle que soit le temps vraiment fait sur une session, à la session suivante, la même durée sera proposée. C’est donc vraiment une propriété de travail. |
-| **`restTime`**    | Oui         | Durée restante pour que le cycle soit complet pour le travail. |
+| **`leftTime`**    | Oui         | Durée restante pour que le cycle soit complet pour le travail. |
 | **`totalTime`**   | Oui         | Durée totale de travail sur le projet, tous cycles confondus. |
-| **`workedTime`**  | Non         | Durée déjà effectuée dans le cycle courant. On a donc `workedTime + restTime = cycleTime`. |
+| **`workedTime`**  | Non         | Durée déjà effectuée dans le cycle courant. On a donc `workedTime + leftTime = cycleTime`. |
 
 ## Locales
 

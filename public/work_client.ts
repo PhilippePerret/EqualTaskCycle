@@ -56,8 +56,8 @@ export class Work {
   public async addTimeAndSave(time: number): Promise<boolean> {
     this.data.totalTime += time;
     this.data.cycleTime += time;
-    this.data.restTime -= time;
-    if (this.data.restTime < 0) { this.data.restTime = 0; }
+    this.data.leftTime -= time;
+    if (this.data.leftTime < 0) { this.data.leftTime = 0; }
     if ( this.data.cycleCount === 0 ) {
       this.data.cycleCount = 1;
       this.data.startedAt = clock.getStartTime();
@@ -130,7 +130,7 @@ export class Work {
   public get id(){ return this.data.id; }
   public get script(): string | undefined {return this.data.script}
   public get folder(): string | undefined {return this.data.folder}
-  public get restTime(): number {return this.data.restTime}
+  public get leftTime(): number {return this.data.leftTime}
   public get cycleTime(): number {return this.data.cycleTime}
   public get totalTime(): number {return this.data.totalTime}
 
@@ -158,7 +158,7 @@ export class Work {
         switch(prop){
           case 'totalTime': 
           case 'cycleTime':
-          case 'restTime':
+          case 'leftTime':
             return clock.time2horloge(v);
           case 'report':
             if ( v ) {

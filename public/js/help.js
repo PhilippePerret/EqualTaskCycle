@@ -1416,11 +1416,11 @@ class Clock {
     if (this.counterMode === "clock") {
       return "0:00:00";
     } else {
-      return this.s2h(this.currentWork.restTime * 60);
+      return this.s2h(this.currentWork.leftTime * 60);
     }
   }
   get totalRestTimeSeconds() {
-    return this._totresttime || (this._totresttime = this.currentWork.restTime * 60);
+    return this._totresttime || (this._totresttime = this.currentWork.leftTime * 60);
   }
   _totresttime;
   calcTotalRecTime() {
@@ -1469,26 +1469,26 @@ class Clock {
     } else {
       displayedSeconds = this.totalRestTimeSeconds - secondesOfWork;
     }
-    const restTime = this.taskRestTime(secondesOfWork);
+    const leftTime = this.taskRestTime(secondesOfWork);
     this.clockObj.innerHTML = this.s2h(displayedSeconds);
     if (secondesOfWork % 60 === 0) {
       const thisMinute = Math.round(secondesOfWork / 60);
       const elapsedMinutes = this.currentWork.cycleTime + thisMinute;
       const totalMinutes = this.currentWork.totalTime + thisMinute;
-      this.restTimeField.innerHTML = this.time2horloge(restTime);
+      this.restTimeField.innerHTML = this.time2horloge(leftTime);
       this.cycleTimeField.innerHTML = this.time2horloge(elapsedMinutes);
       this.totalTimeField.innerHTML = this.time2horloge(totalMinutes);
     }
-    if (restTime < 10 && this.alerte10minsDone === false) {
+    if (leftTime < 10 && this.alerte10minsDone === false) {
       this.donneAlerte10mins();
     } else if (this.alerte10minsDone) {
-      if (this.alerteWorkDone === false && restTime < 0) {
+      if (this.alerteWorkDone === false && leftTime < 0) {
         this.donneAlerteWorkDone();
       }
     }
   }
   get restTimeField() {
-    return this._restfield || (this._restfield = DGet("span#current-work-restTime"));
+    return this._restfield || (this._restfield = DGet("span#current-work-leftTime"));
   }
   get cycleTimeField() {
     return this._cycledurfield || (this._cycledurfield = DGet("span#current-work-cycleTime"));
@@ -1511,7 +1511,7 @@ class Clock {
   }
   taskRestTime(minutesOfWork) {
     minutesOfWork = minutesOfWork / 60;
-    return this.currentWork.restTime - minutesOfWork;
+    return this.currentWork.leftTime - minutesOfWork;
   }
   lapsFromStart() {
     return Math.round(this.getTime() - this.startTime);
@@ -15696,9 +15696,9 @@ class Work {
   async addTimeAndSave(time) {
     this.data.totalTime += time;
     this.data.cycleTime += time;
-    this.data.restTime -= time;
-    if (this.data.restTime < 0) {
-      this.data.restTime = 0;
+    this.data.leftTime -= time;
+    if (this.data.leftTime < 0) {
+      this.data.leftTime = 0;
     }
     if (this.data.cycleCount === 0) {
       this.data.cycleCount = 1;
@@ -15757,8 +15757,8 @@ class Work {
   get folder() {
     return this.data.folder;
   }
-  get restTime() {
-    return this.data.restTime;
+  get leftTime() {
+    return this.data.leftTime;
   }
   get cycleTime() {
     return this.data.cycleTime;
@@ -15784,7 +15784,7 @@ class Work {
         switch (prop) {
           case "totalTime":
           case "cycleTime":
-          case "restTime":
+          case "leftTime":
             return clock.time2horloge(v3);
           case "report":
             if (v3) {

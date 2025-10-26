@@ -79,12 +79,12 @@ class Clock {
     if (this.counterMode === 'clock') {
       return '0:00:00';
     } else {
-      return this.s2h(this.currentWork.restTime * 60);
+      return this.s2h(this.currentWork.leftTime * 60);
     }
   }
 
   private get totalRestTimeSeconds(){
-    return this._totresttime || (this._totresttime = this.currentWork.restTime * 60)
+    return this._totresttime || (this._totresttime = this.currentWork.leftTime * 60)
   }; private _totresttime!: number;
 
   /**
@@ -157,7 +157,7 @@ class Clock {
     let displayedSeconds: number;
     if (this.counterMode === 'clock') { displayedSeconds = secondesOfWork}
     else /* countdown */ { displayedSeconds = this.totalRestTimeSeconds - secondesOfWork}
-    const restTime = this.taskRestTime(secondesOfWork);
+    const leftTime = this.taskRestTime(secondesOfWork);
     /****************************************
      * AFFICHAGE DU TEMPS DANS L'INTERFACE  *
      ****************************************/
@@ -168,25 +168,25 @@ class Clock {
       const thisMinute = Math.round(secondesOfWork / 60);
       const elapsedMinutes = this.currentWork.cycleTime + thisMinute;
       const totalMinutes = this.currentWork.totalTime + thisMinute;
-      this.restTimeField.innerHTML  = this.time2horloge(restTime);
+      this.restTimeField.innerHTML  = this.time2horloge(leftTime);
       this.cycleTimeField.innerHTML = this.time2horloge(elapsedMinutes);
       this.totalTimeField.innerHTML = this.time2horloge(totalMinutes);
     }
     /****************************************/
-    // console.log("restTime = %i", restTime);
-    if ( restTime < 10 && this.alerte10minsDone === false) {
+    // console.log("leftTime = %i", leftTime);
+    if ( leftTime < 10 && this.alerte10minsDone === false) {
       // 10 minutes restantes sur ce travail
       this.donneAlerte10mins();
     } else if (this.alerte10minsDone) {
       // L'alerte des 10 minutes a été donnée
-      if (this.alerteWorkDone === false && restTime < 0) {
+      if (this.alerteWorkDone === false && leftTime < 0) {
         // Temps de travail atteint, alerte pour avertir l'user
         this.donneAlerteWorkDone()
       }
     }
   }; 
   private get restTimeField(){
-    return this._restfield || (this._restfield = DGet('span#current-work-restTime'))
+    return this._restfield || (this._restfield = DGet('span#current-work-leftTime'))
   }
   private get cycleTimeField(){
     return this._cycledurfield || (this._cycledurfield = DGet('span#current-work-cycleTime'))
@@ -216,7 +216,7 @@ class Clock {
    */
   private taskRestTime(minutesOfWork: number): number {
     minutesOfWork = minutesOfWork / 60;
-    return this.currentWork.restTime - minutesOfWork;
+    return this.currentWork.leftTime - minutesOfWork;
   }
 
   private lapsFromStart(){

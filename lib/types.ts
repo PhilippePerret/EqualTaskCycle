@@ -16,7 +16,7 @@ export const WorkProps = ['active', 'id','project', 'content', 'duration','folde
 export interface RunTimeInfosType {
   totalTime: number;  // Le nombre total de minutes de travail
   cycleTime: number;  // Le nombre de minutes travaillées dans le cycle courant
-  restTime: number;   // Nombre de minutes restant pour finir le cycle
+  leftTime: number;   // Nombre de minutes restant pour finir le cycle
   cycleCount: number; // Nombre de cycles
   startedAt: number;  // Date de démarrage du travail
   lastWorkedAt: number; // Date de dernier travail

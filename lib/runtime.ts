@@ -61,7 +61,7 @@ export class RunTime { /* singleton */
   public getCandidateWorks(options: RecType | undefined = {}): string[] {
     let condition: string[] | string = []
     condition.push('active = 1');
-    condition.push('restTime > 0');
+    condition.push('leftTime > 0');
     if (options.no_time_constraint !== true) {
       condition.push(`(lastWorkedAt IS NULL OR lastWorkedAt <= ${this.startOfToday})`)
     }
@@ -75,7 +75,7 @@ export class RunTime { /* singleton */
     WHERE 
       ${condition}
     ORDER BY 
-      restTime DESC
+      leftTime DESC
     `;
     const activeIds = this.db.query(request).all().map((row: any) => row.id);
     console.log("Candidats ids :", activeIds);
@@ -138,7 +138,7 @@ export class RunTime { /* singleton */
     return this.count('active = 1') === 0
   }
   private aucuneTacheWithRestTime(): boolean {
-    return this.count('active = 1 AND restTime > 0') === 0
+    return this.count('active = 1 AND leftTime > 0') === 0
   }
 
   /**
@@ -174,7 +174,7 @@ export class RunTime { /* singleton */
         works
       SET
         cycleTime = 0,
-        restTime = defaultRestTime
+        leftTime = defaultRestTime
       WHERE
         active = 1
       `
@@ -203,7 +203,7 @@ export class RunTime { /* singleton */
       totalTime INTEGER,
       cycleTime INTEGER,
       sessionTime INTEGER,
-      restTime INTEGER,
+      leftTime INTEGER,
       cycleCount INTEGER,
       startedAt INTEGER,
       lastWorkedAt INTEGER,
@@ -229,7 +229,7 @@ export class RunTime { /* singleton */
         startedAt = ?,
         totalTime = ?,
         cycleTime = ?,
-        restTime = ?,
+        leftTime = ?,
         cycleCount = ?,
         lastWorkedAt = ?,
         report = ?
@@ -240,7 +240,7 @@ export class RunTime { /* singleton */
       dw.startedAt,
       dw.totalTime,
       dw.cycleTime,
-      dw.restTime,
+      dw.leftTime,
       dw.cycleCount,
       dw.lastWorkedAt,
       dw.report,
@@ -255,7 +255,7 @@ export class RunTime { /* singleton */
    * recommencer un autre.
    * 
    * Un cycle est terminé lorsque toutes les tâches ont un temps
-   * restant (restTime) à zéro.
+   * restant (leftTime) à zéro.
    */
   private checkIfCycleIsComplete(): boolean {
     const request = `
@@ -264,7 +264,7 @@ export class RunTime { /* singleton */
       WHERE
         active = 1
         AND 
-        restTime > 0
+        leftTime > 0
       LIMIT 1
       `;
     if ( this.db.query(request).all().length ) {
@@ -287,7 +287,7 @@ export class RunTime { /* singleton */
     SET
       cycleCount = cycleCount + 1,
       cycleTime = 0
-      restTime = defaultRestTime
+      leftTime = defaultRestTime
     WHERE
       active = 1
     `
