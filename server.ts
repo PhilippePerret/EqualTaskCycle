@@ -13,7 +13,7 @@ import { loc, tf } from './lib/Locale';
 
 const app = express();
 
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   console.log("-> route /")
   loc.init('fr');
   res.send(tf(path.join(__dirname, 'public', 'main.html')));
@@ -190,11 +190,8 @@ app.post('/localization/get-all', (req, res) => {
 
 app.post('/tool/reset-cycle', async (req, res) => {
   console.log("-> /tool/reset-cycle")
-  const data = req.body;
-  res.json(Object.assign(data, {ok: false, error: 'Pour faire une erreur'}))
-  // const { tools } = await require('public/tools.ts');
-  // console.log("Module tools chargé")
-  // tools.run_ResetCycle(req.body, res);
+  const { tools } = await require('./public/tools.ts');
+  tools.run_ResetCycle(req.body, res);
 })
 
 

@@ -10,12 +10,10 @@ import { Database } from "bun:sqlite"
 import { userDataPath } from './constants_server';
 
 
-export class RunTime {
+export class RunTime { /* singleton */
   private constructor(){}
-  private static instance: RunTime;
-  public static getInstance(){
-    return this.instance || (this.instance = new RunTime())
-  }
+  private static inst: RunTime;
+  public static getInstance(){return this.inst || (this.inst = new RunTime())}
 
   private get db(){
     return this._db || (this._db = new Database(this.dbPath));
@@ -162,6 +160,31 @@ export class RunTime {
     return res["COUNT(id)"];
   }
 
+  /**
+   * @api
+   * 
+   * Pour réinitialiser le cycle
+   * 
+   */
+  public resetCycle(){
+    console.log("-> runtime.resetCycle");
+    try {
+      const request = `
+      UPDATE
+        works
+      SET
+        cycleTime = 0,
+        restTime = defaultRestTime
+      WHERE
+        active = 1
+      `
+      this.db.run(request);
+      return {ok: true, error: undefined}
+    } catch(err) {
+      return {ok: false, error: (err as any).message}
+    }
+  }
+
 
   private get startOfToday(): number {
     const today = new Date()
@@ -263,6 +286,7 @@ export class RunTime {
       works
     SET
       cycleCount = cycleCount + 1,
+      cycleTime = 0
       restTime = defaultRestTime
     WHERE
       active = 1

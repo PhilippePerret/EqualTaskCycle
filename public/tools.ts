@@ -30,9 +30,11 @@ class Tools { /* singleton */
     }
   }
   /* Server-side */
-  public run_ResetCycle(data:any, response: any) {
+  public async run_ResetCycle(data:any, response: any) {
     console.log("Je passe par run_ResetCycle");
-    response.json({ok: false, process: data.process, error: 'Je ne fais rien, encore'})
+    const { runtime } = require('../lib/runtime.ts');
+    const {ok, error} = runtime.resetCycle();
+    response.json(Object.assign(data, {ok, error}));
   }
 
   // -------- /TOOLS ----------
