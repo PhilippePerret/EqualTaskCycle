@@ -6,10 +6,10 @@
  */
 import fs from 'fs';
 import path from 'path';
-import { Dialog } from './Dialog';
-import { t } from '../lib/Locale';
+import { Dialog } from '../Dialog';
+import { t } from '../shared/Locale';
 
-const fileWatcher = new Worker('./lib/ActivityTracker_worker.ts');
+const fileWatcher = new Worker('./lib/ActivityTracker_watcher.ts');
 
 export class ActivityTracker /* SERVER */ {
   public static getInstance(){

@@ -1,9 +1,9 @@
-import type { RecType } from "../lib/types";
-import { DGet } from "./js/dom";
+import type { RecType } from "../shared/types";
+import { DGet } from "../../public/js/dom";
 import { marked } from 'marked';
 import { ui } from "./ui";
-import { loc, tt } from "../lib/Locale";
-import { listenBtn } from "./utils";
+import { loc, tt } from "../shared/Locale";
+import { listenBtn } from "../shared/utils";
 
 /**
  * Module pour la gestion de l'aide

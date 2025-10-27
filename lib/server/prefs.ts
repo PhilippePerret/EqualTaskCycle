@@ -1,9 +1,8 @@
 import path from "path";
 import os from 'os';
-import type { PrefsDataType, RecType } from "./types";
+import type { PrefsDataType, RecType } from "../shared/types";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { userDataPath } from "./constants_server";
-import { t, tf } from '../lib/Locale';
 
 
 type ReportType = {

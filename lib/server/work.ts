@@ -1,11 +1,12 @@
 import { DataManager } from "./data_manager";
-import { prefs } from "./prefs_server_side";
+import { prefs } from "./prefs";
 import { runtime } from "./runtime";
-import type { RecType, WorkType } from "./types";
-import { t } from '../lib/Locale';
+import type { RecType, WorkType } from "../shared/types";
+import { t } from '../shared/Locale';
 
 export class Work {
   public static defaultDuration: number;
+  public static inited: boolean = false;
 
   // private static works: Work[] = [];
   private static table: {[x:string]: Work} = {};
@@ -22,6 +23,7 @@ export class Work {
       Object.assign(this.table, {[w.id]: w});
     });
     runtime.init(works, this.defaultDuration);
+    this.inited = true;
   }
 
   public static get(workId: string): Work {
@@ -32,6 +34,7 @@ export class Work {
    * Crée le tout premier fichier, à l'ouverture de l'app
    */
   public static buildPrimoFile(){
+    if (false === this.inited) { this.init() }
     console.log("-> buildPrimoFile")
     this.saveAllData(this.dataManager.defaultData);
   }
@@ -41,6 +44,7 @@ export class Work {
    */
   public static getCurrentWork(options: RecType | undefined = {}){
     console.log("-> getCurrentWork")
+    if (false === this.inited) { this.init() }
     let ids: string[] = runtime.getCandidateWorks();
     if (options.but) {
       ids = ids.filter(id => id != options.but)
@@ -56,9 +60,15 @@ export class Work {
         candidatId = ids[0] as string;
       } else {
         candidatId = ids.pop() as string;
+        ids.push(candidatId);// pour débug
       }
       console.log("candidat ID", candidatId);
-      const candidatData = this.get(candidatId as string).dataForClient;
+      let candidatData;
+      try {
+        candidatData = this.get(candidatId as string).dataForClient;
+      } catch(err) {
+        return {ok: false, error: `Impossible d'obtenir la tâche '${candidatId}' (ids = ${ids.join(', ')}) : ${(err as any).message}`}
+      }
       console.log("Candidat :", candidatData);
       return candidatData;
     } else {
@@ -68,19 +78,8 @@ export class Work {
     }
   }
 
-  /**
-   * Ajout d'un travail instancié (qui se trouve dans le fichier des
-   * données des travaux/tâches)
-   * 
-   * On en profite aussi pour récupérer son temps de travail.
-   * 
-   * @param work Le travail à ajouter
-  */
-  public static add(work: Work) {
-
-  }
-
   public static saveAllData(allData: WorkType[]) {
+    if (false === this.inited) { this.init() }
     this.dataManager.setData(allData);
   }
 
@@ -92,9 +91,7 @@ export class Work {
 
   constructor(
     private data: WorkType
-  ){
-    Work.add(this);
-  }
+  ){}
 
   public get dataForClient(){
     return Object.assign(
@@ -106,5 +103,3 @@ export class Work {
   public get id(){ return this.data.id; }
 
 }
-
-Work.init();

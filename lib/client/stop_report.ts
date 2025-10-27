@@ -1,8 +1,8 @@
-import type { Work } from "./work_client";
-import { listenBtn } from "./utils";
-import { DGet, stopEvent } from "./js/dom";
-import { Flash } from "./js/flash";
-import { t } from '../lib/Locale';
+import type { Work } from "./work";
+import { listenBtn } from "../shared/utils";
+import { DGet, stopEvent } from "../../public/js/dom";
+import { Flash } from "../../public/js/flash";
+import { t } from '../shared/Locale';
 
 /**
  * RAPPORT DE FIN DE TÂCHE (ET DE DÉBUT DE TÂCHE FUTURE)

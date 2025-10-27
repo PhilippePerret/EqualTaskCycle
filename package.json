@@ -16,8 +16,8 @@
     "electron-builder": "^26.0.12"
   },
   "scripts": {
-    "reset": "cat .secret/password | sudo pkill -f \"bun.*server\"",
-    "watch_ts": "bun build ./public/work_client.ts --outfile=./public/js/work_client.js --target=browser --watch & bun build ./public/ui.ts --outfile=./public/js/ui.js --target=browser --watch & bun build ./public/prefs.ts --outfile=./public/js/prefs.js --target=browser --watch & bun build ./public/help.ts --outfile=./public/js/help.js --target=browser --watch",
+    "reset": "cat .secret/password | sudo pkill -f \"bun.*server\"; rm -rf ~/.bun/install/cache",
+    "watch_ts": "bun build ./lib/client/work.ts --outfile=./public/js/work.js --target=browser --watch & bun build ./lib/client/ui.ts --outfile=./public/js/ui.js --target=browser --watch & bun build ./lib/client/prefs.ts --outfile=./public/js/prefs.js --target=browser --watch & bun build ./lib/client/help.ts --outfile=./public/js/help.js --target=browser --watch",
     "start": "bun pm cache rm && npx electron .",
     "check-locales": "bun run scripts/check_locales.ts",
     "build": "electron-builder",
@@ -29,6 +29,7 @@
   "dependencies": {
     "@types/marked": "^6.0.0",
     "better-sqlite3": "^12.4.1",
+    "electron-log": "^5.4.3",
     "express": "^5.1.0",
     "js-yaml": "^4.1.0",
     "marked": "^16.4.1",
@@ -54,8 +55,7 @@
       }
     ],
     "asarUnpack": [
-      "server.ts",
-      "public/**/*", 
+      "public/**/*",
       "lib/**/*"
     ],
     "files": [

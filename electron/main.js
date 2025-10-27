@@ -20,7 +20,7 @@ app.name = "Equal Task Cycle";
 
 app.whenReady().then(() => {
   app.dock.setIcon(ICON_PATH);
-  const serverPath = path.join(__dirname, '..', 'server.ts').replace('app.asar', 'app.asar.unpacked');
+  const serverPath = path.join(__dirname, '..', 'lib', 'server', 'server.ts').replace('app.asar', 'app.asar.unpacked');
 
   const bunPath = app.isPackaged 
   ? path.join(process.resourcesPath, 'bun')
@@ -33,7 +33,7 @@ app.whenReady().then(() => {
   //*/
 
   // server = spawn('bun', ['--no-cache', 'run', serverPath], {
-  server = spawn(bunPath, ['run', serverPath], {
+  server = spawn(bunPath, ['--no-cache', 'run', serverPath], {
     // cwd: path.join(__dirname, '..'), // ORIGINAL
     cwd: path.join(__dirname, '..').replace('app.asar', 'app.asar.unpacked'),
     env: { 

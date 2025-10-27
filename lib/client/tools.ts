@@ -1,9 +1,9 @@
-import { t } from "../lib/Locale.js";
-import { DGet, stopEvent } from "./js/dom.js";
-import { Flash } from "./js/flash.js";
-import { ui } from "./ui.js";
-import { postToServer } from "./utils.js";
-import { Work } from "./work_client.js";
+import { t } from "../shared/Locale.js";
+import { DGet, stopEvent } from "../../public/js/dom.js";
+import { Flash } from "../../public/js/flash.js";
+import { ui } from "./ui";
+import { postToServer } from "../shared/utils.js";
+import { Work } from "./work.js";
 
 interface ToolType {
   name: string;

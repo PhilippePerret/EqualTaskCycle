@@ -1,8 +1,8 @@
 import path from 'path';
 import yaml from 'js-yaml';
 import fs from 'fs';
-import type { RecType } from '../lib/types';
-import { blue, green, red, subTitleize } from '../public/utils';
+import type { RecType } from '../lib/shared/types';
+import { blue, green, red, subTitleize } from '../lib/shared/utils';
 import { loc, t } from '../lib/Locale';
 
 loc.init('en');

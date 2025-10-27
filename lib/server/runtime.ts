@@ -5,12 +5,13 @@
  */
 import { existsSync } from 'fs';
 import path from 'path';
-import type { RecType, RunTimeInfosType, WorkType } from './types';
+import type { RecType, RunTimeInfosType, WorkType } from '../shared/types';
 import { Database } from "bun:sqlite"
 import { userDataPath } from './constants_server';
 
 
 export class RunTime { /* singleton */
+  
   private constructor(){}
   private static inst: RunTime;
   public static getInstance(){return this.inst || (this.inst = new RunTime())}

@@ -1,7 +1,7 @@
-import { DGet } from "../public/js/dom";
-import { ui } from "../public/ui";
-import { Work } from "../public/work_client";
-import { Flash } from "../public/js/flash";
+import { DGet } from "../../public/js/dom";
+import { ui } from "./ui";
+import { Work } from "./work";
+import { Flash } from "../../public/js/flash";
 
 interface TimeSegment {
   beg: number;

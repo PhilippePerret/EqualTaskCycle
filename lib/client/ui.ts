@@ -1,10 +1,10 @@
-import { clock } from "../lib/Clock";
-import { Work } from "./work_client";
+import { clock } from "./Clock";
+import { Work } from "./work";
 import { ActivityTracker } from "./activityTracker";
-import { DGet } from "./js/dom";
-import { Flash } from "./js/flash";
-import { t } from '../lib/Locale';
-import { postToServer } from "./utils";
+import { DGet } from "../../public/js/dom";
+import { Flash } from "../../public/js/flash";
+import { t } from '../shared/Locale';
+import { postToServer } from "../shared/utils";
 
 function stopEvent(ev: Event){
   ev.stopPropagation();

@@ -1,11 +1,11 @@
-import { WorkProps, type RecType, type WorkType } from "../lib/types";
-import { DGet } from "./js/dom";
-import { Flash } from "./js/flash";
+import { WorkProps, type RecType, type WorkType } from "../shared/types";
+import { DGet } from "../../public/js/dom";
+import { Flash } from "../../public/js/flash";
 import { prefs } from "./prefs";
 import { ui } from "./ui";
-import { listenBtn, postToServer } from "./utils";
+import { listenBtn, postToServer } from "../shared/utils";
 import { nanoid } from 'nanoid';
-import { t } from '../lib/Locale';
+import { t } from '../shared/Locale';
 
 
 class Editing {

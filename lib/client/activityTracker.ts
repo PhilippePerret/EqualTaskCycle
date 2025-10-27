@@ -1,9 +1,9 @@
-import { Work } from "./work_client";
+import { Work } from "./work";
 import { ui } from "./ui";
-import { postToServer } from "./utils";
-import { Flash } from "./js/flash";
-import { t } from '../lib/Locale';
-import type { RecType } from "../lib/types";
+import { postToServer } from "../shared/utils";
+import { Flash } from "../../public/js/flash";
+import { t } from '../shared/Locale';
+import type { RecType } from "../shared/types";
 
 export class ActivityTracker /* CLIENT */ {
 

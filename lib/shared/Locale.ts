@@ -25,7 +25,6 @@ export function t(route: string, params?: string[]): string {
   }
 }
 export function tf(fpath: string) {
-  // return readFileSync(fpath, 'utf8');
   return loc.translateText(readFileSync(fpath, 'utf8'));
 }
 
@@ -83,9 +82,9 @@ class Locale {
       })
     } else {
       /* client side */
-      const { postToServer } = await import("../public/utils");
-      const { prefs } = await import("../public/prefs");
-      const { Flash } = await import("../public/js/flash");
+      const { postToServer } = await import("./utils");
+      const { prefs } = await import("../client/prefs");
+      const { Flash } = await import("../../public/js/flash");
 
       const retour = await postToServer('/localization/get-all', {lang: prefs.getLang()});
       if (retour.ok) {

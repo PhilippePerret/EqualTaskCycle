@@ -1,38 +1,38 @@
 import express from 'express';
 import path from 'path';
 import yaml from 'js-yaml';
-import { HOST, PORT } from './public/js/constants';
-import { Work } from "./lib/work";
-import { prefs } from './lib/prefs_server_side';
-import { runtime } from './lib/runtime';
+import { HOST, PORT } from '../../public/js/constants';
+import { Work } from "./work";
+import { prefs } from './prefs';
+import { runtime } from './runtime';
 import { existsSync, readFileSync } from 'fs';
 import { execFileSync, execSync } from 'child_process';
-import type { RecType, WorkType } from './lib/types';
-import { activTracker } from './lib/activityTracker';
-import { loc, tf } from './lib/Locale';
+import type { RecType, WorkType } from '../shared/types';
+import { activTracker } from './activityTracker';
+import { loc, tf } from '../shared/Locale';
+import log from 'electron-log/main';
 
 const app = express();
+const APP_PATH = path.resolve('.');
+console.log("APP_PATH = %s", APP_PATH);
+const MAIN_HTML_FILE = path.join(APP_PATH, 'public', 'main.html');
+console.log("MAIN_HTML_FILE = %s", MAIN_HTML_FILE);
+
 
 app.get('/', (_req, res) => {
-  // console.log("-> route /")
+  // log("-> route /")
+  log.info("->route /");
   loc.init('fr');
-  res.send(tf(path.join(__dirname, 'public', 'main.html')));
+  res.send(tf(MAIN_HTML_FILE));
 });
 
-app.use(express.static(__dirname));
+// app.use(express.static(__dirname));
 app.use(express.json());
 app.use(express.static('public'));
 
-function log(msg: string, data: any = undefined) {
-  if (data) {
-    console.log(msg, data);
-  } else {
-    console.log(msg);
-  }
-}
 
 app.post('/work/check-activity', async (req, res) => {
-  log("-> /work/check-activity");
+  log.info("->route /work/check-activity");
   req.setTimeout(30 * 60 * 1000);
   res.setTimeout(30 * 60 * 1000);
   let response: RecType;
@@ -41,12 +41,12 @@ app.post('/work/check-activity', async (req, res) => {
     const folder: string = dreq.projectFolder;
     const lastCheck = dreq.lastCheck;
     const isActive = await activTracker.watchActivity(folder, lastCheck);
-    log('Données:', {isActive, folder, lastCheck, date: new Date(lastCheck)});
+    log.info('Données:', {isActive, folder, lastCheck, date: new Date(lastCheck)});
     if (!isActive) {
-      log("-> Alerte pour demander de confirmer le travail.");
+      log.info("-> Alerte pour demander de confirmer le travail.");
       response = await activTracker.askUserIfWorking();
       // response = {ok: true, userIsWorking: true}; // pour essayer sans l'appel
-      log("Réponse de l'utilisateur : ", response);
+      log.info("Réponse de l'utilisateur : ", response);
     } else {
       response = {ok: true, userIsWorking: true, raison: 'acitivity in folder'};
     }
@@ -58,19 +58,19 @@ app.post('/work/check-activity', async (req, res) => {
 });
 
 app.post('/work/save-session', (req, res) => {
-  log("-> /work/save-session");
+  log.info("-> /work/save-session");
   const dwork = req.body;
-  log("Sauvegarde de la session : ", dwork);
+  log.info("Sauvegarde de la session : ", dwork);
   runtime.updateWork(dwork);
   res.json({
-    ok: true, 
+    ok: true,
     next: Work.getCurrentWork(),
     options: {canChange: true /* TODO: À régler */}
   });
 });
 
 app.post('/task/current', (req, res) => {
-  log("-> /task/current");
+  log.info("-> /task/current");
   let result = {ok: true, error: ''};
   try {
     const dprefs = prefs.load();
@@ -78,6 +78,7 @@ app.post('/task/current', (req, res) => {
     if (false === existsSync(dprefs.file)) {
       throw new Error('Tasks File doesn’t exist, again...');
     }
+    Work.inited || Work.init();
     Object.assign(result, {
       task: Work.getCurrentWork(),
       options: { canChange: runtime.lastChangeIsFarEnough()},
@@ -109,11 +110,11 @@ app.post('/task/run-script', (req, res) => {
   const dreq = req.body;
   let result = {ok: true, error: ''};
   dreq.script = path.resolve(dreq.script);
-  // console.log("Je dois jouer le script", dreq.script);
+  // log.info("Je dois jouer le script", dreq.script);
   if (existsSync(dreq.script)) {
     try {
       const res = execFileSync(dreq.script, {encoding: 'utf8'});
-      console.log("Résultat du script", res);
+      log.info("Résultat du script", res);
     } catch(err: any) {
       result = {ok: false, error: err.stderr}
     }
@@ -178,7 +179,7 @@ app.post('/prefs/open-data-file', (req, res) => {
     try {
       execSync(`open "${fpath}"`);
     } catch(err) {
-      console.log('ERR: ' + err);
+      log.info('ERR: ' + err);
       report = {ok: false, error: 'ERROR DURING OPEN DATA FILE (see console)'}
     }
   } else {
@@ -192,22 +193,22 @@ app.post('/prefs/save', (req, res) => {
 });
 
 app.post('/localization/get-all', (req, res) => {
+  log.info("->route /localization/get-all")
   const lang = req.body.lang;
   let retour = {ok: true, error: '', locales: loc.getLocales()};
-  log("process.env.ETC_MODE = %s", process.env.ETC_MODE);
+  log.info("process.env.ETC_MODE = %s", process.env.ETC_MODE);
   retour.locales.app.mode = process.env.ETC_MODE;
   res.json(retour);
 });
 
 app.post('/tool/reset-cycle', async (req, res) => {
-  console.log("-> /tool/reset-cycle")
+  log.info("->route /tool/reset-cycle")
   const data = req.body;
   const {ok, error} = runtime.resetCycle();
   res.json(Object.assign(data, {ok, error}));
 
 })
 
-
 app.listen(PORT, () => {
-  console.log(`Server running on ${HOST}`);
+  log.info(`Server running on ${HOST}`);
 });

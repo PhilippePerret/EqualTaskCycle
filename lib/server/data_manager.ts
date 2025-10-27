@@ -2,9 +2,9 @@ import os from 'os';
 import path from 'path';
 import yaml from 'js-yaml';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
-import type { RecType, WorkType } from './types';
-import { prefs } from './prefs_server_side';
-import { t } from '../lib/Locale';
+import type { RecType, WorkType } from '../shared/types';
+import { prefs } from './prefs';
+import { t } from '../shared/Locale';
 
 
 export class DataManager {

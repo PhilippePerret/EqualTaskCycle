@@ -1,10 +1,10 @@
-import { clock } from "../lib/Clock";
-import type { PrefsDataType, RecType } from "../lib/types";
-import { DGet, stopEvent } from "./js/dom";
-import { Flash } from "./js/flash";
+import { clock } from "./Clock";
+import type { PrefsDataType, RecType } from "../shared/types";
+import { DGet, stopEvent } from "../../public/js/dom";
+import { Flash } from "../../public/js/flash";
 import { ui } from "./ui";
-import { listenBtn, postToServer } from "./utils";
-import { t } from '../lib/Locale';
+import { listenBtn, postToServer } from "../shared/utils";
+import { t } from '../shared/Locale';
 import { tools } from "./tools";
 
 export class Prefs { /* singleton */

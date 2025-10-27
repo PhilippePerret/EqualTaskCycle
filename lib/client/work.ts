@@ -1,14 +1,14 @@
-import { clock } from "../lib/Clock.js";
-import type { RecType, RunTimeInfosType, WorkType } from "../lib/types.js";
-import { DGet } from "./js/dom.js";
-import { Flash } from "./js/flash.js";
+import { clock } from "./Clock.js";
+import type { RecType, RunTimeInfosType, WorkType } from "../shared/types.js";
+import { DGet } from "../../public/js/dom.js";
+import { Flash } from "../../public/js/flash.js";
 import { ui } from "./ui.js";
 import { prefs } from "./prefs.js";
 import { help } from "./help.js";
 import { editor } from "./editing.js";
-import { EndWorkReport } from "./end_work_report.js";
-import { markdown, postToServer } from "./utils.js";
-import { loc, t } from "../lib/Locale.js";
+import { EndWorkReport } from "./stop_report.js";
+import { markdown, postToServer } from "../shared/utils.js";
+import { loc, t } from "../shared/Locale.js";
 
 export class Work {
 
@@ -48,7 +48,6 @@ export class Work {
       Flash.error(t('times.to_short_to_be_saved'))
     }
   }
-
 
   /**
    * Méthode d'instance pour sauver le temps
