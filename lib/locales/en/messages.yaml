@@ -19,7 +19,7 @@ task:
   very_first_one: "You must edit the preferences by clicking the ⚙️ button and start by defining where to place the task file (it can remain in the Documents folder).\n\nThen, you can click the ✍🏽 button to create your first tasks."
   destroy: 'Destroy task _0_'
   any_active: No active task.
-  saved: Task saved successfully
+  saved: Tasks saved successfully
 times:
   dont_add_and_save: "I don’t add & save time"
   saved: New times recorded

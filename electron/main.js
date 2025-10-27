@@ -26,10 +26,11 @@ app.whenReady().then(() => {
   ? path.join(process.resourcesPath, 'bun')
   : 'bun';
 
+  /*
   console.log('Bun path:', bunPath);
   console.log('Server path:', serverPath);
   console.log('CWD:', path.join(__dirname, '..').replace('app.asar', 'app.asar.unpacked'));
-
+  //*/
 
   // server = spawn('bun', ['--no-cache', 'run', serverPath], {
   server = spawn(bunPath, ['run', serverPath], {
@@ -38,7 +39,8 @@ app.whenReady().then(() => {
     env: { 
       ...process.env, 
       USER_DATA_PATH: userDataPath,
-      APP_ICON_PATH: ICON_PATH
+      APP_ICON_PATH: ICON_PATH,
+      ETC_MODE: app.isPackaged ? 'prod' : 'dev'
     }
   });
 

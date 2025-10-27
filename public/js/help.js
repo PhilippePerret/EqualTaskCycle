@@ -15077,8 +15077,6 @@ class Locale {
       const retour = await postToServer("/localization/get-all", { lang: prefs.getLang() });
       if (retour.ok) {
         this.locales = retour.locales;
-      } else {
-        Flash2.error("Impossible to load locales… I can only speaking english, sorry…");
       }
     }
   }
@@ -15529,8 +15527,11 @@ class Editing {
     });
     owork.scrollIntoView({ behavior: "smooth", block: "start" });
   }
-  onSaveData() {
-    postToServer("/tasks/save", this.collectTaskData());
+  async onSaveData() {
+    const retour = await postToServer("/tasks/save", this.collectTaskData());
+    if (retour.ok) {
+      Flash.success(t("task.saved"));
+    }
   }
   stopEditing() {
     ui.toggleSection("work");
@@ -15551,7 +15552,7 @@ class Editing {
   constructor() {}
   _formtemp;
 }
-var ConfigProperties, editor;
+var editor;
 var init_editing = __esm(() => {
   init_types3();
   init_flash();
@@ -15560,10 +15561,6 @@ var init_editing = __esm(() => {
   init_utils();
   init_index_browser();
   init_Locale();
-  ConfigProperties = [
-    ["duration", 120],
-    ["theme", t("ui.adj.light")]
-  ];
   editor = Editing.getIntance();
 });
 

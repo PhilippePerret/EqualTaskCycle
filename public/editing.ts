@@ -7,19 +7,6 @@ import { listenBtn, postToServer } from "./utils";
 import { nanoid } from 'nanoid';
 import { t } from '../lib/Locale';
 
-interface AllDataType {
-  duration: number;
-  works: WorkType;
-}
-
-interface ConfigDataType {
-  duration: number;
-  theme?: string;
-}
-const ConfigProperties: [string, any][] = [
-  ['duration', 120], 
-  ['theme', t('ui.adj.light')]
-];
 
 class Editing {
 
@@ -147,8 +134,11 @@ class Editing {
     owork.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  onSaveData(){
-    postToServer('/tasks/save', this.collectTaskData());
+  private async onSaveData(){
+    const retour = await postToServer('/tasks/save', this.collectTaskData());
+    if (retour.ok){
+      Flash.success(t('task.saved'));
+    }
   }
 
   // Pour finir l'édition et revenir au panneau principal

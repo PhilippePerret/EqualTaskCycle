@@ -90,8 +90,6 @@ class Locale {
       const retour = await postToServer('/localization/get-all', {lang: prefs.getLang()});
       if (retour.ok) {
         this.locales = retour.locales;
-      } else {
-        Flash.error('Impossible to load locales… I can only speaking english, sorry…');
       }
     }
     // console.log("Toutes les locales : ", this.locales);

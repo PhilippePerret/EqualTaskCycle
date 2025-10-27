@@ -5,6 +5,8 @@ _TASKS_.yaml
 
 tmp/
 
+.secret/
+
 # output
 out
 dist

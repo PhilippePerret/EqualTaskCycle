@@ -16,7 +16,7 @@
     "electron-builder": "^26.0.12"
   },
   "scripts": {
-    "reset": "sudo pkill -f \"bun.*server\"",
+    "reset": "cat .secret/password | sudo pkill -f \"bun.*server\"",
     "watch_ts": "bun build ./public/work_client.ts --outfile=./public/js/work_client.js --target=browser --watch & bun build ./public/ui.ts --outfile=./public/js/ui.js --target=browser --watch & bun build ./public/prefs.ts --outfile=./public/js/prefs.js --target=browser --watch & bun build ./public/help.ts --outfile=./public/js/help.js --target=browser --watch",
     "start": "bun pm cache rm && npx electron .",
     "check-locales": "bun run scripts/check_locales.ts",

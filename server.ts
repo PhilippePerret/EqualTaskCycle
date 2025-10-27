@@ -14,7 +14,7 @@ import { loc, tf } from './lib/Locale';
 const app = express();
 
 app.get('/', (_req, res) => {
-  console.log("-> route /")
+  // console.log("-> route /")
   loc.init('fr');
   res.send(tf(path.join(__dirname, 'public', 'main.html')));
 });
@@ -194,6 +194,8 @@ app.post('/prefs/save', (req, res) => {
 app.post('/localization/get-all', (req, res) => {
   const lang = req.body.lang;
   let retour = {ok: true, error: '', locales: loc.getLocales()};
+  console.log("process.env.ETC_MODE = %s", process.env.ETC_MODE);
+  retour.locales.app.mode = process.env.ETC_MODE;
   res.json(retour);
 });
 
