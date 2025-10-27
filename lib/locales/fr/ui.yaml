@@ -29,7 +29,7 @@ ui:
     help: Aide
     preferences: Préférences
     project: Projet
-    stop_report: Rapport de fin
+    stop_report: Rapport d’arrêt
     task_editing: Édition des tâches
     tasks: Tâches
     tools: Outils

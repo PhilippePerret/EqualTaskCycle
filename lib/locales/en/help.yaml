@@ -8,6 +8,22 @@ help:
       | Cycle | | A *c.* is a complete loop over all tasks to be performed. |
       | Remaining time | | A *rem. t.* corresponds to the time left to complete the work within the current cycle. |
       | Time spent | | The *spent t.* corresponds to the time dedicated to the work/project during the current cycle. |
+  stop_report:
+    title: Stop Report
+    text: |
+      The *end report* appears when you stop (STOP) working
+      on a specific task.
+      
+      The *end report* is used to prepare for the next work cycle,
+      so the task can be resumed as quickly and efficiently
+      as possible.
+
+      To write this report, you should project yourself into the next
+      work session and think about the information you'll need
+      to immediately pick up where you left off. For example,
+      note the files you're working on and the exact lines involved.
+
+      The supported format is [Markdown](https://en.wikipedia.org/wiki/Markdown).
   task_data:
     title: Task data
     text: |

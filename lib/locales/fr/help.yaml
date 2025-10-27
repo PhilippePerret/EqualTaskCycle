@@ -34,6 +34,23 @@ help:
       de ceux que vous pouvez connaitre et s'adapte particulièrement aux
       situations où vous avez des projets à mener de front, sans en oublier,
       en leur consacrant un temps chaque jour ou chaque semaine.
+  stop_report:
+    title: "Rapport d’arrêt (de tâche)"
+    text: |
+      Le *rapport de fin* apparait lorsque l’on arrête (STOP) le travail
+      sur une tâche particulière.
+
+      Le *rapport de fin* permet de préparer le prochain cycle de travail,
+      lorsqu'il faudra reprendre la tâche le plus rapidement possible Et
+      le plus efficacement.
+
+      Pour rédiger ce rapport, il faut donc ce projeter à la prochaine
+      session de travail et imaginer les indications dont on aura besoin 
+      pour poursuivre aussitôt le travail sur la tâche. Indiquer par 
+      exemple les fichiers sur lesquels on travaille ainsi que les lignes
+      précises qui sont concernées.
+
+      Le format utilisable est le format [Markdown](https://fr.wikipedia.org/wiki/Markdown).
   task_list:
     title: Liste des travaux
     text: |

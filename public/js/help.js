@@ -16249,6 +16249,11 @@ t(help.task_data.text)
 # t(help.durcycvsdursess.title)
 
 t(help.durcycvsdursess.text)
+`,
+    stop_report: `
+# t(help.stop_report.title)
+
+t(help.stop_report.text)
 `
   };
   help = Help.getInstance();

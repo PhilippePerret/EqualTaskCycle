@@ -56,7 +56,16 @@ duree_cycle_vs_duree_sess: `
 # t(help.durcycvsdursess.title)
 
 t(help.durcycvsdursess.text)
+`,
+
+stop_report: `
+# t(help.stop_report.title)
+
+t(help.stop_report.text)
 `
+
+
+
 }
 
 
