@@ -45,7 +45,9 @@ export async function postToServer(route: string, data: RecType){
     clearTimeout(timeoutId);
   }
   if (response.ok === false) {
-    Flash.error(`[${response.process}] ${t('error.occurred', [response.error])}`);
+    let msg = `${t('error.occurred', [response.error])}`;
+    if (response.process) { msg = `[${response.process}] ${msg}` }
+    Flash.error(msg);
   }
   return response;
 }

@@ -9,7 +9,7 @@ import path from 'path';
 import { Dialog } from './Dialog';
 import { t } from '../shared/Locale';
 
-const fileWatcher = new Worker('./lib/ActivityTracker_watcher.ts');
+const fileWatcher = new Worker(path.join(__dirname, 'ActivityTracker_watcher.ts'));
 
 export class ActivityTracker /* SERVER */ {
   public static getInstance(){
@@ -31,11 +31,22 @@ export class ActivityTracker /* SERVER */ {
    * dans le projet dans le quart d'heure précédent
    */
   public watchActivity(folder: string, lastCheckAt: number): Promise<boolean> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const handler = (event: MessageEvent) => {
         this.watcher.removeEventListener('message', handler);
         resolve(event.data.active);
       };
+      const errorHandler = (event: ErrorEvent) => {
+        this.watcher.removeEventListener('error', errorHandler);
+        reject(new Error(event.message || 'Worker unknown error'));
+      };
+      const messageErrorHandler = (event: MessageEvent) => {
+        this.watcher.removeEventListener('messageerror', messageErrorHandler);
+        reject(new Error(event.data || 'Worker unknown message error'));
+      };
+
+      this.watcher.addEventListener('error', errorHandler);
+      this.watcher.addEventListener('messageerror', messageErrorHandler);
       this.watcher.addEventListener('message', handler);
       this.watcher.postMessage({ folder, lastCheckAt });
     });

@@ -1,14 +1,11 @@
 import { Work } from "./work";
 import { ui } from "./ui";
 import { postToServer } from "../shared/utils";
-import { Flash } from "../../public/js/flash";
-import { t } from '../shared/Locale';
-import type { RecType } from "../shared/types";
 
 export class ActivityTracker /* CLIENT */ {
 
-  // private static CHECK_INTERVAL = 15 * 60 * 1000;
-  private static CHECK_INTERVAL = 5 * 60 * 1000;
+  private static CHECK_INTERVAL = 15 * 60 * 1000;
+  // private static CHECK_INTERVAL = 1 * 60 * 1000; // test avec 1 minute
   private static timer: NodeJS.Timeout | undefined;
   private static inactiveUser: boolean;
 
@@ -42,9 +39,6 @@ export class ActivityTracker /* CLIENT */ {
     if (result.ok) {
       this.inactiveUser = result.userIsWorking === false;
       if (this.inactiveUser) { ui.onForceStop() }
-    } else {
-      console.error("An error has occurred: ", result.error);
-      Flash.error(t('error.occurred', [result.error]));
     }
 
   }

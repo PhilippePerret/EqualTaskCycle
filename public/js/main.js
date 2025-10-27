@@ -14243,7 +14243,11 @@ async function postToServer(route, data) {
     clearTimeout(timeoutId);
   }
   if (response.ok === false) {
-    Flash.error(`[${response.process}] ${t("error.occurred", [response.error])}`);
+    let msg = `${t("error.occurred", [response.error])}`;
+    if (response.process) {
+      msg = `[${response.process}] ${msg}`;
+    }
+    Flash.error(msg);
   }
   return response;
 }
@@ -16067,10 +16071,8 @@ var init_activityTracker = __esm(() => {
   init_work();
   init_ui();
   init_utils();
-  init_flash();
-  init_Locale();
   ActivityTracker = class ActivityTracker {
-    static CHECK_INTERVAL = 5 * 60 * 1000;
+    static CHECK_INTERVAL = 15 * 60 * 1000;
     static timer;
     static inactiveUser;
     static startControl() {
@@ -16101,9 +16103,6 @@ var init_activityTracker = __esm(() => {
         if (this.inactiveUser) {
           ui.onForceStop();
         }
-      } else {
-        console.error("An error has occurred: ", result.error);
-        Flash.error(t("error.occurred", [result.error]));
       }
     }
   };

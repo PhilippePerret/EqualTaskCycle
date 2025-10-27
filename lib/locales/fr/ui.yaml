@@ -54,6 +54,7 @@ ui:
     light: clair
     Light: Clair
   text:
+    are_you_still_working: "Êtes-vous encore en train de travailler ?"
     baton_relais: Bâton de relais
     counter_mode: Mode de compteur
     cycle: Cycle

@@ -1,4 +1,4 @@
-const { existsSync, writeFileSync, unlinkSync, readFileSync } = require('fs');
+const { existsSync } = require('fs');
 const { app, BrowserWindow } = require('electron');
 const { spawn } = require('child_process');
 const { HOST } = require('../public/js/constants');
@@ -20,13 +20,44 @@ if (existsSync(ICON_PATH)) {
 
 app.name = "Equal Task Cycle";
 
+const bunPath = app.isPackaged 
+? path.join(process.resourcesPath, 'bun')
+: 'bun';
+const serverPath = path.join(__dirname, '..', 'lib', 'server', 'server.ts').replace('app.asar', 'app.asar.unpacked');
+const envProps = { 
+  ...process.env, 
+  USER_DATA_PATH: userDataPath,
+  APP_ICON_PATH: ICON_PATH,
+  ETC_MODE: app.isPackaged ? 'prod' : 'dev'
+}
+const cwdPath = path.join(__dirname, '..').replace('app.asar', 'app.asar.unpacked')
+
+function startAServer(){
+  const server = spawn(bunPath, ['--no-cache', 'run', serverPath], {
+    // cwd: path.join(__dirname, '..'), // ORIGINAL
+    cwd: cwdPath,
+    env: envProps
+  });
+
+  if (!server) { return }
+  
+  server.stdout.on('data', (data) => console.log(`SERVER STDOUT: ${data}`));
+  server.stderr.on('data', (data) => console.error(`SERVER STDERR: ${data}`));
+  server.on('error', (err) => console.error('SERVER FAILED TO START:', err));
+  server.on('exit', (code, signal) => {
+    console.log('SERVER EXITED - code:', code, 'signal:', signal);
+    if (signal === 'SIGTRAP' || code !== 0) {
+      console.log('Restarting server...');
+      setTimeout(() => { startAServer()}, 1000);
+    }
+  });
+  server.on('close', (code, signal) => {
+    console.log('SERVER CLOSED - code:', code, 'signal:', signal);
+  });
+} // startAServer
+
 app.whenReady().then(() => {
   app.dock.setIcon(ICON_PATH);
-  const serverPath = path.join(__dirname, '..', 'lib', 'server', 'server.ts').replace('app.asar', 'app.asar.unpacked');
-
-  const bunPath = app.isPackaged 
-  ? path.join(process.resourcesPath, 'bun')
-  : 'bun';
 
   /*
   console.log('Bun path:', bunPath);
@@ -34,31 +65,8 @@ app.whenReady().then(() => {
   console.log('CWD:', path.join(__dirname, '..').replace('app.asar', 'app.asar.unpacked'));
   //*/
 
-  // server = spawn('bun', ['--no-cache', 'run', serverPath], {
-  server = spawn(bunPath, ['--no-cache', 'run', serverPath], {
-    // cwd: path.join(__dirname, '..'), // ORIGINAL
-    cwd: path.join(__dirname, '..').replace('app.asar', 'app.asar.unpacked'),
-    env: { 
-      ...process.env, 
-      USER_DATA_PATH: userDataPath,
-      APP_ICON_PATH: ICON_PATH,
-      ETC_MODE: app.isPackaged ? 'prod' : 'dev'
-    }
-  });
+  startAServer();
 
-  
-  if (server) {
-    server.stdout.on('data', (data) => console.log(`SERVER STDOUT: ${data}`));
-    server.stderr.on('data', (data) => console.error(`SERVER STDERR: ${data}`));
-    server.on('error', (err) => console.error('SERVER FAILED TO START:', err));
-    server.on('exit', (code, signal) => {
-      console.log('SERVER EXITED - code:', code, 'signal:', signal);
-    });
-    server.on('close', (code, signal) => {
-      console.log('SERVER CLOSED - code:', code, 'signal:', signal);
-    });
-    
-  }
 
   const WITH_CONSOLE_DEV = false;
   
@@ -91,13 +99,10 @@ app.whenReady().then(() => {
     win.show();
     win.focus();
   }
-
   
   win.webContents.session.clearCache();
 
   setTimeout(() => win.loadURL(HOST), 1000);
-
-  // setTimeout(() => bringToFront(), 5000);
 
 });
 
