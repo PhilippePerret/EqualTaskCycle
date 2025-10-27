@@ -163,9 +163,9 @@
 
     <!-- PRÉFÉRENCES -->
     <h2>t(ui.title.preferences)</h2>
-    <div style="width: 480px;">
+    <div style="width: 680px;">
 
-      <div class="row-flex">
+      <div class="row">
         <label>t(ui.text.lang)</label>
         <select id="prefs-lang">
           <option value="en">English</option>
@@ -181,43 +181,44 @@
         <button class="small btn-open-datafile">t(ui.button.open_min)</button>
       </div>
 
-      <div class="row-flex">
+      <div class="row">
         <label>t(ui.text.default_duration)</label>
         <input type="number" id="prefs-duree" />
+        <span>t(ui.thing.minutes)</span>
       </div>
 
 
-      <div class="row-flex">
+      <div class="row">
         <label>t(ui.text.order)</label>
         <input type="checkbox" id="prefs-random" />
         <label for="prefs-random">t(ui.text.tasks_in_random_order)</label>
       </div>
       
-      <div class="row-flex">
+      <div class="row">
         <label></label>
         <input type="checkbox" id="prefs-shortest" />
         <label for="prefs-shortest">t(ui.text.shortest_tasks_first)</label>
       </div>
     
-      <div class="row-flex">
+      <div class="row">
         <label for="prefs-counter">t(ui.text.counter_mode)</label>
-        <select id="prefs-counter">
+        <select id="prefs-counter" class="w200">
           <option value="clock">t(ui.thing.Clock)</option>
           <option value="countdown">t(ui.thing.Countdown)</option>
         </select>
       </div>
 
-      <div class="row-flex">
+      <div class="row">
         <label for="prefs-theme">t(ui.thing.Theme)</label>
-        <select id="prefs-theme">
+        <select id="prefs-theme" class="w120">
           <option value="dark">t(ui.adj.Dark)</option>
           <option value="light">t(ui.adj.Light)</option>
         </select>
       </div>
 
-      <div class="row-flex">
+      <div class="row">
         <label for="prefs-clock">t(ui.thing.Clock)</label>
-        <select id="prefs-clock">
+        <select id="prefs-clock" class="w120">
           <option value="mini">t(ui.adj.Miniature)</option>
           <option value="medium">t(ui.adj.Medium)</option>
           <option value="big">t(ui.adj.Big)</option>

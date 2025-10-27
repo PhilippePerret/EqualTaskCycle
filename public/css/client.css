@@ -9,6 +9,10 @@ body {
 .tiny {font-size: 0.8em;}
 .mono {font-family: monospace, 'Courier New', Courier}
 
+.w120 {width: 120px;}
+.w180 {width: 180px;}
+.w200 {width: 200px;}
+
 span[onclick] {
   color: darkblue;
   cursor: pointer;
@@ -123,6 +127,14 @@ label + input,
 label + select {
   margin-left: 1em;
 }
+div.row label:first-child + input,
+div.row label:first-child + select {
+  margin-left: -5px;
+}
+div.row input[type="number"] {
+  width: 60px;
+}
+
 input + span {
   margin-left: 1em;
 }
@@ -148,9 +160,7 @@ div.buttons {
   display:inline-block;
   width: 160px;
 }
-.row label:first-child + input {
-  margin-left: -5px;
-}
+
 .row-flex label + input,
 .row-flex label + textarea,
 .row-flex label + select {
