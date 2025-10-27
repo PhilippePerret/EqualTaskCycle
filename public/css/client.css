@@ -16,10 +16,16 @@ span[onclick] {
 
 section#help {
   margin-top: -2em;
-  background-color: whitesmoke;
   padding: 1em 3em;
   text-align: justify;
 }
+body.light section#help {
+  background-color: whitesmoke;
+}
+body.dark section#help {
+  background-color: #4b4b4b;
+}
+
 section#help div#help-content {
   font-size: 16pt;
 }
