@@ -125,7 +125,7 @@ class Editing {
 
   onAddTask(){
     const owork = this.createNewTask({
-      id: nanoid(),
+      id: nanoid().toLowerCase(),
       project: t('ui.text.your_project'),
       content: t('ui.text.temp_description'),
       folder: t('ui.text.path_example'),
