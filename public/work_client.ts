@@ -60,9 +60,9 @@ export class Work {
     if (this.data.leftTime < 0) { this.data.leftTime = 0; }
     if ( this.data.cycleCount === 0 ) {
       this.data.cycleCount = 1;
-      this.data.startedAt = clock.getStartTime();
+      this.data.startedAt = clock.getStartTime() * 1000;
     }
-    this.data.lastWorkedAt = clock.getStartTime();
+    this.data.lastWorkedAt = clock.getStartTime() * 1000;
     const stopReport = await new EndWorkReport(this).writeReport();
     if (!stopReport /* annulation */) {
       await Work.getCurrent();
