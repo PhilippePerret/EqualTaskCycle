@@ -15,6 +15,9 @@ locales:
     loc_to_create: Locales à créer
     title: RAPPORT DU CHECK DES LOCALES
     unknown_count: Nombre de locales inconnues
+manual:
+  produced: "Manuel produit avec succès dans votre dossier Documents"
+  not_produced: "Impossible de produire le manuel d’ETC…"
 task:
   very_first_one: "Vous devez éditer les préférences en cliquant sur le bouton ⚙️ et commencer par définir où mettre le fichier des tâches (il peut rester à sa place dans le dossier Documents).\n\nEnsuite, vous pouvez cliquer sur le bouton ✍🏽 pour créer vos premiers travaux."
   destroy: 'Destruction de la tâche _0_'

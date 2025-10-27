@@ -4,6 +4,7 @@ import { Flash } from "../../public/js/flash.js";
 import { ui } from "./ui";
 import { postToServer } from "../shared/utils.js";
 import { Work } from "./work.js";
+import { prefs } from "./prefs.js";
 
 interface ToolType {
   name: string;
@@ -49,26 +50,17 @@ class Tools { /* singleton */
   private async openManual(ev: Event){
     stopEvent(ev);
   }
-  public async openManual_server(data: any, response: any){
-    let ok = true, error = undefined;
-    response.json(Object.assign(data, {ok, error}))
-  }
 
   // --- //
 
   private async produceManual(ev: Event){
     stopEvent(ev);
-  }
-  public async produceManual_server(data: any, response: any){
-    let ok = true, error = undefined;
-    response.json(Object.assign(data, {ok, error}))
+    const retour = await postToServer('/manual/produce', {lang: prefs.getLang()})
+    if (retour.ok) { Flash.success(t('manual.produced')) }
   }
 
   // -------- /TOOLS ----------
 
-  public init(){
-
-  }
 
   /**
    * Construction de la section des outils

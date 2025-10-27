@@ -13727,7 +13727,11 @@ async function postToServer(route, data) {
     clearTimeout(timeoutId);
   }
   if (response.ok === false) {
-    let msg = `${t("error.occurred", [response.error])}`;
+    let error = response.error;
+    if (error.match(" ") === null) {
+      error = t(error);
+    }
+    let msg = `${t("error.occurred", [error])}`;
     if (response.process) {
       msg = `[${response.process}] ${msg}`;
     }
@@ -14536,18 +14540,13 @@ class Tools {
   async openManual(ev) {
     stopEvent(ev);
   }
-  async openManual_server(data, response) {
-    let ok3 = true, error = undefined;
-    response.json(Object.assign(data, { ok: ok3, error }));
-  }
   async produceManual(ev) {
     stopEvent(ev);
+    const retour = await postToServer("/manual/produce", { lang: prefs.getLang() });
+    if (retour.ok) {
+      Flash.success(t("manual.produced"));
+    }
   }
-  async produceManual_server(data, response) {
-    let ok3 = true, error = undefined;
-    response.json(Object.assign(data, { ok: ok3, error }));
-  }
-  init() {}
   build() {
     if (this.built) {
       return;
@@ -14594,7 +14593,6 @@ class Prefs {
     if (retour.ok) {
       this.setData(retour.prefs);
       this.observeButtons();
-      tools.init();
     }
     return retour.ok;
   }

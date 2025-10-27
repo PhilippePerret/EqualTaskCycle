@@ -15,6 +15,9 @@ locales:
     loc_to_create: Locales to create
     title: LOCALE CHECK REPORT
     unknown_count: Number of unknown locales
+manual:
+  produced: "Manual produced successfully in your Documents folder"
+  not_produced: "Fail to produce the ETC Manual…"
 task:
   very_first_one: "You must edit the preferences by clicking the ⚙️ button and start by defining where to place the task file (it can remain in the Documents folder).\n\nThen, you can click the ✍🏽 button to create your first tasks."
   destroy: 'Destroy task _0_'

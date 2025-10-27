@@ -11,6 +11,7 @@ import type { RecType, WorkType } from '../shared/types';
 import { activTracker } from './activityTracker';
 import { loc, tf } from '../shared/Locale';
 import log from 'electron-log/main';
+import { manual } from './Manual';
 
 const app = express();
 const APP_PATH = path.resolve('.');
@@ -214,7 +215,16 @@ app.post('/tool/reset-cycle', async (req, res) => {
   const data = req.body;
   const {ok, error} = runtime.resetCycle();
   res.json(Object.assign(data, {ok, error}));
+});
 
+app.post('/manual/produce', (req, res) => {
+  log.info('->route /manual/produce');
+  const data = req.body;
+  if (manual.produce(data.lang)) {
+    return res.json(Object.assign(data, {ok: true}));
+  } else {
+    return res.json(Object.assign(data, {ok: false, error: 'manual.not_produced'}))
+  }
 })
 
 app.listen(PORT, () => {

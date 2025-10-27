@@ -13727,7 +13727,11 @@ async function postToServer(route, data) {
     clearTimeout(timeoutId);
   }
   if (response.ok === false) {
-    let msg = `${t("error.occurred", [response.error])}`;
+    let error = response.error;
+    if (error.match(" ") === null) {
+      error = t(error);
+    }
+    let msg = `${t("error.occurred", [error])}`;
     if (response.process) {
       msg = `[${response.process}] ${msg}`;
     }

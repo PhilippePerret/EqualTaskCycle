@@ -21,7 +21,6 @@ export class Prefs { /* singleton */
     if (retour.ok) {
       this.setData(retour.prefs);
       this.observeButtons();
-      tools.init();
     }
     return retour.ok;
   }
