@@ -1,5 +1,5 @@
 div#clock-container {
-  position: absolute;
+  position: fixed;
 
 }
 div#clock-container.big {

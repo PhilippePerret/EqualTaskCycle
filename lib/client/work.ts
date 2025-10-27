@@ -20,11 +20,9 @@ export class Work {
    * 
    */
   public static async init(){
-    console.log("-> Initialisation de Work")
     const res = await this.getCurrent();
-    console.log("Retour de getCurrent:", res);
+    console.log("Retour getCurrent:", res);
     if (res === true) {
-      prefs.init();
       editor.init();
       Flash.notice(`${t('app.is_ready')} <span id="mes123">(${t('help.show')})</span>`)
       DGet('span#mes123').addEventListener('click', 
@@ -98,11 +96,6 @@ export class Work {
     const retour: RecType = await postToServer('/task/current', {process: 'Work::getCurrent'});
     console.log("retour:", retour);
     if (retour.ok === false) { return false}
-    prefs.setData(retour.prefs);
-    await loc.init(prefs.getLang());
-    clock.setClockStyle(retour.prefs.clock);
-    clock.setCounterMode(retour.prefs.counter);
-    ui.setUITheme(retour.prefs.theme);
     if (retour.task.ok === false) {
       // <= il n'y aucune tâche active
       Flash.error(t('task.any_active'));
@@ -181,5 +174,3 @@ export class Work {
     return Work.obj.querySelector(`#current-work-${prop}`);
   }
 }
-
-Work.init();

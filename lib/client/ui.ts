@@ -5,6 +5,7 @@ import { DGet } from "../../public/js/dom";
 import { Flash } from "../../public/js/flash";
 import { t } from '../shared/Locale';
 import { postToServer } from "../shared/utils";
+import type { RecType } from "../shared/types";
 
 function stopEvent(ev: Event){
   ev.stopPropagation();
@@ -30,6 +31,11 @@ export class UI {
     return UI.instance || (UI.instance = new UI());
   }
 
+  public init(data: RecType){
+    clock.setClockStyle(data.clock);
+    clock.setCounterMode(data.counter);
+    ui.setUITheme(data.theme);
+  }
 
 
   private onStart(ev: Event){

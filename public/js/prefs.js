@@ -15410,11 +15410,9 @@ var init_stop_report = __esm(() => {
 class Work {
   data;
   static async init() {
-    console.log("-> Initialisation de Work");
     const res = await this.getCurrent();
-    console.log("Retour de getCurrent:", res);
+    console.log("Retour getCurrent:", res);
     if (res === true) {
-      prefs.init();
       editor.init();
       Flash.notice(`${t("app.is_ready")} <span id="mes123">(${t("help.show")})</span>`);
       DGet("span#mes123").addEventListener("click", help.show.bind(help, ["resume_home_page"]), { once: true, capture: true });
@@ -15466,11 +15464,6 @@ class Work {
     if (retour.ok === false) {
       return false;
     }
-    prefs.setData(retour.prefs);
-    await loc.init(prefs.getLang());
-    clock.setClockStyle(retour.prefs.clock);
-    clock.setCounterMode(retour.prefs.counter);
-    ui.setUITheme(retour.prefs.theme);
     if (retour.task.ok === false) {
       Flash.error(t("task.any_active"));
       return false;
@@ -15553,13 +15546,11 @@ var init_work = __esm(() => {
   init_Clock();
   init_flash();
   init_ui();
-  init_prefs();
   init_help();
   init_editing();
   init_stop_report();
   init_utils();
   init_Locale();
-  Work.init();
 });
 
 // lib/client/activityTracker.ts
@@ -15622,6 +15613,11 @@ class UI {
   constructor() {}
   static getInstance() {
     return UI.instance || (UI.instance = new UI);
+  }
+  init(data) {
+    clock.setClockStyle(data.clock);
+    clock.setCounterMode(data.counter);
+    ui.setUITheme(data.theme);
   }
   onStart(ev) {
     this.mask([this.btnStart]);
@@ -16147,12 +16143,19 @@ class Prefs {
   static getInstance() {
     return this.inst || (this.inst = new Prefs);
   }
-  init() {
-    this.observeButtons();
-    tools.init();
+  async init() {
+    const retour = await postToServer("/prefs/load", { process: "Prefs.init" });
+    if (retour.ok) {
+      this.setData(retour.prefs);
+      this.observeButtons();
+      tools.init();
+    }
   }
   getLang() {
     return this.data.lang || "en";
+  }
+  getSavedData() {
+    return this.data;
   }
   async onOpenDataFile(ev) {
     stopEvent(ev);

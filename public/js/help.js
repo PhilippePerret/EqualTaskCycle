@@ -1542,6 +1542,12 @@ var init_Clock = __esm(() => {
   clock = Clock.getInstance();
 });
 
+// lib/shared/types.ts
+var WorkProps;
+var init_types = __esm(() => {
+  WorkProps = ["active", "id", "project", "content", "duration", "folder", "script"];
+});
+
 // public/js/constants.js
 var PORT = 3002, HOST;
 var init_constants = __esm(() => {
@@ -2852,7 +2858,7 @@ var init_constants2 = __esm(() => {
 
 // node_modules/micromark-util-symbol/lib/types.js
 var types;
-var init_types = __esm(() => {
+var init_types2 = __esm(() => {
   types = {
     data: "data",
     whitespace: "whitespace",
@@ -3071,7 +3077,7 @@ var init_values = __esm(() => {
 var init_default = __esm(() => {
   init_codes();
   init_constants2();
-  init_types();
+  init_types2();
   init_values();
 });
 
@@ -9918,7 +9924,7 @@ function increment() {
   return 2 ** ++powers;
 }
 var powers = 0, boolean, booleanish, overloadedBoolean, number, spaceSeparated, commaSeparated, commaOrSpaceSeparated;
-var init_types2 = __esm(() => {
+var init_types3 = __esm(() => {
   boolean = increment();
   booleanish = increment();
   overloadedBoolean = increment();
@@ -9937,7 +9943,7 @@ function mark(values2, key, value) {
 var checks, DefinedInfo;
 var init_defined_info = __esm(() => {
   init_info();
-  init_types2();
+  init_types3();
   checks = Object.keys(exports_types);
   DefinedInfo = class DefinedInfo extends Info {
     constructor(property, attribute, mask, space2) {
@@ -9979,7 +9985,7 @@ var init_create = __esm(() => {
 var aria;
 var init_aria = __esm(() => {
   init_create();
-  init_types2();
+  init_types3();
   aria = create({
     properties: {
       ariaActiveDescendant: null,
@@ -10054,7 +10060,7 @@ var html2;
 var init_html2 = __esm(() => {
   init_case_insensitive_transform();
   init_create();
-  init_types2();
+  init_types3();
   html2 = create({
     attributes: {
       acceptcharset: "accept-charset",
@@ -10366,7 +10372,7 @@ var init_html2 = __esm(() => {
 var svg;
 var init_svg = __esm(() => {
   init_create();
-  init_types2();
+  init_types3();
   svg = create({
     attributes: {
       accentHeight: "accent-height",
@@ -15280,12 +15286,19 @@ class Prefs {
   static getInstance() {
     return this.inst || (this.inst = new Prefs);
   }
-  init() {
-    this.observeButtons();
-    tools.init();
+  async init() {
+    const retour = await postToServer("/prefs/load", { process: "Prefs.init" });
+    if (retour.ok) {
+      this.setData(retour.prefs);
+      this.observeButtons();
+      tools.init();
+    }
   }
   getLang() {
     return this.data.lang || "en";
+  }
+  getSavedData() {
+    return this.data;
   }
   async onOpenDataFile(ev) {
     stopEvent(ev);
@@ -15396,12 +15409,6 @@ var init_prefs = __esm(() => {
   init_Locale();
   init_tools();
   prefs = Prefs.getInstance();
-});
-
-// lib/shared/types.ts
-var WorkProps;
-var init_types3 = __esm(() => {
-  WorkProps = ["active", "id", "project", "content", "duration", "folder", "script"];
 });
 
 // node_modules/nanoid/url-alphabet/index.js
@@ -15557,7 +15564,7 @@ class Editing {
 }
 var editor;
 var init_editing = __esm(() => {
-  init_types3();
+  init_types();
   init_flash();
   init_prefs();
   init_ui();
@@ -15679,11 +15686,9 @@ var init_stop_report = __esm(() => {
 class Work {
   data;
   static async init() {
-    console.log("-> Initialisation de Work");
     const res = await this.getCurrent();
-    console.log("Retour de getCurrent:", res);
+    console.log("Retour getCurrent:", res);
     if (res === true) {
-      prefs.init();
       editor.init();
       Flash.notice(`${t("app.is_ready")} <span id="mes123">(${t("help.show")})</span>`);
       DGet("span#mes123").addEventListener("click", help.show.bind(help, ["resume_home_page"]), { once: true, capture: true });
@@ -15735,11 +15740,6 @@ class Work {
     if (retour.ok === false) {
       return false;
     }
-    prefs.setData(retour.prefs);
-    await loc.init(prefs.getLang());
-    clock.setClockStyle(retour.prefs.clock);
-    clock.setCounterMode(retour.prefs.counter);
-    ui.setUITheme(retour.prefs.theme);
     if (retour.task.ok === false) {
       Flash.error(t("task.any_active"));
       return false;
@@ -15822,13 +15822,11 @@ var init_work = __esm(() => {
   init_Clock();
   init_flash();
   init_ui();
-  init_prefs();
   init_help();
   init_editing();
   init_stop_report();
   init_utils();
   init_Locale();
-  Work.init();
 });
 
 // lib/client/activityTracker.ts
@@ -15891,6 +15889,11 @@ class UI {
   constructor() {}
   static getInstance() {
     return UI.instance || (UI.instance = new UI);
+  }
+  init(data) {
+    clock.setClockStyle(data.clock);
+    clock.setCounterMode(data.counter);
+    ui.setUITheme(data.theme);
   }
   onStart(ev) {
     this.mask([this.btnStart]);

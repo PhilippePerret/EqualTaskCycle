@@ -16,13 +16,18 @@ export class Prefs { /* singleton */
   private constructor(){}
   public static getInstance(){return this.inst || (this.inst = new Prefs())}
 
-  public init(){
-    this.observeButtons();
-    tools.init();
+  public async init(){
+    const retour = await postToServer('/prefs/load', {process: 'Prefs.init'});
+    if (retour.ok) {
+      this.setData(retour.prefs);
+      this.observeButtons();
+      tools.init();
+    }
   }
 
   public getLang(){ return this.data.lang || 'en' } /* <=========== TODO */
-
+  public getSavedData(){ return this.data }
+  
   /**
    * Pour ouvrir le fichier des données
    */

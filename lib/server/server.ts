@@ -30,6 +30,16 @@ app.get('/', (_req, res) => {
 app.use(express.json());
 app.use(express.static('public'));
 
+app.post('/prefs/load', (req, res) => {
+  log.info('->route /prefs/load');
+  const data = req.body // process seulement
+  const dprefs = prefs.load();
+  Object.assign(data, {
+    ok: true, 
+    prefs: dprefs
+  });
+  res.json(data)
+});
 
 app.post('/work/check-activity', async (req, res) => {
   log.info("->route /work/check-activity");
@@ -81,8 +91,7 @@ app.post('/task/current', (req, res) => {
     Work.inited || Work.init();
     Object.assign(result, {
       task: Work.getCurrentWork(),
-      options: { canChange: runtime.lastChangeIsFarEnough()},
-      prefs: dprefs
+      options: { canChange: runtime.lastChangeIsFarEnough()}
     });
   } catch(err) {
     result = {ok: false, error: (err as any).message}

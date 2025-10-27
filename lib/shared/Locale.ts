@@ -80,16 +80,13 @@ class Locale {
         const pathLocale = path.join(folderLang, `${base}.yaml`)
         Object.assign(this.locales, yaml.load(readFileSync(pathLocale, 'utf8')));
       })
-    } else {
-      /* client side */
+    } else /* client side */ {
       const { postToServer } = await import("./utils");
       const { prefs } = await import("../client/prefs");
       const { Flash } = await import("../../public/js/flash");
 
       const retour = await postToServer('/localization/get-all', {lang: prefs.getLang()});
-      if (retour.ok) {
-        this.locales = retour.locales;
-      }
+      if (retour.ok) { this.locales = retour.locales }
     }
     // console.log("Toutes les locales : ", this.locales);
   }
