@@ -3,7 +3,7 @@ import path from 'path';
 import yaml from 'js-yaml';
 import { readFileSync } from "fs";
 
-const LOCALES_FOLDER = path.resolve(path.join(__dirname,'locales'));
+const LOCALES_FOLDER = path.resolve(path.join(__dirname,'..','locales'));
 
 // const SERVER_SIDE = typeof window === 'undefined';
 

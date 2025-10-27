@@ -136,7 +136,7 @@ class FlashMessage {
 }
 var init_flash = () => {};
 
-// lib/Clock.ts
+// lib/client/Clock.ts
 class Clock {
   static getInstance() {
     return this._instance || (this._instance = new Clock);
@@ -13796,7 +13796,7 @@ var init_js_yaml = __esm(() => {
   js_yaml_default = jsYaml;
 });
 
-// lib/Locale.ts
+// lib/shared/Locale.ts
 var {readFileSync} = (() => ({}));
 function t(route, params) {
   if (params) {
@@ -13854,15 +13854,15 @@ class Locale {
   }
   static inst;
 }
-var __dirname = "/Users/philippeperret/Programmes/EqualTaskCycle/lib", LOCALES_FOLDER, loc;
+var __dirname = "/Users/philippeperret/Programmes/EqualTaskCycle/lib/shared", LOCALES_FOLDER, loc;
 var init_Locale = __esm(() => {
   init_path();
   init_js_yaml();
-  LOCALES_FOLDER = path_default.resolve(path_default.join(__dirname, "locales"));
+  LOCALES_FOLDER = path_default.resolve(path_default.join(__dirname, "..", "locales"));
   loc = Locale.getInstance();
 });
 
-// public/utils.ts
+// lib/shared/utils.ts
 var exports_utils = {};
 __export(exports_utils, {
   subTitleize: () => subTitleize,
@@ -13948,7 +13948,7 @@ var init_utils = __esm(() => {
   init_flash();
 });
 
-// public/tools.ts
+// lib/client/tools.ts
 class Tools {
   get TOOLS_DATA() {
     return [
@@ -14029,11 +14029,11 @@ var init_tools = __esm(() => {
   init_flash();
   init_ui();
   init_utils();
-  init_work_client();
+  init_work();
   tools = Tools.getInstance();
 });
 
-// public/prefs.ts
+// lib/client/prefs.ts
 var exports_prefs = {};
 __export(exports_prefs, {
   prefs: () => prefs,
@@ -15398,7 +15398,7 @@ var init_marked_esm = __esm(() => {
   Ut = x.lex;
 });
 
-// public/help.ts
+// lib/client/help.ts
 class Help {
   static getInstance() {
     return this.inst || (this.inst = new Help);
@@ -15521,7 +15521,7 @@ t(help.stop_report.text)
   window.help = help;
 });
 
-// lib/types.ts
+// lib/shared/types.ts
 var WorkProps;
 var init_types3 = __esm(() => {
   WorkProps = ["active", "id", "project", "content", "duration", "folder", "script"];
@@ -15541,7 +15541,7 @@ var nanoid = (size = 21) => {
 };
 var init_index_browser = () => {};
 
-// public/editing.ts
+// lib/client/editing.ts
 class Editing {
   get section() {
     return DGet("section#editing");
@@ -15690,7 +15690,7 @@ var init_editing = __esm(() => {
   editor = Editing.getIntance();
 });
 
-// public/end_work_report.ts
+// lib/client/stop_report.ts
 class EndWorkReport {
   work;
   inited = false;
@@ -15792,13 +15792,13 @@ class EndWorkReport {
     `
   ];
 }
-var init_end_work_report = __esm(() => {
+var init_stop_report = __esm(() => {
   init_utils();
   init_flash();
   init_Locale();
 });
 
-// public/work_client.ts
+// lib/client/work.ts
 class Work {
   data;
   static async init() {
@@ -15941,23 +15941,23 @@ class Work {
     return Work.obj.querySelector(`#current-work-${prop}`);
   }
 }
-var init_work_client = __esm(() => {
+var init_work = __esm(() => {
   init_Clock();
   init_flash();
   init_ui();
   init_prefs();
   init_help();
   init_editing();
-  init_end_work_report();
+  init_stop_report();
   init_utils();
   init_Locale();
   Work.init();
 });
 
-// public/activityTracker.ts
+// lib/client/activityTracker.ts
 var ActivityTracker;
 var init_activityTracker = __esm(() => {
-  init_work_client();
+  init_work();
   init_ui();
   init_utils();
   init_flash();
@@ -16002,7 +16002,7 @@ var init_activityTracker = __esm(() => {
   };
 });
 
-// public/ui.ts
+// lib/client/ui.ts
 function stopEvent2(ev) {
   ev.stopPropagation();
   ev.preventDefault();
@@ -16257,7 +16257,7 @@ class Button {
 var ui;
 var init_ui = __esm(() => {
   init_Clock();
-  init_work_client();
+  init_work();
   init_activityTracker();
   init_flash();
   init_Locale();

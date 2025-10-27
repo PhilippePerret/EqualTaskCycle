@@ -6,7 +6,7 @@
  */
 import fs from 'fs';
 import path from 'path';
-import { Dialog } from '../Dialog';
+import { Dialog } from './Dialog';
 import { t } from '../shared/Locale';
 
 const fileWatcher = new Worker('./lib/ActivityTracker_watcher.ts');

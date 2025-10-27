@@ -3,6 +3,8 @@ const { app, BrowserWindow } = require('electron');
 const { spawn } = require('child_process');
 const { HOST } = require('../public/js/constants');
 const userDataPath = app.getPath('userData');
+const log = require('electron-log/main');
+log.initialize();
 
 let server = null;
 
