@@ -14100,11 +14100,6 @@ var init_rehype_stringify = __esm(() => {
 });
 
 // public/js/flash.js
-var exports_flash = {};
-__export(exports_flash, {
-  Flash: () => Flash
-});
-
 class Flash {
   static init() {}
   static checkServerMessages() {
@@ -14286,13 +14281,1015 @@ var init_utils = __esm(() => {
   init_flash();
 });
 
+// lib/shared/Locale.ts
+var {readFileSync} = (() => ({}));
+function t(route, params) {
+  if (params) {
+    let template = loc.translate(route);
+    for (var i2 in params) {
+      const regexp = new RegExp(`_${i2}_`, "g");
+      template = template.replace(regexp, params[i2]);
+    }
+    return template;
+  } else {
+    return loc.translate(route);
+  }
+}
+function tt(text5) {
+  return loc.translateText(text5);
+}
+
+class Locale {
+  BASEFILES = ["messages", "ui", "help"];
+  getLocales() {
+    return this.locales;
+  }
+  translateText(texte) {
+    return texte.replace(/\bt\((.+?)\)/g, this.replacementMethod.bind(this));
+  }
+  translate(route) {
+    const translated = route.split(".").reduce((obj, key2) => obj?.[key2], this.locales);
+    return typeof translated === "string" ? translated : `[LOC: ${route}]`;
+  }
+  replacementMethod(tout, route) {
+    return this.translate(route);
+  }
+  async init(lang) {
+    if (typeof window === "undefined") {
+      this.locales = {};
+      const folderLang = path_default.join(LOCALES_FOLDER, lang);
+      this.BASEFILES.forEach((base) => {
+        const pathLocale = path_default.join(folderLang, `${base}.yaml`);
+        Object.assign(this.locales, js_yaml_default.load(readFileSync(pathLocale, "utf8")));
+      });
+      return true;
+    } else {
+      const { postToServer: postToServer2 } = await Promise.resolve().then(() => (init_utils(), exports_utils));
+      const retour = await postToServer2("/localization/get-all", { lang });
+      if (retour.ok) {
+        console.log("Locales remontées : ", retour.locales);
+        this.locales = retour.locales;
+      }
+      return retour.ok;
+    }
+  }
+  locales;
+  constructor() {}
+  static getInstance() {
+    return this.inst || (this.inst = new Locale);
+  }
+  static inst;
+}
+var __dirname = "/Users/philippeperret/Programmes/EqualTaskCycle/lib/shared", LOCALES_FOLDER, loc;
+var init_Locale = __esm(() => {
+  init_path();
+  init_js_yaml();
+  LOCALES_FOLDER = path_default.resolve(path_default.join(__dirname, "..", "locales"));
+  loc = Locale.getInstance();
+});
+
+// lib/client/main.ts
+var import_renderer = __toESM(require_renderer2(), 1);
+init_Locale();
+// lib/client/work.ts
+init_flash();
+
+// lib/client/stop_report.ts
+init_utils();
+init_flash();
+init_Locale();
+
+class EndWorkReport {
+  work;
+  inited = false;
+  constructor(work) {
+    this.work = work;
+  }
+  async writeReport() {
+    return new Promise((ok3, ko) => {
+      this.ok = ok3;
+      this.ko = ko;
+      this.open();
+    });
+  }
+  ok;
+  ko;
+  open() {
+    this.inited || this.init();
+    this.reset();
+    this.show();
+  }
+  close() {
+    this.hide();
+  }
+  onSave(ev) {
+    this.close();
+    this.ok(this.getContent());
+    ev && stopEvent(ev);
+    return false;
+  }
+  onDontSave(ev) {
+    this.close();
+    this.ok(false);
+    ev && stopEvent(ev);
+    return false;
+  }
+  onTemplate(ev) {
+    if (this.getContent().length) {
+      Flash.error(t("report.empty_content"));
+    } else {
+      this.setContent(this.TEMPLATES[0]);
+    }
+    return ev && stopEvent(ev);
+  }
+  getContent() {
+    return this.contentField.value;
+  }
+  setContent(s) {
+    this.contentField.value = s;
+  }
+  init() {
+    this.contentField.setAttribute("placeholder", t("ui.text.description_stop_report_modele"));
+    DGet("#ETR-explication", this.obj).innerText = t("ui.text.description_stop_report");
+    this.observeButtons();
+  }
+  observeButtons() {
+    listenBtn("etr-save", this.onSave.bind(this));
+    listenBtn("etr-dont-save", this.onDontSave.bind(this));
+    listenBtn("etr-template", this.onTemplate.bind(this));
+  }
+  reset() {
+    this.contentField.value = "";
+  }
+  show() {
+    this.obj.classList.remove("hidden");
+  }
+  hide() {
+    this.obj.classList.add("hidden");
+  }
+  id;
+  get contentField() {
+    return this._contfield || (this._contfield = DGet("textarea#ETR-report", this.obj));
+  }
+  get obj() {
+    return this._obj || (this._obj = DGet("div#ETR-container"));
+  }
+  _contfield;
+  _obj;
+  TEMPLATES = [
+    `
+    *(Taking up the baton for the next work session)*
+    ## Main Goal : 
+
+    ## Main Tasks :
+    - 
+    -
+    -
+
+    ## Main Usefull Files :
+    - 
+    - 
+    - 
+
+    ## Remarque
+    *(mind about this)*
+
+    ## Config Note
+    *(note about curren config or situation)*
+
+    `
+  ];
+}
+
+// lib/client/work.ts
+init_utils();
+init_Locale();
+
+class Work {
+  data;
+  static async init() {
+    const res = await this.getCurrent();
+    console.log("Retour getCurrent:", res);
+    return res.ok;
+  }
+  static currentWork;
+  static async addTimeToCurrentWork(time) {
+    if (time) {
+      await this.currentWork.addTimeAndSave(time);
+    } else {
+      Flash.error(t("times.to_short_to_be_saved"));
+    }
+  }
+  async addTimeAndSave(time) {
+    this.data.totalTime += time;
+    this.data.cycleTime += time;
+    this.data.leftTime -= time;
+    if (this.data.leftTime < 0) {
+      this.data.leftTime = 0;
+    }
+    if (this.data.cycleCount === 0) {
+      this.data.cycleCount = 1;
+      this.data.startedAt = clock.getStartTime() * 1000;
+    }
+    this.data.lastWorkedAt = clock.getStartTime() * 1000;
+    const stopReport = await new EndWorkReport(this).writeReport();
+    if (!stopReport) {
+      await Work.getCurrent();
+      return false;
+    }
+    this.data.report = stopReport;
+    console.log("[addTimeAndSave] Enregistrement des temps et du rapport", this.data);
+    const result = await postToServer("/work/save-session", this.data);
+    this.dispatchData();
+    await new Promise((resolve2) => setTimeout(resolve2, 2000));
+    Work.displayWork(result.next, result.options);
+    if (result.ok) {
+      Flash.success(t("times.saved"));
+    }
+    return true;
+  }
+  static get obj() {
+    return this._obj || (this._obj = DGet("section#current-work-container"));
+  }
+  static _obj;
+  static async getCurrent() {
+    const retour = await postToServer("/task/current", { process: "Work::getCurrent" });
+    console.log("retour:", retour);
+    if (retour.ok === false) {
+      return false;
+    }
+    if (retour.task.ok === false) {
+      Flash.error(t("task.any_active"));
+      return false;
+    } else {
+      ui.resetBackgroundColor();
+      this.displayWork(retour.task, retour.options);
+      return true;
+    }
+  }
+  static displayWork(wdata, options) {
+    this.currentWork = new Work(wdata);
+    this.currentWork.display(options);
+  }
+  constructor(data) {
+    this.data = data;
+  }
+  get id() {
+    return this.data.id;
+  }
+  get script() {
+    return this.data.script;
+  }
+  get folder() {
+    return this.data.folder;
+  }
+  get leftTime() {
+    return this.data.leftTime;
+  }
+  get cycleTime() {
+    return this.data.cycleTime;
+  }
+  get totalTime() {
+    return this.data.totalTime;
+  }
+  display(options) {
+    this.dispatchData();
+    ui.showButtons({
+      Start: true,
+      Restart: false,
+      Stop: false,
+      Pause: false,
+      Change: options.canChange,
+      runScript: !!this.data.script,
+      openFolder: !!this.data.folder
+    });
+  }
+  dispatchData() {
+    Object.entries(this.data).forEach(([k, v]) => {
+      v = ((prop, v2) => {
+        switch (prop) {
+          case "totalTime":
+          case "cycleTime":
+          case "leftTime":
+            return clock.time2horloge(v2);
+          case "report":
+            if (v2) {
+              return markdown(`---
+
+# ${t("ui.title.stop_report")}
+
+` + v2);
+            } else {
+              return "";
+            }
+          default:
+            return v2;
+        }
+      })(k, v);
+      const propField = this.field(k);
+      if (propField) {
+        propField.innerHTML = v;
+      }
+    });
+  }
+  field(prop) {
+    return Work.obj.querySelector(`#current-work-${prop}`);
+  }
+}
+
+// lib/client/activityTracker.ts
+init_utils();
+
+class ActivityTracker {
+  static CHECK_INTERVAL = 15 * 60 * 1000;
+  static timer;
+  static inactiveUser;
+  static startControl() {
+    this.timer = setInterval(this.control.bind(this), this.CHECK_INTERVAL);
+  }
+  static stopControl() {
+    if (this.timer) {
+      clearInterval(this.timer);
+      delete this.timer;
+    }
+  }
+  static inactiveUserCorrection(workingTime) {
+    console.log("Working time : ", workingTime);
+    if (this.inactiveUser) {
+      console.log("Working time rectifié : ", workingTime - this.CHECK_INTERVAL / 2 / 1000);
+      return workingTime - this.CHECK_INTERVAL / 2 / 1000;
+    } else {
+      return workingTime;
+    }
+  }
+  static async control() {
+    const result = await postToServer("/work/check-activity", {
+      projectFolder: Work.currentWork.folder,
+      lastCheck: Date.now() - this.CHECK_INTERVAL
+    });
+    if (result.ok) {
+      this.inactiveUser = result.userIsWorking === false;
+      if (this.inactiveUser) {
+        ui.onForceStop();
+      }
+    }
+  }
+}
+
+// lib/client/ui.ts
+init_flash();
+init_Locale();
+init_utils();
+function stopEvent2(ev) {
+  ev.stopPropagation();
+  ev.preventDefault();
+  return false;
+}
+
+class UI {
+  static inst;
+  constructor() {}
+  static getInst() {
+    return UI.inst || (UI.inst = new UI);
+  }
+  init(data) {
+    clock.setClockStyle(data.clock);
+    clock.setCounterMode(data.counter);
+    ui.setUITheme(data.theme);
+  }
+  onStart(ev) {
+    this.mask([this.btnStart]);
+    clock.start(Work.currentWork);
+    this.reveal([this.btnStop, this.btnPause]);
+    ActivityTracker.startControl();
+  }
+  onRestart(ev) {
+    this.mask([this.btnRestart]);
+    clock.restart();
+    this.reveal([this.btnStop, this.btnPause]);
+    ActivityTracker.startControl();
+  }
+  onStop(ev) {
+    this.mask([this.btnStop, this.btnPause, this.btnRestart]);
+    this.reveal([this.btnStart]);
+    ActivityTracker.stopControl();
+    if (ev && (ev.shiftKey || ev.metaKey)) {
+      Flash.notice(t("times.dont_add_and_save"));
+    } else {
+      const workTime = ActivityTracker.inactiveUserCorrection(clock.stop());
+      Work.addTimeToCurrentWork(Math.round(workTime / 60));
+    }
+  }
+  onPause(ev) {
+    this.mask([this.btnPause]);
+    this.reveal([this.btnRestart]);
+    ActivityTracker.stopControl();
+    clock.pause();
+  }
+  setUITheme(theme) {
+    document.body.className = theme;
+  }
+  setBackgroundColorAt(color2) {
+    document.body.style.backgroundColor = color2;
+  }
+  resetBackgroundColor() {
+    document.body.style.backgroundColor = "";
+  }
+  SECTIONS = ["work", "help", "prefs", "editing"];
+  toggleSection(name) {
+    this.SECTIONS.forEach((section) => {
+      if (name === section) {
+        this.openSection(section);
+      } else {
+        this.closeSection(section);
+      }
+    });
+  }
+  toggleHelp() {
+    if (this.isSectionOpen("help")) {
+      this.toggleSection("work");
+    } else {
+      this.toggleSection("help");
+    }
+  }
+  isSectionOpen(name) {
+    return !DGet("section#" + name).classList.contains("hidden");
+  }
+  mask(eList) {
+    eList.forEach((e) => e.obj.classList.add("hidden"));
+  }
+  reveal(eList) {
+    eList.forEach((e) => e.obj.classList.remove("hidden"));
+  }
+  showButtons(states) {
+    this.buttons.forEach((bouton) => bouton.setState(states[bouton.id]));
+  }
+  closeSection(name) {
+    DGet("section#" + name).classList.add("hidden");
+  }
+  openSection(name) {
+    DGet("section#" + name).classList.remove("hidden");
+  }
+  onForceStop() {
+    this.onStop(undefined);
+  }
+  async onChange(ev) {
+    ev && stopEvent2(ev);
+    const curwork = Work.currentWork;
+    const result = await postToServer("/task/change", { workId: curwork.id });
+    if (result.ok === false) {
+      Flash.error(t("error.occurred", [result.error]));
+    }
+    return false;
+  }
+  async onRunScript(ev) {
+    ev && stopEvent2(ev);
+    const curwork = Work.currentWork;
+    const result = await postToServer("/task/run-script", { workId: curwork.id, script: curwork.script });
+    if (result.ok) {
+      Flash.success(t("script.ran_successfully"));
+    } else {
+      Flash.error(t("error.occurred", [result.error]));
+    }
+    return false;
+  }
+  async onOpenFolder(ev) {
+    ev && stopEvent2(ev);
+    const curwork = Work.currentWork;
+    const result = await postToServer("/task/open-folder", { workId: curwork.id, folder: curwork.folder });
+    if (result.ok) {
+      Flash.success(t("folder.opened_in_finder"));
+    } else {
+      Flash.error(t("error.occurred", [result.error]));
+    }
+    return false;
+  }
+  btnStart;
+  btnRestart;
+  btnPause;
+  btnStop;
+  btnChange;
+  btnRunScript;
+  btnOpenFolder;
+  get buttons() {
+    this._buttons || this.instancieButtons();
+    return this._buttons;
+  }
+  _buttons;
+  instancieButtons() {
+    console.log("-> Instanciation des boutons");
+    this._buttons = this.DATA_BUTTONS.map((bdata) => {
+      let id, name, onclick, hidden, row, title;
+      [id, name, onclick, hidden, row, title] = bdata;
+      this[`btn${id}`] = new Button({ id, name, onclick, hidden, row, title }).build();
+      return this[`btn${id}`];
+    });
+  }
+  get DATA_BUTTONS() {
+    return this.databuts || (this.databuts = this.getDataButtons());
+  }
+  databuts;
+  getDataButtons() {
+    return [
+      [
+        "runScript",
+        t("ui.button.run"),
+        this.onRunScript.bind(this),
+        false,
+        2,
+        t("ui.text.to_run_script")
+      ],
+      [
+        "openFolder",
+        t("ui.button.open_project"),
+        this.onOpenFolder.bind(this),
+        false,
+        2,
+        t("ui.text.to_open_project_folder")
+      ],
+      [
+        "Change",
+        t("ui.button.change"),
+        this.onChange.bind(this),
+        false,
+        2,
+        t("ui.text.to_choose_another_task")
+      ],
+      [
+        "Stop",
+        t("ui.button.stop"),
+        this.onStop.bind(this),
+        true,
+        1,
+        t("ui.text.to_stop_and_next")
+      ],
+      [
+        "Pause",
+        t("ui.button.pause"),
+        this.onPause.bind(this),
+        true,
+        1,
+        t("ui.text.to_pause_the_task")
+      ],
+      [
+        "Start",
+        t("ui.button.start"),
+        this.onStart.bind(this),
+        false,
+        1,
+        t("ui.text.to_start_working_on_task")
+      ],
+      [
+        "Restart",
+        t("ui.button.restart"),
+        this.onRestart.bind(this),
+        true,
+        1,
+        t("ui.text.to_restart_work_on_task")
+      ]
+    ];
+  }
+}
+
+class Button {
+  data;
+  static get container() {
+    return this._container || (this._container = document.body.querySelector("div#buttons-container"));
+  }
+  static _container;
+  _obj;
+  constructor(data) {
+    this.data = data;
+  }
+  setState(state) {
+    this[state ? "show" : "hide"]();
+  }
+  onClick(ev) {
+    this.data.onclick(ev);
+    return stopEvent2(ev);
+  }
+  build() {
+    const o = document.createElement("BUTTON");
+    o.innerHTML = this.data.name;
+    o.id = `btn-${this.id}`;
+    o.setAttribute("title", this.data.title);
+    o.addEventListener("click", this.onClick.bind(this));
+    Button.container.querySelector(`div#row${this.data.row}`).appendChild(o);
+    this._obj = o;
+    if (this.data.hidden) {
+      this.hide();
+    } else {
+      this.show();
+    }
+    return this;
+  }
+  show() {
+    this.obj.classList.remove("hidden");
+  }
+  hide() {
+    this.obj.classList.add("hidden");
+  }
+  get id() {
+    return this.data.id;
+  }
+  get obj() {
+    return this._obj;
+  }
+}
+var ui = UI.getInst();
+
+// lib/client/Clock.ts
+init_flash();
+
+class Clock {
+  static getInstance() {
+    return this._instance || (this._instance = new Clock);
+  }
+  static _instance;
+  constructor() {}
+  counterMode;
+  time2horloge(mn) {
+    let hrs = Math.floor(mn / 60);
+    let mns = Math.round(mn % 60);
+    let horloge = [];
+    horloge.push(`${hrs}`);
+    horloge.push(`${mns > 9 ? "" : "0"}${mns}’`);
+    return horloge.join(" h ");
+  }
+  get clockContainer() {
+    return this._clockcont || (this._clockcont = DGet("div#clock-container"));
+  }
+  _clockcont;
+  setClockStyle(style) {
+    this.clockContainer.className = style;
+  }
+  setCounterMode(mode = "clock") {
+    this.counterMode = mode;
+  }
+  currentWork;
+  timer;
+  startTime;
+  totalTime;
+  currentTimeSegment;
+  timeSegments = [];
+  getTime() {
+    return Math.round(new Date().getTime() / 1000);
+  }
+  start(currentWork) {
+    this.currentWork = currentWork;
+    this.timeSegments = [];
+    this.clockContainer.classList.remove("hidden");
+    this.clockObj.innerHTML = this.startClockPerCounterMode();
+    this.createTimeSegment();
+    this.calcTotalRecTime();
+    this.startTimer();
+  }
+  startClockPerCounterMode() {
+    if (this.counterMode === "clock") {
+      return "0:00:00";
+    } else {
+      return this.s2h(this.currentWork.leftTime * 60);
+    }
+  }
+  get totalRestTimeSeconds() {
+    return this._totresttime || (this._totresttime = this.currentWork.leftTime * 60);
+  }
+  _totresttime;
+  calcTotalRecTime() {
+    this.totalTime = this.timeSegments.filter((segTime) => !!segTime.laps).reduce((accu, segTime) => accu + segTime.laps, 0);
+  }
+  restart() {
+    this.createTimeSegment();
+    this.clockContainer.classList.remove("hidden");
+    this.startTimer();
+  }
+  startTimer() {
+    this.startTime = this.getTime();
+    this.timer = setInterval(this.run.bind(this), 1000);
+  }
+  createTimeSegment() {
+    this.currentTimeSegment = { beg: this.getTime(), end: undefined, laps: undefined };
+  }
+  endCurrentTimeSegment() {
+    const end = this.getTime();
+    const laps = end - this.currentTimeSegment.beg;
+    Object.assign(this.currentTimeSegment, { end, laps });
+    this.timeSegments.push(this.currentTimeSegment);
+    delete this.currentTimeSegment;
+    this.calcTotalRecTime();
+  }
+  getStartTime() {
+    return this.startTime;
+  }
+  pause() {
+    this.endCurrentTimeSegment();
+    clearInterval(this.timer);
+  }
+  stop() {
+    clearInterval(this.timer);
+    delete this.timer;
+    this.endCurrentTimeSegment();
+    this.clockContainer.classList.add("hidden");
+    return this.totalTime;
+  }
+  run() {
+    const secondesOfWork = this.totalTime + this.lapsFromStart();
+    let displayedSeconds;
+    if (this.counterMode === "clock") {
+      displayedSeconds = secondesOfWork;
+    } else {
+      displayedSeconds = this.totalRestTimeSeconds - secondesOfWork;
+    }
+    const leftTime = this.taskRestTime(secondesOfWork);
+    this.clockObj.innerHTML = this.s2h(displayedSeconds);
+    if (secondesOfWork % 60 === 0) {
+      const thisMinute = Math.round(secondesOfWork / 60);
+      const elapsedMinutes = this.currentWork.cycleTime + thisMinute;
+      const totalMinutes = this.currentWork.totalTime + thisMinute;
+      this.restTimeField.innerHTML = this.time2horloge(leftTime);
+      this.cycleTimeField.innerHTML = this.time2horloge(elapsedMinutes);
+      this.totalTimeField.innerHTML = this.time2horloge(totalMinutes);
+    }
+    if (leftTime < 10 && this.alerte10minsDone === false) {
+      this.donneAlerte10mins();
+    } else if (this.alerte10minsDone) {
+      if (this.alerteWorkDone === false && leftTime < 0) {
+        this.donneAlerteWorkDone();
+      }
+    }
+  }
+  get restTimeField() {
+    return this._restfield || (this._restfield = DGet("span#current-work-leftTime"));
+  }
+  get cycleTimeField() {
+    return this._cycledurfield || (this._cycledurfield = DGet("span#current-work-cycleTime"));
+  }
+  get totalTimeField() {
+    return this._totalfield || (this._totalfield = DGet("span#current-work-totalTime"));
+  }
+  alerte10minsDone = false;
+  alerteWorkDone = false;
+  donneAlerte10mins() {
+    ui.setBackgroundColorAt("orange");
+    this.bringAppToFront();
+    Flash.notice("10 minutes of work remaining");
+    this.alerte10minsDone = true;
+  }
+  donneAlerteWorkDone() {
+    this.bringAppToFront();
+    Flash.notice("Work time is over. Please move on to the next task.");
+    this.alerteWorkDone = true;
+  }
+  taskRestTime(minutesOfWork) {
+    minutesOfWork = minutesOfWork / 60;
+    return this.currentWork.leftTime - minutesOfWork;
+  }
+  lapsFromStart() {
+    return Math.round(this.getTime() - this.startTime);
+  }
+  get clockObj() {
+    return this._clockobj || (this._clockobj = DGet("#clock"));
+  }
+  _clockobj;
+  s2h(s) {
+    let h = Math.floor(s / 3600);
+    s = s % 3600;
+    let m = Math.floor(s / 60);
+    const mstr = m < 10 ? `0${m}` : String(m);
+    s = s % 60;
+    const sstr = s < 10 ? `0${s}` : String(s);
+    return `${h}:${mstr}:${sstr}`;
+  }
+  bringAppToFront() {
+    window.electronAPI.bringToFront();
+  }
+  _restfield;
+  _cycledurfield;
+  _totalfield;
+}
+var clock = Clock.getInstance();
+
+// lib/client/prefs.ts
+init_flash();
+init_utils();
+init_Locale();
+
+// lib/client/tools.ts
+init_Locale();
+init_flash();
+init_utils();
+class Tools {
+  get TOOLS_DATA() {
+    return [
+      {
+        name: t("ui.tool.reset_cycle.name"),
+        description: t("ui.tool.reset_cycle.desc"),
+        method: this.resetCycle.bind(this)
+      },
+      {
+        name: t("ui.tool.manual.open.name"),
+        description: t("ui.tool.manual.open.desc"),
+        method: this.openManual.bind(this)
+      },
+      {
+        name: t("ui.tool.manual.produce.name"),
+        description: t("ui.tool.manual.produce.desc"),
+        method: this.produceManual.bind(this)
+      }
+    ];
+  }
+  async resetCycle(ev) {
+    ev && stopEvent(ev);
+    const retour = await postToServer("/tool/reset-cycle", { process: t("ui.tool.reset_cycle.name") });
+    if (retour.ok) {
+      Flash.success(t("tool.cycle_reset"));
+      ui.toggleSection("work");
+      await Work.getCurrent();
+    }
+  }
+  async openManual(ev) {
+    stopEvent(ev);
+  }
+  async openManual_server(data, response) {
+    let ok3 = true, error = undefined;
+    response.json(Object.assign(data, { ok: ok3, error }));
+  }
+  async produceManual(ev) {
+    stopEvent(ev);
+  }
+  async produceManual_server(data, response) {
+    let ok3 = true, error = undefined;
+    response.json(Object.assign(data, { ok: ok3, error }));
+  }
+  init() {}
+  build() {
+    if (this.built) {
+      return;
+    }
+    const cont = this.container;
+    this.TOOLS_DATA.forEach((dtool) => {
+      const o = document.createElement("DIV");
+      o.className = "tool-container";
+      const a = document.createElement("A");
+      a.innerHTML = dtool.name;
+      const d = document.createElement("DIV");
+      d.innerHTML = dtool.description;
+      d.className = "explication";
+      o.appendChild(a);
+      o.appendChild(d);
+      cont.appendChild(o);
+      a.addEventListener("click", dtool.method);
+    });
+    this.built = true;
+  }
+  get container() {
+    return DGet("#tools-container");
+  }
+  built = false;
+  static getInstance() {
+    return this.inst || (this.inst = new Tools);
+  }
+  constructor() {}
+  static inst;
+}
+var tools = Tools.getInstance();
+
+// lib/client/prefs.ts
+class Prefs {
+  data;
+  fieldsReady = false;
+  static inst;
+  constructor() {}
+  static getInstance() {
+    return this.inst || (this.inst = new Prefs);
+  }
+  async init() {
+    const retour = await postToServer("/prefs/load", { process: "Prefs.init" });
+    if (retour.ok) {
+      this.setData(retour.prefs);
+      this.observeButtons();
+      tools.init();
+    }
+  }
+  getLang() {
+    return this.data.lang || "en";
+  }
+  getSavedData() {
+    return this.data;
+  }
+  async onOpenDataFile(ev) {
+    stopEvent(ev);
+    const result = await postToServer("/prefs/open-data-file", {
+      filePath: this.getValue("file")
+    });
+    if (result.ok) {
+      Flash.success(t("data_file.open_with_sucess"));
+    } else {
+      Flash.error(t("error.occurred", result.error));
+    }
+  }
+  async onSave(ev) {
+    stopEvent(ev);
+    const result = await postToServer("/prefs/save", this.getData());
+    if (result.ok) {
+      this.close();
+      Flash.success(t("prefs.saved"));
+    } else {
+      Flash.error(result.errors);
+    }
+    return false;
+  }
+  onChangePref(prop, ev) {
+    const value = this.getValue(prop);
+    switch (prop) {
+      case "clock":
+        clock.setClockStyle(value);
+        break;
+      case "counter":
+        clock.setCounterMode(value);
+        break;
+      case "theme":
+        ui.setUITheme(value);
+        break;
+      default:
+    }
+  }
+  onOpen(ev) {
+    tools.build();
+    this.open();
+    return stopEvent(ev);
+  }
+  onClose(ev) {
+    this.close();
+    return stopEvent(ev);
+  }
+  setData(data) {
+    this.data = data;
+    this.fieldsReady || this.observeFields();
+    Object.entries(this.data).forEach(([k, v]) => {
+      this.setValue(k, v);
+    });
+  }
+  getData() {
+    Object.entries(this.data).forEach(([k, _v]) => {
+      Object.assign(this.data, { [k]: this.getValue(k) });
+    });
+    return this.data;
+  }
+  getValue(prop) {
+    switch (prop) {
+      case "random":
+        return this.field("random").checked;
+      default:
+        return this.field(prop).value;
+    }
+  }
+  setValue(prop, value) {
+    switch (prop) {
+      case "random":
+        this.field("random").checked = value;
+        break;
+      default:
+        this.field(prop).value = value;
+    }
+  }
+  field(key2) {
+    return DGet(`#prefs-${key2}`) || console.error(t("error.unfound_field", [`prefs-${key2}`]));
+  }
+  close() {
+    ui.openSection("work");
+    ui.closeSection("prefs");
+  }
+  open() {
+    ui.openSection("prefs");
+    ui.closeSection("work");
+  }
+  observeButtons() {
+    listenBtn("prefs", this.onOpen.bind(this));
+    listenBtn("close-prefs", this.onClose.bind(this));
+    listenBtn("save-prefs", this.onSave.bind(this));
+    listenBtn("open-datafile", this.onOpenDataFile.bind(this));
+  }
+  observeFields() {
+    Object.keys(this.data).forEach((prop) => {
+      this.field(prop).addEventListener("change", this.onChangePref.bind(this, prop));
+    });
+    this.fieldsReady = true;
+  }
+}
+var prefs = Prefs.getInstance();
+
+// lib/client/main.ts
+init_flash();
 // node_modules/marked/lib/marked.esm.js
 function L() {
   return { async: false, breaks: false, extensions: null, gfm: true, hooks: null, pedantic: false, renderer: null, silent: false, tokenizer: null, walkTokens: null };
 }
+var T = L();
 function G(u) {
   T = u;
 }
+var I = { exec: () => null };
 function h(u, e = "") {
   let t2 = typeof u == "string" ? u : u.source, n = { replace: (r, i2) => {
     let s = typeof i2 == "string" ? i2 : i2.source;
@@ -14300,6 +15297,68 @@ function h(u, e = "") {
   }, getRegex: () => new RegExp(t2, e) };
   return n;
 }
+var m = { codeRemoveIndent: /^(?: {1,4}| {0,3}\t)/gm, outputLinkReplace: /\\([\[\]])/g, indentCodeCompensation: /^(\s+)(?:```)/, beginningSpace: /^\s+/, endingHash: /#$/, startingSpaceChar: /^ /, endingSpaceChar: / $/, nonSpaceChar: /[^ ]/, newLineCharGlobal: /\n/g, tabCharGlobal: /\t/g, multipleSpaceGlobal: /\s+/g, blankLine: /^[ \t]*$/, doubleBlankLine: /\n[ \t]*\n[ \t]*$/, blockquoteStart: /^ {0,3}>/, blockquoteSetextReplace: /\n {0,3}((?:=+|-+) *)(?=\n|$)/g, blockquoteSetextReplace2: /^ {0,3}>[ \t]?/gm, listReplaceTabs: /^\t+/, listReplaceNesting: /^ {1,4}(?=( {4})*[^ ])/g, listIsTask: /^\[[ xX]\] /, listReplaceTask: /^\[[ xX]\] +/, anyLine: /\n.*\n/, hrefBrackets: /^<(.*)>$/, tableDelimiter: /[:|]/, tableAlignChars: /^\||\| *$/g, tableRowBlankLine: /\n[ \t]*$/, tableAlignRight: /^ *-+: *$/, tableAlignCenter: /^ *:-+: *$/, tableAlignLeft: /^ *:-+ *$/, startATag: /^<a /i, endATag: /^<\/a>/i, startPreScriptTag: /^<(pre|code|kbd|script)(\s|>)/i, endPreScriptTag: /^<\/(pre|code|kbd|script)(\s|>)/i, startAngleBracket: /^</, endAngleBracket: />$/, pedanticHrefTitle: /^([^'"]*[^\s])\s+(['"])(.*)\2/, unicodeAlphaNumeric: /[\p{L}\p{N}]/u, escapeTest: /[&<>"']/, escapeReplace: /[&<>"']/g, escapeTestNoEncode: /[<>"']|&(?!(#\d{1,7}|#[Xx][a-fA-F0-9]{1,6}|\w+);)/, escapeReplaceNoEncode: /[<>"']|&(?!(#\d{1,7}|#[Xx][a-fA-F0-9]{1,6}|\w+);)/g, unescapeTest: /&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/ig, caret: /(^|[^\[])\^/g, percentDecode: /%25/g, findPipe: /\|/g, splitPipe: / \|/, slashPipe: /\\\|/g, carriageReturn: /\r\n|\r/g, spaceLine: /^ +$/gm, notSpaceStart: /^\S*/, endingNewline: /\n$/, listItemRegex: (u) => new RegExp(`^( {0,3}${u})((?:[	 ][^\\n]*)?(?:\\n|$))`), nextBulletRegex: (u) => new RegExp(`^ {0,${Math.min(3, u - 1)}}(?:[*+-]|\\d{1,9}[.)])((?:[ 	][^\\n]*)?(?:\\n|$))`), hrRegex: (u) => new RegExp(`^ {0,${Math.min(3, u - 1)}}((?:- *){3,}|(?:_ *){3,}|(?:\\* *){3,})(?:\\n+|$)`), fencesBeginRegex: (u) => new RegExp(`^ {0,${Math.min(3, u - 1)}}(?:\`\`\`|~~~)`), headingBeginRegex: (u) => new RegExp(`^ {0,${Math.min(3, u - 1)}}#`), htmlBeginRegex: (u) => new RegExp(`^ {0,${Math.min(3, u - 1)}}<(?:[a-z].*>|!--)`, "i") };
+var be = /^(?:[ \t]*(?:\n|$))+/;
+var Re = /^((?: {4}| {0,3}\t)[^\n]+(?:\n(?:[ \t]*(?:\n|$))*)?)+/;
+var Te = /^ {0,3}(`{3,}(?=[^`\n]*(?:\n|$))|~{3,})([^\n]*)(?:\n|$)(?:|([\s\S]*?)(?:\n|$))(?: {0,3}\1[~`]* *(?=\n|$)|$)/;
+var E = /^ {0,3}((?:-[\t ]*){3,}|(?:_[ \t]*){3,}|(?:\*[ \t]*){3,})(?:\n+|$)/;
+var Oe = /^ {0,3}(#{1,6})(?=\s|$)(.*)(?:\n+|$)/;
+var F = /(?:[*+-]|\d{1,9}[.)])/;
+var ie = /^(?!bull |blockCode|fences|blockquote|heading|html|table)((?:.|\n(?!\s*?\n|bull |blockCode|fences|blockquote|heading|html|table))+?)\n {0,3}(=+|-+) *(?:\n+|$)/;
+var oe = h(ie).replace(/bull/g, F).replace(/blockCode/g, /(?: {4}| {0,3}\t)/).replace(/fences/g, / {0,3}(?:`{3,}|~{3,})/).replace(/blockquote/g, / {0,3}>/).replace(/heading/g, / {0,3}#{1,6}/).replace(/html/g, / {0,3}<[^\n>]+>\n/).replace(/\|table/g, "").getRegex();
+var we = h(ie).replace(/bull/g, F).replace(/blockCode/g, /(?: {4}| {0,3}\t)/).replace(/fences/g, / {0,3}(?:`{3,}|~{3,})/).replace(/blockquote/g, / {0,3}>/).replace(/heading/g, / {0,3}#{1,6}/).replace(/html/g, / {0,3}<[^\n>]+>\n/).replace(/table/g, / {0,3}\|?(?:[:\- ]*\|)+[\:\- ]*\n/).getRegex();
+var j = /^([^\n]+(?:\n(?!hr|heading|lheading|blockquote|fences|list|html|table| +\n)[^\n]+)*)/;
+var ye = /^[^\n]+/;
+var Q = /(?!\s*\])(?:\\[\s\S]|[^\[\]\\])+/;
+var Pe = h(/^ {0,3}\[(label)\]: *(?:\n[ \t]*)?([^<\s][^\s]*|<.*?>)(?:(?: +(?:\n[ \t]*)?| *\n[ \t]*)(title))? *(?:\n+|$)/).replace("label", Q).replace("title", /(?:"(?:\\"?|[^"\\])*"|'[^'\n]*(?:\n[^'\n]+)*\n?'|\([^()]*\))/).getRegex();
+var Se = h(/^( {0,3}bull)([ \t][^\n]+?)?(?:\n|$)/).replace(/bull/g, F).getRegex();
+var v = "address|article|aside|base|basefont|blockquote|body|caption|center|col|colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption|figure|footer|form|frame|frameset|h[1-6]|head|header|hr|html|iframe|legend|li|link|main|menu|menuitem|meta|nav|noframes|ol|optgroup|option|p|param|search|section|summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul";
+var U = /<!--(?:-?>|[\s\S]*?(?:-->|$))/;
+var $e = h("^ {0,3}(?:<(script|pre|style|textarea)[\\s>][\\s\\S]*?(?:</\\1>[^\\n]*\\n+|$)|comment[^\\n]*(\\n+|$)|<\\?[\\s\\S]*?(?:\\?>\\n*|$)|<![A-Z][\\s\\S]*?(?:>\\n*|$)|<!\\[CDATA\\[[\\s\\S]*?(?:\\]\\]>\\n*|$)|</?(tag)(?: +|\\n|/?>)[\\s\\S]*?(?:(?:\\n[ \t]*)+\\n|$)|<(?!script|pre|style|textarea)([a-z][\\w-]*)(?:attribute)*? */?>(?=[ \\t]*(?:\\n|$))[\\s\\S]*?(?:(?:\\n[ \t]*)+\\n|$)|</(?!script|pre|style|textarea)[a-z][\\w-]*\\s*>(?=[ \\t]*(?:\\n|$))[\\s\\S]*?(?:(?:\\n[ 	]*)+\\n|$))", "i").replace("comment", U).replace("tag", v).replace("attribute", / +[a-zA-Z:_][\w.:-]*(?: *= *"[^"\n]*"| *= *'[^'\n]*'| *= *[^\s"'=<>`]+)?/).getRegex();
+var ae = h(j).replace("hr", E).replace("heading", " {0,3}#{1,6}(?:\\s|$)").replace("|lheading", "").replace("|table", "").replace("blockquote", " {0,3}>").replace("fences", " {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n").replace("list", " {0,3}(?:[*+-]|1[.)]) ").replace("html", "</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)").replace("tag", v).getRegex();
+var _e = h(/^( {0,3}> ?(paragraph|[^\n]*)(?:\n|$))+/).replace("paragraph", ae).getRegex();
+var K = { blockquote: _e, code: Re, def: Pe, fences: Te, heading: Oe, hr: E, html: $e, lheading: oe, list: Se, newline: be, paragraph: ae, table: I, text: ye };
+var re2 = h("^ *([^\\n ].*)\\n {0,3}((?:\\| *)?:?-+:? *(?:\\| *:?-+:? *)*(?:\\| *)?)(?:\\n((?:(?! *\\n|hr|heading|blockquote|code|fences|list|html).*(?:\\n|$))*)\\n*|$)").replace("hr", E).replace("heading", " {0,3}#{1,6}(?:\\s|$)").replace("blockquote", " {0,3}>").replace("code", "(?: {4}| {0,3}\t)[^\\n]").replace("fences", " {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n").replace("list", " {0,3}(?:[*+-]|1[.)]) ").replace("html", "</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)").replace("tag", v).getRegex();
+var Le = { ...K, lheading: we, table: re2, paragraph: h(j).replace("hr", E).replace("heading", " {0,3}#{1,6}(?:\\s|$)").replace("|lheading", "").replace("table", re2).replace("blockquote", " {0,3}>").replace("fences", " {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n").replace("list", " {0,3}(?:[*+-]|1[.)]) ").replace("html", "</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)").replace("tag", v).getRegex() };
+var Me = { ...K, html: h(`^ *(?:comment *(?:\\n|\\s*$)|<(tag)[\\s\\S]+?</\\1> *(?:\\n{2,}|\\s*$)|<tag(?:"[^"]*"|'[^']*'|\\s[^'"/>\\s]*)*?/?> *(?:\\n{2,}|\\s*$))`).replace("comment", U).replace(/tag/g, "(?!(?:a|em|strong|small|s|cite|q|dfn|abbr|data|time|code|var|samp|kbd|sub|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo|span|br|wbr|ins|del|img)\\b)\\w+(?!:|[^\\w\\s@]*@)\\b").getRegex(), def: /^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +(["(][^\n]+[")]))? *(?:\n+|$)/, heading: /^(#{1,6})(.*)(?:\n+|$)/, fences: I, lheading: /^(.+?)\n {0,3}(=+|-+) *(?:\n+|$)/, paragraph: h(j).replace("hr", E).replace("heading", ` *#{1,6} *[^
+]`).replace("lheading", oe).replace("|table", "").replace("blockquote", " {0,3}>").replace("|fences", "").replace("|list", "").replace("|html", "").replace("|tag", "").getRegex() };
+var ze = /^\\([!"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])/;
+var Ae = /^(`+)([^`]|[^`][\s\S]*?[^`])\1(?!`)/;
+var le = /^( {2,}|\\)\n(?!\s*$)/;
+var Ie = /^(`+|[^`])(?:(?= {2,}\n)|[\s\S]*?(?:(?=[\\<!\[`*_]|\b_|$)|[^ ](?= {2,}\n)))/;
+var D = /[\p{P}\p{S}]/u;
+var W = /[\s\p{P}\p{S}]/u;
+var ue = /[^\s\p{P}\p{S}]/u;
+var Ee = h(/^((?![*_])punctSpace)/, "u").replace(/punctSpace/g, W).getRegex();
+var pe = /(?!~)[\p{P}\p{S}]/u;
+var Ce = /(?!~)[\s\p{P}\p{S}]/u;
+var Be = /(?:[^\s\p{P}\p{S}]|~)/u;
+var qe = h(/link|code|html/, "g").replace("link", /\[(?:[^\[\]`]|(?<!`)(?<a>`+)[^`]+\k<a>(?!`))*?\]\((?:\\[\s\S]|[^\\\(\)]|\((?:\\[\s\S]|[^\\\(\)])*\))*\)/).replace("code", /(?<!`)(?<b>`+)[^`]+\k<b>(?!`)/).replace("html", /<(?! )[^<>]*?>/).getRegex();
+var ce = /^(?:\*+(?:((?!\*)punct)|[^\s*]))|^_+(?:((?!_)punct)|([^\s_]))/;
+var ve = h(ce, "u").replace(/punct/g, D).getRegex();
+var De = h(ce, "u").replace(/punct/g, pe).getRegex();
+var he = "^[^_*]*?__[^_*]*?\\*[^_*]*?(?=__)|[^*]+(?=[^*])|(?!\\*)punct(\\*+)(?=[\\s]|$)|notPunctSpace(\\*+)(?!\\*)(?=punctSpace|$)|(?!\\*)punctSpace(\\*+)(?=notPunctSpace)|[\\s](\\*+)(?!\\*)(?=punct)|(?!\\*)punct(\\*+)(?!\\*)(?=punct)|notPunctSpace(\\*+)(?=notPunctSpace)";
+var He = h(he, "gu").replace(/notPunctSpace/g, ue).replace(/punctSpace/g, W).replace(/punct/g, D).getRegex();
+var Ze = h(he, "gu").replace(/notPunctSpace/g, Be).replace(/punctSpace/g, Ce).replace(/punct/g, pe).getRegex();
+var Ge = h("^[^_*]*?\\*\\*[^_*]*?_[^_*]*?(?=\\*\\*)|[^_]+(?=[^_])|(?!_)punct(_+)(?=[\\s]|$)|notPunctSpace(_+)(?!_)(?=punctSpace|$)|(?!_)punctSpace(_+)(?=notPunctSpace)|[\\s](_+)(?!_)(?=punct)|(?!_)punct(_+)(?!_)(?=punct)", "gu").replace(/notPunctSpace/g, ue).replace(/punctSpace/g, W).replace(/punct/g, D).getRegex();
+var Ne = h(/\\(punct)/, "gu").replace(/punct/g, D).getRegex();
+var Fe = h(/^<(scheme:[^\s\x00-\x1f<>]*|email)>/).replace("scheme", /[a-zA-Z][a-zA-Z0-9+.-]{1,31}/).replace("email", /[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+(@)[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(?![-_])/).getRegex();
+var je = h(U).replace("(?:-->|$)", "-->").getRegex();
+var Qe = h("^comment|^</[a-zA-Z][\\w:-]*\\s*>|^<[a-zA-Z][\\w-]*(?:attribute)*?\\s*/?>|^<\\?[\\s\\S]*?\\?>|^<![a-zA-Z]+\\s[\\s\\S]*?>|^<!\\[CDATA\\[[\\s\\S]*?\\]\\]>").replace("comment", je).replace("attribute", /\s+[a-zA-Z:_][\w.:-]*(?:\s*=\s*"[^"]*"|\s*=\s*'[^']*'|\s*=\s*[^\s"'=<>`]+)?/).getRegex();
+var q = /(?:\[(?:\\[\s\S]|[^\[\]\\])*\]|\\[\s\S]|`+[^`]*?`+(?!`)|[^\[\]\\`])*?/;
+var Ue = h(/^!?\[(label)\]\(\s*(href)(?:(?:[ \t]*(?:\n[ \t]*)?)(title))?\s*\)/).replace("label", q).replace("href", /<(?:\\.|[^\n<>\\])+>|[^ \t\n\x00-\x1f]*/).replace("title", /"(?:\\"?|[^"\\])*"|'(?:\\'?|[^'\\])*'|\((?:\\\)?|[^)\\])*\)/).getRegex();
+var de = h(/^!?\[(label)\]\[(ref)\]/).replace("label", q).replace("ref", Q).getRegex();
+var ke = h(/^!?\[(ref)\](?:\[\])?/).replace("ref", Q).getRegex();
+var Ke = h("reflink|nolink(?!\\()", "g").replace("reflink", de).replace("nolink", ke).getRegex();
+var se = /[hH][tT][tT][pP][sS]?|[fF][tT][pP]/;
+var X = { _backpedal: I, anyPunctuation: Ne, autolink: Fe, blockSkip: qe, br: le, code: Ae, del: I, emStrongLDelim: ve, emStrongRDelimAst: He, emStrongRDelimUnd: Ge, escape: ze, link: Ue, nolink: ke, punctuation: Ee, reflink: de, reflinkSearch: Ke, tag: Qe, text: Ie, url: I };
+var We = { ...X, link: h(/^!?\[(label)\]\((.*?)\)/).replace("label", q).getRegex(), reflink: h(/^!?\[(label)\]\s*\[([^\]]*)\]/).replace("label", q).getRegex() };
+var N = { ...X, emStrongRDelimAst: Ze, emStrongLDelim: De, url: h(/^((?:protocol):\/\/|www\.)(?:[a-zA-Z0-9\-]+\.?)+[^\s<]*|^email/).replace("protocol", se).replace("email", /[A-Za-z0-9._+-]+(@)[a-zA-Z0-9-_]+(?:\.[a-zA-Z0-9-_]*[a-zA-Z0-9])+(?![-_])/).getRegex(), _backpedal: /(?:[^?!.,:;*_'"~()&]+|\([^)]*\)|&(?![a-zA-Z0-9]+;$)|[?!.,:;*_'"~)]+(?!$))+/, del: /^(~~?)(?=[^\s~])((?:\\[\s\S]|[^\\])*?(?:\\[\s\S]|[^\s~\\]))\1(?=[^~]|$)/, text: h(/^([`~]+|[^`~])(?:(?= {2,}\n)|(?=[a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-]+@)|[\s\S]*?(?:(?=[\\<!\[`*~_]|\b_|protocol:\/\/|www\.|$)|[^ ](?= {2,}\n)|[^a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-](?=[a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-]+@)))/).replace("protocol", se).getRegex() };
+var Xe = { ...N, br: h(le).replace("{2,}", "*").getRegex(), text: h(N.text).replace("\\b_", "\\b_| {2,}\\n").replace(/\{2,\}/g, "*").getRegex() };
+var C = { normal: K, gfm: Le, pedantic: Me };
+var M = { normal: X, gfm: N, breaks: Xe, pedantic: We };
+var Je = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+var ge = (u) => Je[u];
 function w(u, e) {
   if (e) {
     if (m.escapeTest.test(u))
@@ -14383,10 +15442,7 @@ function Ve(u, e, t2) {
   }).join(`
 `);
 }
-function k(u3, e) {
-  return _.parse(u3, e);
-}
-var T, I, m, be, Re, Te, E, Oe, F, ie, oe, we, j, ye, Q, Pe, Se, v = "address|article|aside|base|basefont|blockquote|body|caption|center|col|colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption|figure|footer|form|frame|frameset|h[1-6]|head|header|hr|html|iframe|legend|li|link|main|menu|menuitem|meta|nav|noframes|ol|optgroup|option|p|param|search|section|summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul", U, $e, ae, _e, K, re2, Le, Me, ze, Ae, le, Ie, D, W, ue, Ee, pe, Ce, Be, qe, ce, ve, De, he = "^[^_*]*?__[^_*]*?\\*[^_*]*?(?=__)|[^*]+(?=[^*])|(?!\\*)punct(\\*+)(?=[\\s]|$)|notPunctSpace(\\*+)(?!\\*)(?=punctSpace|$)|(?!\\*)punctSpace(\\*+)(?=notPunctSpace)|[\\s](\\*+)(?!\\*)(?=punct)|(?!\\*)punct(\\*+)(?!\\*)(?=punct)|notPunctSpace(\\*+)(?=notPunctSpace)", He, Ze, Ge, Ne, Fe, je, Qe, q, Ue, de, ke, Ke, se, X, We, N, Xe, C, M, Je, ge = (u) => Je[u], y = class {
+var y = class {
   options;
   rules;
   lexer;
@@ -14703,7 +15759,8 @@ ${p2}` : p2;
       return { type: "text", raw: t2[0], text: t2[0], escaped: n };
     }
   }
-}, x = class u {
+};
+var x = class u {
   tokens;
   options;
   state;
@@ -14917,7 +15974,8 @@ ${p2}` : p2;
     }
     return t2;
   }
-}, P = class {
+};
+var P = class {
   options;
   parser;
   constructor(e) {
@@ -15043,7 +16101,8 @@ ${e}</tr>
   text(e) {
     return "tokens" in e && e.tokens ? this.parser.parseInline(e.tokens) : ("escaped" in e) && e.escaped ? e.text : w(e.text);
   }
-}, $ = class {
+};
+var $ = class {
   strong({ text: e }) {
     return e;
   }
@@ -15071,7 +16130,8 @@ ${e}</tr>
   br() {
     return "";
   }
-}, b = class u2 {
+};
+var b = class u2 {
   options;
   renderer;
   textRenderer;
@@ -15218,7 +16278,35 @@ ${e}</tr>
     }
     return n;
   }
-}, S, B = class {
+};
+var S = class {
+  options;
+  block;
+  constructor(e) {
+    this.options = e || T;
+  }
+  static passThroughHooks = new Set(["preprocess", "postprocess", "processAllTokens", "emStrongMask"]);
+  static passThroughHooksRespectAsync = new Set(["preprocess", "postprocess", "processAllTokens"]);
+  preprocess(e) {
+    return e;
+  }
+  postprocess(e) {
+    return e;
+  }
+  processAllTokens(e) {
+    return e;
+  }
+  emStrongMask(e) {
+    return e;
+  }
+  provideLexer() {
+    return this.block ? x.lex : x.lexInline;
+  }
+  provideParser() {
+    return this.block ? b.parse : b.parseInline;
+  }
+};
+var B = class {
   defaults = L();
   options = this.setOptions;
   parse = this.parseMarkdown(true);
@@ -15397,128 +16485,81 @@ Please report this to https://github.com/markedjs/marked.`, e) {
       throw n;
     };
   }
-}, _, Ht, Zt, Gt, Nt, Ft, Qt, Ut;
-var init_marked_esm = __esm(() => {
-  T = L();
-  I = { exec: () => null };
-  m = { codeRemoveIndent: /^(?: {1,4}| {0,3}\t)/gm, outputLinkReplace: /\\([\[\]])/g, indentCodeCompensation: /^(\s+)(?:```)/, beginningSpace: /^\s+/, endingHash: /#$/, startingSpaceChar: /^ /, endingSpaceChar: / $/, nonSpaceChar: /[^ ]/, newLineCharGlobal: /\n/g, tabCharGlobal: /\t/g, multipleSpaceGlobal: /\s+/g, blankLine: /^[ \t]*$/, doubleBlankLine: /\n[ \t]*\n[ \t]*$/, blockquoteStart: /^ {0,3}>/, blockquoteSetextReplace: /\n {0,3}((?:=+|-+) *)(?=\n|$)/g, blockquoteSetextReplace2: /^ {0,3}>[ \t]?/gm, listReplaceTabs: /^\t+/, listReplaceNesting: /^ {1,4}(?=( {4})*[^ ])/g, listIsTask: /^\[[ xX]\] /, listReplaceTask: /^\[[ xX]\] +/, anyLine: /\n.*\n/, hrefBrackets: /^<(.*)>$/, tableDelimiter: /[:|]/, tableAlignChars: /^\||\| *$/g, tableRowBlankLine: /\n[ \t]*$/, tableAlignRight: /^ *-+: *$/, tableAlignCenter: /^ *:-+: *$/, tableAlignLeft: /^ *:-+ *$/, startATag: /^<a /i, endATag: /^<\/a>/i, startPreScriptTag: /^<(pre|code|kbd|script)(\s|>)/i, endPreScriptTag: /^<\/(pre|code|kbd|script)(\s|>)/i, startAngleBracket: /^</, endAngleBracket: />$/, pedanticHrefTitle: /^([^'"]*[^\s])\s+(['"])(.*)\2/, unicodeAlphaNumeric: /[\p{L}\p{N}]/u, escapeTest: /[&<>"']/, escapeReplace: /[&<>"']/g, escapeTestNoEncode: /[<>"']|&(?!(#\d{1,7}|#[Xx][a-fA-F0-9]{1,6}|\w+);)/, escapeReplaceNoEncode: /[<>"']|&(?!(#\d{1,7}|#[Xx][a-fA-F0-9]{1,6}|\w+);)/g, unescapeTest: /&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/ig, caret: /(^|[^\[])\^/g, percentDecode: /%25/g, findPipe: /\|/g, splitPipe: / \|/, slashPipe: /\\\|/g, carriageReturn: /\r\n|\r/g, spaceLine: /^ +$/gm, notSpaceStart: /^\S*/, endingNewline: /\n$/, listItemRegex: (u) => new RegExp(`^( {0,3}${u})((?:[	 ][^\\n]*)?(?:\\n|$))`), nextBulletRegex: (u) => new RegExp(`^ {0,${Math.min(3, u - 1)}}(?:[*+-]|\\d{1,9}[.)])((?:[ 	][^\\n]*)?(?:\\n|$))`), hrRegex: (u) => new RegExp(`^ {0,${Math.min(3, u - 1)}}((?:- *){3,}|(?:_ *){3,}|(?:\\* *){3,})(?:\\n+|$)`), fencesBeginRegex: (u) => new RegExp(`^ {0,${Math.min(3, u - 1)}}(?:\`\`\`|~~~)`), headingBeginRegex: (u) => new RegExp(`^ {0,${Math.min(3, u - 1)}}#`), htmlBeginRegex: (u) => new RegExp(`^ {0,${Math.min(3, u - 1)}}<(?:[a-z].*>|!--)`, "i") };
-  be = /^(?:[ \t]*(?:\n|$))+/;
-  Re = /^((?: {4}| {0,3}\t)[^\n]+(?:\n(?:[ \t]*(?:\n|$))*)?)+/;
-  Te = /^ {0,3}(`{3,}(?=[^`\n]*(?:\n|$))|~{3,})([^\n]*)(?:\n|$)(?:|([\s\S]*?)(?:\n|$))(?: {0,3}\1[~`]* *(?=\n|$)|$)/;
-  E = /^ {0,3}((?:-[\t ]*){3,}|(?:_[ \t]*){3,}|(?:\*[ \t]*){3,})(?:\n+|$)/;
-  Oe = /^ {0,3}(#{1,6})(?=\s|$)(.*)(?:\n+|$)/;
-  F = /(?:[*+-]|\d{1,9}[.)])/;
-  ie = /^(?!bull |blockCode|fences|blockquote|heading|html|table)((?:.|\n(?!\s*?\n|bull |blockCode|fences|blockquote|heading|html|table))+?)\n {0,3}(=+|-+) *(?:\n+|$)/;
-  oe = h(ie).replace(/bull/g, F).replace(/blockCode/g, /(?: {4}| {0,3}\t)/).replace(/fences/g, / {0,3}(?:`{3,}|~{3,})/).replace(/blockquote/g, / {0,3}>/).replace(/heading/g, / {0,3}#{1,6}/).replace(/html/g, / {0,3}<[^\n>]+>\n/).replace(/\|table/g, "").getRegex();
-  we = h(ie).replace(/bull/g, F).replace(/blockCode/g, /(?: {4}| {0,3}\t)/).replace(/fences/g, / {0,3}(?:`{3,}|~{3,})/).replace(/blockquote/g, / {0,3}>/).replace(/heading/g, / {0,3}#{1,6}/).replace(/html/g, / {0,3}<[^\n>]+>\n/).replace(/table/g, / {0,3}\|?(?:[:\- ]*\|)+[\:\- ]*\n/).getRegex();
-  j = /^([^\n]+(?:\n(?!hr|heading|lheading|blockquote|fences|list|html|table| +\n)[^\n]+)*)/;
-  ye = /^[^\n]+/;
-  Q = /(?!\s*\])(?:\\[\s\S]|[^\[\]\\])+/;
-  Pe = h(/^ {0,3}\[(label)\]: *(?:\n[ \t]*)?([^<\s][^\s]*|<.*?>)(?:(?: +(?:\n[ \t]*)?| *\n[ \t]*)(title))? *(?:\n+|$)/).replace("label", Q).replace("title", /(?:"(?:\\"?|[^"\\])*"|'[^'\n]*(?:\n[^'\n]+)*\n?'|\([^()]*\))/).getRegex();
-  Se = h(/^( {0,3}bull)([ \t][^\n]+?)?(?:\n|$)/).replace(/bull/g, F).getRegex();
-  U = /<!--(?:-?>|[\s\S]*?(?:-->|$))/;
-  $e = h("^ {0,3}(?:<(script|pre|style|textarea)[\\s>][\\s\\S]*?(?:</\\1>[^\\n]*\\n+|$)|comment[^\\n]*(\\n+|$)|<\\?[\\s\\S]*?(?:\\?>\\n*|$)|<![A-Z][\\s\\S]*?(?:>\\n*|$)|<!\\[CDATA\\[[\\s\\S]*?(?:\\]\\]>\\n*|$)|</?(tag)(?: +|\\n|/?>)[\\s\\S]*?(?:(?:\\n[ \t]*)+\\n|$)|<(?!script|pre|style|textarea)([a-z][\\w-]*)(?:attribute)*? */?>(?=[ \\t]*(?:\\n|$))[\\s\\S]*?(?:(?:\\n[ \t]*)+\\n|$)|</(?!script|pre|style|textarea)[a-z][\\w-]*\\s*>(?=[ \\t]*(?:\\n|$))[\\s\\S]*?(?:(?:\\n[ 	]*)+\\n|$))", "i").replace("comment", U).replace("tag", v).replace("attribute", / +[a-zA-Z:_][\w.:-]*(?: *= *"[^"\n]*"| *= *'[^'\n]*'| *= *[^\s"'=<>`]+)?/).getRegex();
-  ae = h(j).replace("hr", E).replace("heading", " {0,3}#{1,6}(?:\\s|$)").replace("|lheading", "").replace("|table", "").replace("blockquote", " {0,3}>").replace("fences", " {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n").replace("list", " {0,3}(?:[*+-]|1[.)]) ").replace("html", "</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)").replace("tag", v).getRegex();
-  _e = h(/^( {0,3}> ?(paragraph|[^\n]*)(?:\n|$))+/).replace("paragraph", ae).getRegex();
-  K = { blockquote: _e, code: Re, def: Pe, fences: Te, heading: Oe, hr: E, html: $e, lheading: oe, list: Se, newline: be, paragraph: ae, table: I, text: ye };
-  re2 = h("^ *([^\\n ].*)\\n {0,3}((?:\\| *)?:?-+:? *(?:\\| *:?-+:? *)*(?:\\| *)?)(?:\\n((?:(?! *\\n|hr|heading|blockquote|code|fences|list|html).*(?:\\n|$))*)\\n*|$)").replace("hr", E).replace("heading", " {0,3}#{1,6}(?:\\s|$)").replace("blockquote", " {0,3}>").replace("code", "(?: {4}| {0,3}\t)[^\\n]").replace("fences", " {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n").replace("list", " {0,3}(?:[*+-]|1[.)]) ").replace("html", "</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)").replace("tag", v).getRegex();
-  Le = { ...K, lheading: we, table: re2, paragraph: h(j).replace("hr", E).replace("heading", " {0,3}#{1,6}(?:\\s|$)").replace("|lheading", "").replace("table", re2).replace("blockquote", " {0,3}>").replace("fences", " {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n").replace("list", " {0,3}(?:[*+-]|1[.)]) ").replace("html", "</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)").replace("tag", v).getRegex() };
-  Me = { ...K, html: h(`^ *(?:comment *(?:\\n|\\s*$)|<(tag)[\\s\\S]+?</\\1> *(?:\\n{2,}|\\s*$)|<tag(?:"[^"]*"|'[^']*'|\\s[^'"/>\\s]*)*?/?> *(?:\\n{2,}|\\s*$))`).replace("comment", U).replace(/tag/g, "(?!(?:a|em|strong|small|s|cite|q|dfn|abbr|data|time|code|var|samp|kbd|sub|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo|span|br|wbr|ins|del|img)\\b)\\w+(?!:|[^\\w\\s@]*@)\\b").getRegex(), def: /^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +(["(][^\n]+[")]))? *(?:\n+|$)/, heading: /^(#{1,6})(.*)(?:\n+|$)/, fences: I, lheading: /^(.+?)\n {0,3}(=+|-+) *(?:\n+|$)/, paragraph: h(j).replace("hr", E).replace("heading", ` *#{1,6} *[^
-]`).replace("lheading", oe).replace("|table", "").replace("blockquote", " {0,3}>").replace("|fences", "").replace("|list", "").replace("|html", "").replace("|tag", "").getRegex() };
-  ze = /^\\([!"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])/;
-  Ae = /^(`+)([^`]|[^`][\s\S]*?[^`])\1(?!`)/;
-  le = /^( {2,}|\\)\n(?!\s*$)/;
-  Ie = /^(`+|[^`])(?:(?= {2,}\n)|[\s\S]*?(?:(?=[\\<!\[`*_]|\b_|$)|[^ ](?= {2,}\n)))/;
-  D = /[\p{P}\p{S}]/u;
-  W = /[\s\p{P}\p{S}]/u;
-  ue = /[^\s\p{P}\p{S}]/u;
-  Ee = h(/^((?![*_])punctSpace)/, "u").replace(/punctSpace/g, W).getRegex();
-  pe = /(?!~)[\p{P}\p{S}]/u;
-  Ce = /(?!~)[\s\p{P}\p{S}]/u;
-  Be = /(?:[^\s\p{P}\p{S}]|~)/u;
-  qe = h(/link|code|html/, "g").replace("link", /\[(?:[^\[\]`]|(?<!`)(?<a>`+)[^`]+\k<a>(?!`))*?\]\((?:\\[\s\S]|[^\\\(\)]|\((?:\\[\s\S]|[^\\\(\)])*\))*\)/).replace("code", /(?<!`)(?<b>`+)[^`]+\k<b>(?!`)/).replace("html", /<(?! )[^<>]*?>/).getRegex();
-  ce = /^(?:\*+(?:((?!\*)punct)|[^\s*]))|^_+(?:((?!_)punct)|([^\s_]))/;
-  ve = h(ce, "u").replace(/punct/g, D).getRegex();
-  De = h(ce, "u").replace(/punct/g, pe).getRegex();
-  He = h(he, "gu").replace(/notPunctSpace/g, ue).replace(/punctSpace/g, W).replace(/punct/g, D).getRegex();
-  Ze = h(he, "gu").replace(/notPunctSpace/g, Be).replace(/punctSpace/g, Ce).replace(/punct/g, pe).getRegex();
-  Ge = h("^[^_*]*?\\*\\*[^_*]*?_[^_*]*?(?=\\*\\*)|[^_]+(?=[^_])|(?!_)punct(_+)(?=[\\s]|$)|notPunctSpace(_+)(?!_)(?=punctSpace|$)|(?!_)punctSpace(_+)(?=notPunctSpace)|[\\s](_+)(?!_)(?=punct)|(?!_)punct(_+)(?!_)(?=punct)", "gu").replace(/notPunctSpace/g, ue).replace(/punctSpace/g, W).replace(/punct/g, D).getRegex();
-  Ne = h(/\\(punct)/, "gu").replace(/punct/g, D).getRegex();
-  Fe = h(/^<(scheme:[^\s\x00-\x1f<>]*|email)>/).replace("scheme", /[a-zA-Z][a-zA-Z0-9+.-]{1,31}/).replace("email", /[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+(@)[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(?![-_])/).getRegex();
-  je = h(U).replace("(?:-->|$)", "-->").getRegex();
-  Qe = h("^comment|^</[a-zA-Z][\\w:-]*\\s*>|^<[a-zA-Z][\\w-]*(?:attribute)*?\\s*/?>|^<\\?[\\s\\S]*?\\?>|^<![a-zA-Z]+\\s[\\s\\S]*?>|^<!\\[CDATA\\[[\\s\\S]*?\\]\\]>").replace("comment", je).replace("attribute", /\s+[a-zA-Z:_][\w.:-]*(?:\s*=\s*"[^"]*"|\s*=\s*'[^']*'|\s*=\s*[^\s"'=<>`]+)?/).getRegex();
-  q = /(?:\[(?:\\[\s\S]|[^\[\]\\])*\]|\\[\s\S]|`+[^`]*?`+(?!`)|[^\[\]\\`])*?/;
-  Ue = h(/^!?\[(label)\]\(\s*(href)(?:(?:[ \t]*(?:\n[ \t]*)?)(title))?\s*\)/).replace("label", q).replace("href", /<(?:\\.|[^\n<>\\])+>|[^ \t\n\x00-\x1f]*/).replace("title", /"(?:\\"?|[^"\\])*"|'(?:\\'?|[^'\\])*'|\((?:\\\)?|[^)\\])*\)/).getRegex();
-  de = h(/^!?\[(label)\]\[(ref)\]/).replace("label", q).replace("ref", Q).getRegex();
-  ke = h(/^!?\[(ref)\](?:\[\])?/).replace("ref", Q).getRegex();
-  Ke = h("reflink|nolink(?!\\()", "g").replace("reflink", de).replace("nolink", ke).getRegex();
-  se = /[hH][tT][tT][pP][sS]?|[fF][tT][pP]/;
-  X = { _backpedal: I, anyPunctuation: Ne, autolink: Fe, blockSkip: qe, br: le, code: Ae, del: I, emStrongLDelim: ve, emStrongRDelimAst: He, emStrongRDelimUnd: Ge, escape: ze, link: Ue, nolink: ke, punctuation: Ee, reflink: de, reflinkSearch: Ke, tag: Qe, text: Ie, url: I };
-  We = { ...X, link: h(/^!?\[(label)\]\((.*?)\)/).replace("label", q).getRegex(), reflink: h(/^!?\[(label)\]\s*\[([^\]]*)\]/).replace("label", q).getRegex() };
-  N = { ...X, emStrongRDelimAst: Ze, emStrongLDelim: De, url: h(/^((?:protocol):\/\/|www\.)(?:[a-zA-Z0-9\-]+\.?)+[^\s<]*|^email/).replace("protocol", se).replace("email", /[A-Za-z0-9._+-]+(@)[a-zA-Z0-9-_]+(?:\.[a-zA-Z0-9-_]*[a-zA-Z0-9])+(?![-_])/).getRegex(), _backpedal: /(?:[^?!.,:;*_'"~()&]+|\([^)]*\)|&(?![a-zA-Z0-9]+;$)|[?!.,:;*_'"~)]+(?!$))+/, del: /^(~~?)(?=[^\s~])((?:\\[\s\S]|[^\\])*?(?:\\[\s\S]|[^\s~\\]))\1(?=[^~]|$)/, text: h(/^([`~]+|[^`~])(?:(?= {2,}\n)|(?=[a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-]+@)|[\s\S]*?(?:(?=[\\<!\[`*~_]|\b_|protocol:\/\/|www\.|$)|[^ ](?= {2,}\n)|[^a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-](?=[a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-]+@)))/).replace("protocol", se).getRegex() };
-  Xe = { ...N, br: h(le).replace("{2,}", "*").getRegex(), text: h(N.text).replace("\\b_", "\\b_| {2,}\\n").replace(/\{2,\}/g, "*").getRegex() };
-  C = { normal: K, gfm: Le, pedantic: Me };
-  M = { normal: X, gfm: N, breaks: Xe, pedantic: We };
-  Je = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
-  S = class {
-    options;
-    block;
-    constructor(e) {
-      this.options = e || T;
-    }
-    static passThroughHooks = new Set(["preprocess", "postprocess", "processAllTokens", "emStrongMask"]);
-    static passThroughHooksRespectAsync = new Set(["preprocess", "postprocess", "processAllTokens"]);
-    preprocess(e) {
-      return e;
-    }
-    postprocess(e) {
-      return e;
-    }
-    processAllTokens(e) {
-      return e;
-    }
-    emStrongMask(e) {
-      return e;
-    }
-    provideLexer() {
-      return this.block ? x.lex : x.lexInline;
-    }
-    provideParser() {
-      return this.block ? b.parse : b.parseInline;
-    }
-  };
-  _ = new B;
-  k.options = k.setOptions = function(u3) {
-    return _.setOptions(u3), k.defaults = _.defaults, G(k.defaults), k;
-  };
-  k.getDefaults = L;
-  k.defaults = T;
-  k.use = function(...u3) {
-    return _.use(...u3), k.defaults = _.defaults, G(k.defaults), k;
-  };
-  k.walkTokens = function(u3, e) {
-    return _.walkTokens(u3, e);
-  };
-  k.parseInline = _.parseInline;
-  k.Parser = b;
-  k.parser = b.parse;
-  k.Renderer = P;
-  k.TextRenderer = $;
-  k.Lexer = x;
-  k.lexer = x.lex;
-  k.Tokenizer = y;
-  k.Hooks = S;
-  k.parse = k;
-  Ht = k.options;
-  Zt = k.setOptions;
-  Gt = k.use;
-  Nt = k.walkTokens;
-  Ft = k.parseInline;
-  Qt = b.parse;
-  Ut = x.lex;
-});
+};
+var _ = new B;
+function k(u3, e) {
+  return _.parse(u3, e);
+}
+k.options = k.setOptions = function(u3) {
+  return _.setOptions(u3), k.defaults = _.defaults, G(k.defaults), k;
+};
+k.getDefaults = L;
+k.defaults = T;
+k.use = function(...u3) {
+  return _.use(...u3), k.defaults = _.defaults, G(k.defaults), k;
+};
+k.walkTokens = function(u3, e) {
+  return _.walkTokens(u3, e);
+};
+k.parseInline = _.parseInline;
+k.Parser = b;
+k.parser = b.parse;
+k.Renderer = P;
+k.TextRenderer = $;
+k.Lexer = x;
+k.lexer = x.lex;
+k.Tokenizer = y;
+k.Hooks = S;
+k.parse = k;
+var Ht = k.options;
+var Zt = k.setOptions;
+var Gt = k.use;
+var Nt = k.walkTokens;
+var Ft = k.parseInline;
+var Qt = b.parse;
+var Ut = x.lex;
 
 // lib/client/help.ts
+init_Locale();
+init_utils();
+var HELP_TEXTS = {
+  resume_home_page: `
+help(introduction, terminologie, task_list)
+  `,
+  introduction: `
+### t(help.intro.title)
+
+t(help.intro.text)
+`,
+  terminologie: `
+### t(help.term.title)
+
+*(D'abord un peu de terminologie pour bien comprendre l'aide)*
+
+t(help.term.text)
+  `,
+  task_list: `
+### t(help.task_list.title)
+
+t(help.task_list.text)
+`,
+  task_data: `
+### t(help.task_data.title)
+
+t(help.task_data.text)
+`,
+  duree_cycle_vs_duree_sess: `
+# t(help.durcycvsdursess.title)
+
+t(help.durcycvsdursess.text)
+`,
+  stop_report: `
+# t(help.stop_report.title)
+
+t(help.stop_report.text)
+`
+};
+
 class Help {
   static getInstance() {
     return this.inst || (this.inst = new Help);
@@ -15593,59 +16634,16 @@ class Help {
     listenBtn("help-toggle", this.show.bind(this, ["resume_home_page"]));
   }
 }
-var HELP_TEXTS, help;
-var init_help = __esm(() => {
-  init_marked_esm();
-  init_ui();
-  init_Locale();
-  init_utils();
-  HELP_TEXTS = {
-    resume_home_page: `
-help(introduction, terminologie, task_list)
-  `,
-    introduction: `
-### t(help.intro.title)
-
-t(help.intro.text)
-`,
-    terminologie: `
-### t(help.term.title)
-
-*(D'abord un peu de terminologie pour bien comprendre l'aide)*
-
-t(help.term.text)
-  `,
-    task_list: `
-### t(help.task_list.title)
-
-t(help.task_list.text)
-`,
-    task_data: `
-### t(help.task_data.title)
-
-t(help.task_data.text)
-`,
-    duree_cycle_vs_duree_sess: `
-# t(help.durcycvsdursess.title)
-
-t(help.durcycvsdursess.text)
-`,
-    stop_report: `
-# t(help.stop_report.title)
-
-t(help.stop_report.text)
-`
-  };
-  help = Help.getInstance();
-  help.init();
-  window.help = help;
-});
+var help = Help.getInstance();
+help.init();
+window.help = help;
 
 // lib/shared/types.ts
-var WorkProps;
-var init_types3 = __esm(() => {
-  WorkProps = ["active", "id", "project", "content", "duration", "folder", "script"];
-});
+var WorkProps = ["active", "id", "project", "content", "duration", "folder", "script"];
+
+// lib/client/editing.ts
+init_flash();
+init_utils();
 
 // node_modules/nanoid/url-alphabet/index.js
 var urlAlphabet = "useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict";
@@ -15659,9 +16657,10 @@ var nanoid = (size = 21) => {
   }
   return id;
 };
-var init_index_browser = () => {};
 
 // lib/client/editing.ts
+init_Locale();
+
 class Editing {
   get section() {
     return DGet("section#editing");
@@ -15784,6 +16783,7 @@ class Editing {
   }
   init() {
     this.observeButtons();
+    return true;
   }
   observeButtons() {
     listenBtn("editing-start", this.startEditing.bind(this));
@@ -15798,1056 +16798,9 @@ class Editing {
   constructor() {}
   _formtemp;
 }
-var editor;
-var init_editing = __esm(() => {
-  init_types3();
-  init_flash();
-  init_prefs();
-  init_ui();
-  init_utils();
-  init_index_browser();
-  init_Locale();
-  editor = Editing.getIntance();
-});
-
-// lib/client/stop_report.ts
-class EndWorkReport {
-  work;
-  inited = false;
-  constructor(work) {
-    this.work = work;
-  }
-  async writeReport() {
-    return new Promise((ok3, ko) => {
-      this.ok = ok3;
-      this.ko = ko;
-      this.open();
-    });
-  }
-  ok;
-  ko;
-  open() {
-    this.inited || this.init();
-    this.reset();
-    this.show();
-  }
-  close() {
-    this.hide();
-  }
-  onSave(ev) {
-    this.close();
-    this.ok(this.getContent());
-    ev && stopEvent(ev);
-    return false;
-  }
-  onDontSave(ev) {
-    this.close();
-    this.ok(false);
-    ev && stopEvent(ev);
-    return false;
-  }
-  onTemplate(ev) {
-    if (this.getContent().length) {
-      Flash.error(t("report.empty_content"));
-    } else {
-      this.setContent(this.TEMPLATES[0]);
-    }
-    return ev && stopEvent(ev);
-  }
-  getContent() {
-    return this.contentField.value;
-  }
-  setContent(s) {
-    this.contentField.value = s;
-  }
-  init() {
-    this.contentField.setAttribute("placeholder", t("ui.text.description_stop_report_modele"));
-    DGet("#ETR-explication", this.obj).innerText = t("ui.text.description_stop_report");
-    this.observeButtons();
-  }
-  observeButtons() {
-    listenBtn("etr-save", this.onSave.bind(this));
-    listenBtn("etr-dont-save", this.onDontSave.bind(this));
-    listenBtn("etr-template", this.onTemplate.bind(this));
-  }
-  reset() {
-    this.contentField.value = "";
-  }
-  show() {
-    this.obj.classList.remove("hidden");
-  }
-  hide() {
-    this.obj.classList.add("hidden");
-  }
-  id;
-  get contentField() {
-    return this._contfield || (this._contfield = DGet("textarea#ETR-report", this.obj));
-  }
-  get obj() {
-    return this._obj || (this._obj = DGet("div#ETR-container"));
-  }
-  _contfield;
-  _obj;
-  TEMPLATES = [
-    `
-    *(Taking up the baton for the next work session)*
-    ## Main Goal : 
-
-    ## Main Tasks :
-    - 
-    -
-    -
-
-    ## Main Usefull Files :
-    - 
-    - 
-    - 
-
-    ## Remarque
-    *(mind about this)*
-
-    ## Config Note
-    *(note about curren config or situation)*
-
-    `
-  ];
-}
-var init_stop_report = __esm(() => {
-  init_utils();
-  init_flash();
-  init_Locale();
-});
-
-// lib/client/work.ts
-class Work {
-  data;
-  static async init() {
-    const res = await this.getCurrent();
-    console.log("Retour getCurrent:", res);
-    if (res === true) {
-      editor.init();
-      Flash.notice(`${t("app.is_ready")} <span id="mes123">(${t("help.show")})</span>`);
-      DGet("span#mes123").addEventListener("click", help.show.bind(help, ["resume_home_page"]), { once: true, capture: true });
-    }
-  }
-  static currentWork;
-  static async addTimeToCurrentWork(time) {
-    if (time) {
-      await this.currentWork.addTimeAndSave(time);
-    } else {
-      Flash.error(t("times.to_short_to_be_saved"));
-    }
-  }
-  async addTimeAndSave(time) {
-    this.data.totalTime += time;
-    this.data.cycleTime += time;
-    this.data.leftTime -= time;
-    if (this.data.leftTime < 0) {
-      this.data.leftTime = 0;
-    }
-    if (this.data.cycleCount === 0) {
-      this.data.cycleCount = 1;
-      this.data.startedAt = clock.getStartTime() * 1000;
-    }
-    this.data.lastWorkedAt = clock.getStartTime() * 1000;
-    const stopReport = await new EndWorkReport(this).writeReport();
-    if (!stopReport) {
-      await Work.getCurrent();
-      return false;
-    }
-    this.data.report = stopReport;
-    console.log("[addTimeAndSave] Enregistrement des temps et du rapport", this.data);
-    const result = await postToServer("/work/save-session", this.data);
-    this.dispatchData();
-    await new Promise((resolve2) => setTimeout(resolve2, 2000));
-    Work.displayWork(result.next, result.options);
-    if (result.ok) {
-      Flash.success(t("times.saved"));
-    }
-    return true;
-  }
-  static get obj() {
-    return this._obj || (this._obj = DGet("section#current-work-container"));
-  }
-  static _obj;
-  static async getCurrent() {
-    const retour = await postToServer("/task/current", { process: "Work::getCurrent" });
-    console.log("retour:", retour);
-    if (retour.ok === false) {
-      return false;
-    }
-    if (retour.task.ok === false) {
-      Flash.error(t("task.any_active"));
-      return false;
-    } else {
-      ui.resetBackgroundColor();
-      this.displayWork(retour.task, retour.options);
-      return true;
-    }
-  }
-  static displayWork(wdata, options) {
-    this.currentWork = new Work(wdata);
-    this.currentWork.display(options);
-  }
-  constructor(data) {
-    this.data = data;
-  }
-  get id() {
-    return this.data.id;
-  }
-  get script() {
-    return this.data.script;
-  }
-  get folder() {
-    return this.data.folder;
-  }
-  get leftTime() {
-    return this.data.leftTime;
-  }
-  get cycleTime() {
-    return this.data.cycleTime;
-  }
-  get totalTime() {
-    return this.data.totalTime;
-  }
-  display(options) {
-    this.dispatchData();
-    ui.showButtons({
-      Start: true,
-      Restart: false,
-      Stop: false,
-      Pause: false,
-      Change: options.canChange,
-      runScript: !!this.data.script,
-      openFolder: !!this.data.folder
-    });
-  }
-  dispatchData() {
-    Object.entries(this.data).forEach(([k2, v2]) => {
-      v2 = ((prop, v3) => {
-        switch (prop) {
-          case "totalTime":
-          case "cycleTime":
-          case "leftTime":
-            return clock.time2horloge(v3);
-          case "report":
-            if (v3) {
-              return markdown(`---
-
-# ${t("ui.title.stop_report")}
-
-` + v3);
-            } else {
-              return "";
-            }
-          default:
-            return v3;
-        }
-      })(k2, v2);
-      const propField = this.field(k2);
-      if (propField) {
-        propField.innerHTML = v2;
-      }
-    });
-  }
-  field(prop) {
-    return Work.obj.querySelector(`#current-work-${prop}`);
-  }
-}
-var init_work = __esm(() => {
-  init_Clock();
-  init_flash();
-  init_ui();
-  init_help();
-  init_editing();
-  init_stop_report();
-  init_utils();
-  init_Locale();
-});
-
-// lib/client/activityTracker.ts
-var ActivityTracker;
-var init_activityTracker = __esm(() => {
-  init_work();
-  init_ui();
-  init_utils();
-  ActivityTracker = class ActivityTracker {
-    static CHECK_INTERVAL = 15 * 60 * 1000;
-    static timer;
-    static inactiveUser;
-    static startControl() {
-      this.timer = setInterval(this.control.bind(this), this.CHECK_INTERVAL);
-    }
-    static stopControl() {
-      if (this.timer) {
-        clearInterval(this.timer);
-        delete this.timer;
-      }
-    }
-    static inactiveUserCorrection(workingTime) {
-      console.log("Working time : ", workingTime);
-      if (this.inactiveUser) {
-        console.log("Working time rectifié : ", workingTime - this.CHECK_INTERVAL / 2 / 1000);
-        return workingTime - this.CHECK_INTERVAL / 2 / 1000;
-      } else {
-        return workingTime;
-      }
-    }
-    static async control() {
-      const result = await postToServer("/work/check-activity", {
-        projectFolder: Work.currentWork.folder,
-        lastCheck: Date.now() - this.CHECK_INTERVAL
-      });
-      if (result.ok) {
-        this.inactiveUser = result.userIsWorking === false;
-        if (this.inactiveUser) {
-          ui.onForceStop();
-        }
-      }
-    }
-  };
-});
-
-// lib/client/ui.ts
-function stopEvent2(ev) {
-  ev.stopPropagation();
-  ev.preventDefault();
-  return false;
-}
-
-class UI {
-  static instance;
-  constructor() {}
-  static getInstance() {
-    return UI.instance || (UI.instance = new UI);
-  }
-  init(data) {
-    clock.setClockStyle(data.clock);
-    clock.setCounterMode(data.counter);
-    ui.setUITheme(data.theme);
-  }
-  onStart(ev) {
-    this.mask([this.btnStart]);
-    clock.start(Work.currentWork);
-    this.reveal([this.btnStop, this.btnPause]);
-    ActivityTracker.startControl();
-  }
-  onRestart(ev) {
-    this.mask([this.btnRestart]);
-    clock.restart();
-    this.reveal([this.btnStop, this.btnPause]);
-    ActivityTracker.startControl();
-  }
-  onStop(ev) {
-    this.mask([this.btnStop, this.btnPause, this.btnRestart]);
-    this.reveal([this.btnStart]);
-    ActivityTracker.stopControl();
-    if (ev && (ev.shiftKey || ev.metaKey)) {
-      Flash.notice(t("times.dont_add_and_save"));
-    } else {
-      const workTime = ActivityTracker.inactiveUserCorrection(clock.stop());
-      Work.addTimeToCurrentWork(Math.round(workTime / 60));
-    }
-  }
-  onPause(ev) {
-    this.mask([this.btnPause]);
-    this.reveal([this.btnRestart]);
-    ActivityTracker.stopControl();
-    clock.pause();
-  }
-  setUITheme(theme) {
-    document.body.className = theme;
-  }
-  setBackgroundColorAt(color2) {
-    document.body.style.backgroundColor = color2;
-  }
-  resetBackgroundColor() {
-    document.body.style.backgroundColor = "";
-  }
-  SECTIONS = ["work", "help", "prefs", "editing"];
-  toggleSection(name) {
-    this.SECTIONS.forEach((section) => {
-      if (name === section) {
-        this.openSection(section);
-      } else {
-        this.closeSection(section);
-      }
-    });
-  }
-  toggleHelp() {
-    if (this.isSectionOpen("help")) {
-      this.toggleSection("work");
-    } else {
-      this.toggleSection("help");
-    }
-  }
-  isSectionOpen(name) {
-    return !DGet("section#" + name).classList.contains("hidden");
-  }
-  mask(eList) {
-    eList.forEach((e) => e.obj.classList.add("hidden"));
-  }
-  reveal(eList) {
-    eList.forEach((e) => e.obj.classList.remove("hidden"));
-  }
-  showButtons(states) {
-    this.buttons.forEach((bouton) => bouton.setState(states[bouton.id]));
-  }
-  closeSection(name) {
-    DGet("section#" + name).classList.add("hidden");
-  }
-  openSection(name) {
-    DGet("section#" + name).classList.remove("hidden");
-  }
-  onForceStop() {
-    this.onStop(undefined);
-  }
-  async onChange(ev) {
-    ev && stopEvent2(ev);
-    const curwork = Work.currentWork;
-    const result = await postToServer("/task/change", { workId: curwork.id });
-    if (result.ok === false) {
-      Flash.error(t("error.occurred", [result.error]));
-    }
-    return false;
-  }
-  async onRunScript(ev) {
-    ev && stopEvent2(ev);
-    const curwork = Work.currentWork;
-    const result = await postToServer("/task/run-script", { workId: curwork.id, script: curwork.script });
-    if (result.ok) {
-      Flash.success(t("script.ran_successfully"));
-    } else {
-      Flash.error(t("error.occurred", [result.error]));
-    }
-    return false;
-  }
-  async onOpenFolder(ev) {
-    ev && stopEvent2(ev);
-    const curwork = Work.currentWork;
-    const result = await postToServer("/task/open-folder", { workId: curwork.id, folder: curwork.folder });
-    if (result.ok) {
-      Flash.success(t("folder.opened_in_finder"));
-    } else {
-      Flash.error(t("error.occurred", [result.error]));
-    }
-    return false;
-  }
-  btnStart;
-  btnRestart;
-  btnPause;
-  btnStop;
-  btnChange;
-  btnRunScript;
-  btnOpenFolder;
-  get buttons() {
-    this._buttons || this.instancieButtons();
-    return this._buttons;
-  }
-  _buttons;
-  instancieButtons() {
-    console.log("-> Instanciation des boutons");
-    this._buttons = this.DATA_BUTTONS.map((bdata) => {
-      let id, name, onclick, hidden, row, title;
-      [id, name, onclick, hidden, row, title] = bdata;
-      this[`btn${id}`] = new Button({ id, name, onclick, hidden, row, title }).build();
-      return this[`btn${id}`];
-    });
-  }
-  get DATA_BUTTONS() {
-    return this.databuts || (this.databuts = this.getDataButtons());
-  }
-  databuts;
-  getDataButtons() {
-    return [
-      [
-        "runScript",
-        t("ui.button.run"),
-        this.onRunScript.bind(this),
-        false,
-        2,
-        t("ui.text.to_run_script")
-      ],
-      [
-        "openFolder",
-        t("ui.button.open_project"),
-        this.onOpenFolder.bind(this),
-        false,
-        2,
-        t("ui.text.to_open_project_folder")
-      ],
-      [
-        "Change",
-        t("ui.button.change"),
-        this.onChange.bind(this),
-        false,
-        2,
-        t("ui.text.to_choose_another_task")
-      ],
-      [
-        "Stop",
-        t("ui.button.stop"),
-        this.onStop.bind(this),
-        true,
-        1,
-        t("ui.text.to_stop_and_next")
-      ],
-      [
-        "Pause",
-        t("ui.button.pause"),
-        this.onPause.bind(this),
-        true,
-        1,
-        t("ui.text.to_pause_the_task")
-      ],
-      [
-        "Start",
-        t("ui.button.start"),
-        this.onStart.bind(this),
-        false,
-        1,
-        t("ui.text.to_start_working_on_task")
-      ],
-      [
-        "Restart",
-        t("ui.button.restart"),
-        this.onRestart.bind(this),
-        true,
-        1,
-        t("ui.text.to_restart_work_on_task")
-      ]
-    ];
-  }
-}
-
-class Button {
-  data;
-  static get container() {
-    return this._container || (this._container = document.body.querySelector("div#buttons-container"));
-  }
-  static _container;
-  _obj;
-  constructor(data) {
-    this.data = data;
-  }
-  setState(state) {
-    this[state ? "show" : "hide"]();
-  }
-  onClick(ev) {
-    this.data.onclick(ev);
-    return stopEvent2(ev);
-  }
-  build() {
-    const o = document.createElement("BUTTON");
-    o.innerHTML = this.data.name;
-    o.id = `btn-${this.id}`;
-    o.setAttribute("title", this.data.title);
-    o.addEventListener("click", this.onClick.bind(this));
-    Button.container.querySelector(`div#row${this.data.row}`).appendChild(o);
-    this._obj = o;
-    if (this.data.hidden) {
-      this.hide();
-    } else {
-      this.show();
-    }
-    return this;
-  }
-  show() {
-    this.obj.classList.remove("hidden");
-  }
-  hide() {
-    this.obj.classList.add("hidden");
-  }
-  get id() {
-    return this.data.id;
-  }
-  get obj() {
-    return this._obj;
-  }
-}
-var ui;
-var init_ui = __esm(() => {
-  init_Clock();
-  init_work();
-  init_activityTracker();
-  init_flash();
-  init_Locale();
-  init_utils();
-  ui = UI.getInstance();
-});
-
-// lib/client/Clock.ts
-class Clock {
-  static getInstance() {
-    return this._instance || (this._instance = new Clock);
-  }
-  static _instance;
-  constructor() {}
-  counterMode;
-  time2horloge(mn) {
-    let hrs = Math.floor(mn / 60);
-    let mns = Math.round(mn % 60);
-    let horloge = [];
-    horloge.push(`${hrs}`);
-    horloge.push(`${mns > 9 ? "" : "0"}${mns}’`);
-    return horloge.join(" h ");
-  }
-  get clockContainer() {
-    return this._clockcont || (this._clockcont = DGet("div#clock-container"));
-  }
-  _clockcont;
-  setClockStyle(style) {
-    this.clockContainer.className = style;
-  }
-  setCounterMode(mode = "clock") {
-    this.counterMode = mode;
-  }
-  currentWork;
-  timer;
-  startTime;
-  totalTime;
-  currentTimeSegment;
-  timeSegments = [];
-  getTime() {
-    return Math.round(new Date().getTime() / 1000);
-  }
-  start(currentWork) {
-    this.currentWork = currentWork;
-    this.timeSegments = [];
-    this.clockContainer.classList.remove("hidden");
-    this.clockObj.innerHTML = this.startClockPerCounterMode();
-    this.createTimeSegment();
-    this.calcTotalRecTime();
-    this.startTimer();
-  }
-  startClockPerCounterMode() {
-    if (this.counterMode === "clock") {
-      return "0:00:00";
-    } else {
-      return this.s2h(this.currentWork.leftTime * 60);
-    }
-  }
-  get totalRestTimeSeconds() {
-    return this._totresttime || (this._totresttime = this.currentWork.leftTime * 60);
-  }
-  _totresttime;
-  calcTotalRecTime() {
-    this.totalTime = this.timeSegments.filter((segTime) => !!segTime.laps).reduce((accu, segTime) => accu + segTime.laps, 0);
-  }
-  restart() {
-    this.createTimeSegment();
-    this.clockContainer.classList.remove("hidden");
-    this.startTimer();
-  }
-  startTimer() {
-    this.startTime = this.getTime();
-    this.timer = setInterval(this.run.bind(this), 1000);
-  }
-  createTimeSegment() {
-    this.currentTimeSegment = { beg: this.getTime(), end: undefined, laps: undefined };
-  }
-  endCurrentTimeSegment() {
-    const end = this.getTime();
-    const laps = end - this.currentTimeSegment.beg;
-    Object.assign(this.currentTimeSegment, { end, laps });
-    this.timeSegments.push(this.currentTimeSegment);
-    delete this.currentTimeSegment;
-    this.calcTotalRecTime();
-  }
-  getStartTime() {
-    return this.startTime;
-  }
-  pause() {
-    this.endCurrentTimeSegment();
-    clearInterval(this.timer);
-  }
-  stop() {
-    clearInterval(this.timer);
-    delete this.timer;
-    this.endCurrentTimeSegment();
-    this.clockContainer.classList.add("hidden");
-    return this.totalTime;
-  }
-  run() {
-    const secondesOfWork = this.totalTime + this.lapsFromStart();
-    let displayedSeconds;
-    if (this.counterMode === "clock") {
-      displayedSeconds = secondesOfWork;
-    } else {
-      displayedSeconds = this.totalRestTimeSeconds - secondesOfWork;
-    }
-    const leftTime = this.taskRestTime(secondesOfWork);
-    this.clockObj.innerHTML = this.s2h(displayedSeconds);
-    if (secondesOfWork % 60 === 0) {
-      const thisMinute = Math.round(secondesOfWork / 60);
-      const elapsedMinutes = this.currentWork.cycleTime + thisMinute;
-      const totalMinutes = this.currentWork.totalTime + thisMinute;
-      this.restTimeField.innerHTML = this.time2horloge(leftTime);
-      this.cycleTimeField.innerHTML = this.time2horloge(elapsedMinutes);
-      this.totalTimeField.innerHTML = this.time2horloge(totalMinutes);
-    }
-    if (leftTime < 10 && this.alerte10minsDone === false) {
-      this.donneAlerte10mins();
-    } else if (this.alerte10minsDone) {
-      if (this.alerteWorkDone === false && leftTime < 0) {
-        this.donneAlerteWorkDone();
-      }
-    }
-  }
-  get restTimeField() {
-    return this._restfield || (this._restfield = DGet("span#current-work-leftTime"));
-  }
-  get cycleTimeField() {
-    return this._cycledurfield || (this._cycledurfield = DGet("span#current-work-cycleTime"));
-  }
-  get totalTimeField() {
-    return this._totalfield || (this._totalfield = DGet("span#current-work-totalTime"));
-  }
-  alerte10minsDone = false;
-  alerteWorkDone = false;
-  donneAlerte10mins() {
-    ui.setBackgroundColorAt("orange");
-    this.bringAppToFront();
-    Flash.notice("10 minutes of work remaining");
-    this.alerte10minsDone = true;
-  }
-  donneAlerteWorkDone() {
-    this.bringAppToFront();
-    Flash.notice("Work time is over. Please move on to the next task.");
-    this.alerteWorkDone = true;
-  }
-  taskRestTime(minutesOfWork) {
-    minutesOfWork = minutesOfWork / 60;
-    return this.currentWork.leftTime - minutesOfWork;
-  }
-  lapsFromStart() {
-    return Math.round(this.getTime() - this.startTime);
-  }
-  get clockObj() {
-    return this._clockobj || (this._clockobj = DGet("#clock"));
-  }
-  _clockobj;
-  s2h(s) {
-    let h2 = Math.floor(s / 3600);
-    s = s % 3600;
-    let m2 = Math.floor(s / 60);
-    const mstr = m2 < 10 ? `0${m2}` : String(m2);
-    s = s % 60;
-    const sstr = s < 10 ? `0${s}` : String(s);
-    return `${h2}:${mstr}:${sstr}`;
-  }
-  bringAppToFront() {
-    window.electronAPI.bringToFront();
-  }
-  _restfield;
-  _cycledurfield;
-  _totalfield;
-}
-var clock;
-var init_Clock = __esm(() => {
-  init_ui();
-  init_flash();
-  clock = Clock.getInstance();
-});
-
-// lib/client/tools.ts
-class Tools {
-  get TOOLS_DATA() {
-    return [
-      {
-        name: t("ui.tool.reset_cycle.name"),
-        description: t("ui.tool.reset_cycle.desc"),
-        method: this.resetCycle.bind(this)
-      },
-      {
-        name: t("ui.tool.manual.open.name"),
-        description: t("ui.tool.manual.open.desc"),
-        method: this.openManual.bind(this)
-      },
-      {
-        name: t("ui.tool.manual.produce.name"),
-        description: t("ui.tool.manual.produce.desc"),
-        method: this.produceManual.bind(this)
-      }
-    ];
-  }
-  async resetCycle(ev) {
-    ev && stopEvent(ev);
-    const retour = await postToServer("/tool/reset-cycle", { process: t("ui.tool.reset_cycle.name") });
-    if (retour.ok) {
-      Flash.success(t("tool.cycle_reset"));
-      ui.toggleSection("work");
-      await Work.getCurrent();
-    }
-  }
-  async openManual(ev) {
-    stopEvent(ev);
-  }
-  async openManual_server(data, response) {
-    let ok3 = true, error = undefined;
-    response.json(Object.assign(data, { ok: ok3, error }));
-  }
-  async produceManual(ev) {
-    stopEvent(ev);
-  }
-  async produceManual_server(data, response) {
-    let ok3 = true, error = undefined;
-    response.json(Object.assign(data, { ok: ok3, error }));
-  }
-  init() {}
-  build() {
-    if (this.built) {
-      return;
-    }
-    const cont = this.container;
-    this.TOOLS_DATA.forEach((dtool) => {
-      const o = document.createElement("DIV");
-      o.className = "tool-container";
-      const a = document.createElement("A");
-      a.innerHTML = dtool.name;
-      const d = document.createElement("DIV");
-      d.innerHTML = dtool.description;
-      d.className = "explication";
-      o.appendChild(a);
-      o.appendChild(d);
-      cont.appendChild(o);
-      a.addEventListener("click", dtool.method);
-    });
-    this.built = true;
-  }
-  get container() {
-    return DGet("#tools-container");
-  }
-  built = false;
-  static getInstance() {
-    return this.inst || (this.inst = new Tools);
-  }
-  constructor() {}
-  static inst;
-}
-var tools;
-var init_tools = __esm(() => {
-  init_Locale();
-  init_flash();
-  init_ui();
-  init_utils();
-  init_work();
-  tools = Tools.getInstance();
-});
-
-// lib/client/prefs.ts
-var exports_prefs = {};
-__export(exports_prefs, {
-  prefs: () => prefs,
-  Prefs: () => Prefs
-});
-
-class Prefs {
-  data;
-  fieldsReady = false;
-  static inst;
-  constructor() {}
-  static getInstance() {
-    return this.inst || (this.inst = new Prefs);
-  }
-  async init() {
-    const retour = await postToServer("/prefs/load", { process: "Prefs.init" });
-    if (retour.ok) {
-      this.setData(retour.prefs);
-      this.observeButtons();
-      tools.init();
-    }
-  }
-  getLang() {
-    return this.data.lang || "en";
-  }
-  getSavedData() {
-    return this.data;
-  }
-  async onOpenDataFile(ev) {
-    stopEvent(ev);
-    const result = await postToServer("/prefs/open-data-file", {
-      filePath: this.getValue("file")
-    });
-    if (result.ok) {
-      Flash.success(t("data_file.open_with_sucess"));
-    } else {
-      Flash.error(t("error.occurred", result.error));
-    }
-  }
-  async onSave(ev) {
-    stopEvent(ev);
-    const result = await postToServer("/prefs/save", this.getData());
-    if (result.ok) {
-      this.close();
-      Flash.success(t("prefs.saved"));
-    } else {
-      Flash.error(result.errors);
-    }
-    return false;
-  }
-  onChangePref(prop, ev) {
-    const value = this.getValue(prop);
-    switch (prop) {
-      case "clock":
-        clock.setClockStyle(value);
-        break;
-      case "counter":
-        clock.setCounterMode(value);
-        break;
-      case "theme":
-        ui.setUITheme(value);
-        break;
-      default:
-    }
-  }
-  onOpen(ev) {
-    tools.build();
-    this.open();
-    return stopEvent(ev);
-  }
-  onClose(ev) {
-    this.close();
-    return stopEvent(ev);
-  }
-  setData(data) {
-    this.data = data;
-    this.fieldsReady || this.observeFields();
-    Object.entries(this.data).forEach(([k2, v2]) => {
-      this.setValue(k2, v2);
-    });
-  }
-  getData() {
-    Object.entries(this.data).forEach(([k2, _v]) => {
-      Object.assign(this.data, { [k2]: this.getValue(k2) });
-    });
-    return this.data;
-  }
-  getValue(prop) {
-    switch (prop) {
-      case "random":
-        return this.field("random").checked;
-      default:
-        return this.field(prop).value;
-    }
-  }
-  setValue(prop, value) {
-    switch (prop) {
-      case "random":
-        this.field("random").checked = value;
-        break;
-      default:
-        this.field(prop).value = value;
-    }
-  }
-  field(key2) {
-    return DGet(`#prefs-${key2}`) || console.error(t("error.unfound_field", [`prefs-${key2}`]));
-  }
-  close() {
-    ui.openSection("work");
-    ui.closeSection("prefs");
-  }
-  open() {
-    ui.openSection("prefs");
-    ui.closeSection("work");
-  }
-  observeButtons() {
-    listenBtn("prefs", this.onOpen.bind(this));
-    listenBtn("close-prefs", this.onClose.bind(this));
-    listenBtn("save-prefs", this.onSave.bind(this));
-    listenBtn("open-datafile", this.onOpenDataFile.bind(this));
-  }
-  observeFields() {
-    Object.keys(this.data).forEach((prop) => {
-      this.field(prop).addEventListener("change", this.onChangePref.bind(this, prop));
-    });
-    this.fieldsReady = true;
-  }
-}
-var prefs;
-var init_prefs = __esm(() => {
-  init_Clock();
-  init_flash();
-  init_ui();
-  init_utils();
-  init_Locale();
-  init_tools();
-  prefs = Prefs.getInstance();
-});
-
-// lib/shared/Locale.ts
-var {readFileSync} = (() => ({}));
-function t(route, params) {
-  if (params) {
-    let template = loc.translate(route);
-    for (var i2 in params) {
-      const regexp = new RegExp(`_${i2}_`, "g");
-      template = template.replace(regexp, params[i2]);
-    }
-    return template;
-  } else {
-    return loc.translate(route);
-  }
-}
-function tt(text5) {
-  return loc.translateText(text5);
-}
-
-class Locale {
-  BASEFILES = ["messages", "ui", "help"];
-  getLocales() {
-    return this.locales;
-  }
-  translateText(texte) {
-    return texte.replace(/\bt\((.+?)\)/g, this.replacementMethod.bind(this));
-  }
-  translate(route) {
-    const translated = route.split(".").reduce((obj, key2) => obj?.[key2], this.locales);
-    return typeof translated === "string" ? translated : `[LOC: ${route}]`;
-  }
-  replacementMethod(tout, route) {
-    return this.translate(route);
-  }
-  async init(lang) {
-    if (typeof window === "undefined") {
-      this.locales = {};
-      const folderLang = path_default.join(LOCALES_FOLDER, lang);
-      this.BASEFILES.forEach((base) => {
-        const pathLocale = path_default.join(folderLang, `${base}.yaml`);
-        Object.assign(this.locales, js_yaml_default.load(readFileSync(pathLocale, "utf8")));
-      });
-    } else {
-      const { postToServer: postToServer2 } = await Promise.resolve().then(() => (init_utils(), exports_utils));
-      const { prefs: prefs2 } = await Promise.resolve().then(() => (init_prefs(), exports_prefs));
-      const { Flash: Flash2 } = await Promise.resolve().then(() => (init_flash(), exports_flash));
-      const retour = await postToServer2("/localization/get-all", { lang: prefs2.getLang() });
-      if (retour.ok) {
-        this.locales = retour.locales;
-      }
-    }
-  }
-  locales;
-  constructor() {}
-  static getInstance() {
-    return this.inst || (this.inst = new Locale);
-  }
-  static inst;
-}
-var __dirname = "/Users/philippeperret/Programmes/EqualTaskCycle/lib/shared", LOCALES_FOLDER, loc;
-var init_Locale = __esm(() => {
-  init_path();
-  init_js_yaml();
-  LOCALES_FOLDER = path_default.resolve(path_default.join(__dirname, "..", "locales"));
-  loc = Locale.getInstance();
-});
+var editor = Editing.getIntance();
 
 // lib/client/main.ts
-var import_renderer = __toESM(require_renderer2(), 1);
-init_Locale();
-init_prefs();
-init_work();
-init_ui();
-
 class Client {
   async init() {
     import_renderer.default.info("=== INITIALISATION CLIENT ===");
@@ -16858,12 +16811,25 @@ class Client {
     ui.init(prefs.getSavedData());
     import_renderer.default.info("  -- ok");
     import_renderer.default.info("Locales init…");
-    await loc.init(prefs.getLang());
-    import_renderer.default.info("  -- ok");
+    if (await loc.init(prefs.getLang())) {
+      import_renderer.default.info("  -- ok");
+    } else {
+      import_renderer.default.info("Un problème est servenu avec les locales…");
+    }
     import_renderer.default.info("Work init…");
-    await Work.init();
-    import_renderer.default.info("  -- ok");
-    import_renderer.default.info("JE DOIS POURSUIVRE L'INITIALISATION");
+    if (await Work.init()) {
+      import_renderer.default.info("  -- ok");
+    } else {
+      import_renderer.default.info("Problem avec Work.init");
+    }
+    import_renderer.default.info("Editor init…");
+    if (editor.init()) {
+      import_renderer.default.info("  --ok");
+    } else {
+      import_renderer.default.info("Problem with Editor init");
+    }
+    Flash.notice(`${t("app.is_ready")} <span id="mes123">(${t("help.show")})</span>`);
+    DGet("span#mes123").addEventListener("click", help.show.bind(help, ["resume_home_page"]), { once: true, capture: true });
   }
   static inst;
   constructor() {}

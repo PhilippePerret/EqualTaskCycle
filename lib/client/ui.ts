@@ -24,12 +24,9 @@ interface ButtonType {
 
 
 export class UI {
-
-  private static instance: UI;
+  private static inst: UI;
   private constructor(){}
-  public static getInstance(){
-    return UI.instance || (UI.instance = new UI());
-  }
+  public static getInst(){return UI.inst || (UI.inst = new UI())}
 
   public init(data: RecType){
     clock.setClockStyle(data.clock);
@@ -295,4 +292,4 @@ class Button {
 
 
 
-export const ui = UI.getInstance();
+export const ui = UI.getInst();

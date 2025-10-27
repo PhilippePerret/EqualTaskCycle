@@ -46,13 +46,13 @@ function startAServer(){
   server.on('error', (err) => console.error('SERVER FAILED TO START:', err));
   server.on('exit', (code, signal) => {
     console.log('SERVER EXITED - code:', code, 'signal:', signal);
+  });
+  server.on('close', (code, signal) => {
+    console.log('SERVER CLOSED - code:', code, 'signal:', signal);
     if (signal === 'SIGTRAP' || code !== 0) {
       console.log('Restarting server...');
       setTimeout(() => { startAServer()}, 1000);
     }
-  });
-  server.on('close', (code, signal) => {
-    console.log('SERVER CLOSED - code:', code, 'signal:', signal);
   });
 } // startAServer
 

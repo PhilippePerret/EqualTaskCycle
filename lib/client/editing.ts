@@ -148,6 +148,7 @@ class Editing {
 
   init(){
     this.observeButtons()
+    return true;
   }
 
   private observeButtons(){

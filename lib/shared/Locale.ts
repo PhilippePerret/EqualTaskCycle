@@ -71,7 +71,7 @@ class Locale {
    * Initialisation des locales
    * Consiste principalement à charger le fichier des locales
    */
-  public async init(lang: string){
+  public async init(lang: string): Promise<boolean> {
     // console.log("Initialisation des locales (%s)", lang);
     if ( typeof window === 'undefined' /* server side */) {
       this.locales = {}
@@ -80,13 +80,15 @@ class Locale {
         const pathLocale = path.join(folderLang, `${base}.yaml`)
         Object.assign(this.locales, yaml.load(readFileSync(pathLocale, 'utf8')));
       })
+      return true;
     } else /* client side */ {
       const { postToServer } = await import("./utils");
-      const { prefs } = await import("../client/prefs");
-      const { Flash } = await import("../../public/js/flash");
-
-      const retour = await postToServer('/localization/get-all', {lang: prefs.getLang()});
-      if (retour.ok) { this.locales = retour.locales }
+      const retour = await postToServer('/localization/get-all', {lang: lang});
+      if (retour.ok) { 
+        console.log("Locales remontées : ", retour.locales);
+        this.locales = retour.locales 
+      }
+      return retour.ok;
     }
     // console.log("Toutes les locales : ", this.locales);
   }

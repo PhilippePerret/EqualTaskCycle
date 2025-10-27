@@ -19,17 +19,10 @@ export class Work {
    * Point d'entrée de l'application au niveau client.
    * 
    */
-  public static async init(){
+  public static async init(): Promise<boolean>{
     const res = await this.getCurrent();
     console.log("Retour getCurrent:", res);
-    if (res === true) {
-      editor.init();
-      Flash.notice(`${t('app.is_ready')} <span id="mes123">(${t('help.show')})</span>`)
-      DGet('span#mes123').addEventListener('click', 
-        help.show.bind(help, ['resume_home_page']),
-        {once: true, capture: true}
-      )
-    }
+    return (res as any).ok;
   }
 
   public static currentWork: Work;
