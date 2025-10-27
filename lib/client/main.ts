@@ -10,6 +10,9 @@ import { editor } from './editing';
 
 class Client { /* singleton */
 
+  private initObjetSync(objet: any){}
+
+
   public async init(){
     log.info("=== INITIALISATION CLIENT ===");
     log.info('Prefs init…');
@@ -27,7 +30,10 @@ class Client { /* singleton */
     log.info('Editor init…');
     if (editor.init()) { log.info('  --ok')}
     else { log.info('Problem with Editor init') }
-    
+    log.info('Help init…');
+    if (help.init()) { log.info('  -- ok')}
+    else {log.info('Problem with help.init')}
+
     Flash.notice(`${t('app.is_ready')} <span id="mes123">(${t('help.show')})</span>`)
     DGet('span#mes123').addEventListener('click', 
       help.show.bind(help, ['resume_home_page']),

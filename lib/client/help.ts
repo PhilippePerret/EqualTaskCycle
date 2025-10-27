@@ -69,14 +69,16 @@ t(help.stop_report.text)
 }
 
 
-class Help {
-  public static getInstance(){return this.inst || (this.inst = new Help())}
+class Help { /* singleton */
+  private constructor(){}
+  public static getInst(){return this.inst || (this.inst = new Help())}
   private static inst: Help;
 
   private texts!: string[];
 
   public async show(helpIds: string[]){
     this.isOpened() || ui.toggleHelp();
+    this.content.innerHTML = '';
     this.texts = helpIds.map((helpId: string) => {
       let texte = HELP_TEXTS[helpId];
       // Est-ce un texte contenant d'autres textes d'aide ?
@@ -144,13 +146,12 @@ class Help {
     return this._content || (this._content = DGet('div#help-content', DGet('section#help')) as HTMLDivElement);
   }; private _content!: HTMLDivElement;
 
-  public init(){
+  public init(): boolean {
     DGet('button.btn-close-help').addEventListener('click', this.close.bind(this));
     listenBtn('help-toggle', this.show.bind(this, ['resume_home_page']));
+    return true;
   }
 }
 
-export const help = Help.getInstance();
-
-help.init();
+export const help = Help.getInst();
 (window as any).help = help;

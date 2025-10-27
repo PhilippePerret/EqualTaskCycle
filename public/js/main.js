@@ -16573,13 +16573,15 @@ t(help.stop_report.text)
 };
 
 class Help {
-  static getInstance() {
+  constructor() {}
+  static getInst() {
     return this.inst || (this.inst = new Help);
   }
   static inst;
   texts;
   async show(helpIds) {
     this.isOpened() || ui.toggleHelp();
+    this.content.innerHTML = "";
     this.texts = helpIds.map((helpId) => {
       let texte = HELP_TEXTS[helpId];
       if (texte.indexOf("help(")) {
@@ -16644,10 +16646,10 @@ class Help {
   init() {
     DGet("button.btn-close-help").addEventListener("click", this.close.bind(this));
     listenBtn("help-toggle", this.show.bind(this, ["resume_home_page"]));
+    return true;
   }
 }
-var help = Help.getInstance();
-help.init();
+var help = Help.getInst();
 window.help = help;
 
 // lib/shared/types.ts
@@ -16814,6 +16816,7 @@ var editor = Editing.getIntance();
 
 // lib/client/main.ts
 class Client {
+  initObjetSync(objet) {}
   async init() {
     import_renderer.default.info("=== INITIALISATION CLIENT ===");
     import_renderer.default.info("Prefs init…");
@@ -16839,6 +16842,12 @@ class Client {
       import_renderer.default.info("  --ok");
     } else {
       import_renderer.default.info("Problem with Editor init");
+    }
+    import_renderer.default.info("Help init…");
+    if (help.init()) {
+      import_renderer.default.info("  -- ok");
+    } else {
+      import_renderer.default.info("Problem with help.init");
     }
     Flash.notice(`${t("app.is_ready")} <span id="mes123">(${t("help.show")})</span>`);
     DGet("span#mes123").addEventListener("click", help.show.bind(help, ["resume_home_page"]), { once: true, capture: true });
