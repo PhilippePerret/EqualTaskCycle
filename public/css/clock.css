@@ -67,6 +67,10 @@ div#clock-container.mini div#clock {
 body.dark div#clock {
   color: rgb(56, 207, 53);
 }
+body.dark div#clock-container.big div#clock {
+  color: rgb(84 90 233);
+}
+
 body.light div#clock {
   color:rgb(63 90 202);
 }
