@@ -1452,7 +1452,6 @@ class Clock {
   pause() {
     this.endCurrentTimeSegment();
     clearInterval(this.timer);
-    this.clockContainer.classList.add("hidden");
   }
   stop() {
     clearInterval(this.timer);
