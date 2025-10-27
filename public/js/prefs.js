@@ -14339,7 +14339,13 @@ class Clock {
   }
   _clockcont;
   setClockStyle(style) {
-    this.clockContainer.className = style;
+    ["mini", "medium", "big"].forEach((sty) => {
+      if (sty === style) {
+        this.clockContainer.classList.add(style);
+      } else {
+        this.clockContainer.classList.remove(sty);
+      }
+    });
   }
   setCounterMode(mode = "clock") {
     this.counterMode = mode;
