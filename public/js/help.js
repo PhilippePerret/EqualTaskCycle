@@ -13663,7 +13663,6 @@ class Locale {
       const { postToServer } = await Promise.resolve().then(() => (init_utils(), exports_utils));
       const retour = await postToServer("/localization/get-all", { lang });
       if (retour.ok) {
-        console.log("Locales remontées : ", retour.locales);
         this.locales = retour.locales;
       }
       return retour.ok;
@@ -15590,8 +15589,6 @@ class UI {
     const result = await postToServer("/task/run-script", { workId: curwork.id, script: curwork.script });
     if (result.ok) {
       Flash.success(t("script.ran_successfully"));
-    } else {
-      Flash.error(t("error.occurred", [result.error]));
     }
     return false;
   }
@@ -15601,8 +15598,6 @@ class UI {
     const result = await postToServer("/task/open-folder", { workId: curwork.id, folder: curwork.folder });
     if (result.ok) {
       Flash.success(t("folder.opened_in_finder"));
-    } else {
-      Flash.error(t("error.occurred", [result.error]));
     }
     return false;
   }

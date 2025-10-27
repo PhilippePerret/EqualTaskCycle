@@ -51,7 +51,7 @@ class Editing {
     const container = this.taskContainer;
     container.innerHTML = '';
     const retour: RecType = await postToServer('/tasks/all', {dataPath: prefs.getValue('file')});
-    if (retour.ok === false ) { return Flash.error(retour.error) }
+    if (retour.ok === false ) { return }
     // --- TACHES/WORKS ---
     const works = retour.works;
     // Indiquer le nombre de tâches
@@ -136,9 +136,7 @@ class Editing {
 
   private async onSaveData(){
     const retour = await postToServer('/tasks/save', this.collectTaskData());
-    if (retour.ok){
-      Flash.success(t('task.saved'));
-    }
+    if (retour.ok){ Flash.success(t('task.saved')); }
   }
 
   // Pour finir l'édition et revenir au panneau principal

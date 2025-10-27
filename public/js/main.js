@@ -14327,7 +14327,6 @@ class Locale {
       const { postToServer: postToServer2 } = await Promise.resolve().then(() => (init_utils(), exports_utils));
       const retour = await postToServer2("/localization/get-all", { lang });
       if (retour.ok) {
-        console.log("Locales remontées : ", retour.locales);
         this.locales = retour.locales;
       }
       return retour.ok;
@@ -14754,8 +14753,6 @@ class UI {
     const result = await postToServer("/task/run-script", { workId: curwork.id, script: curwork.script });
     if (result.ok) {
       Flash.success(t("script.ran_successfully"));
-    } else {
-      Flash.error(t("error.occurred", [result.error]));
     }
     return false;
   }
@@ -14765,8 +14762,6 @@ class UI {
     const result = await postToServer("/task/open-folder", { workId: curwork.id, folder: curwork.folder });
     if (result.ok) {
       Flash.success(t("folder.opened_in_finder"));
-    } else {
-      Flash.error(t("error.occurred", [result.error]));
     }
     return false;
   }
@@ -15197,8 +15192,6 @@ class Prefs {
     });
     if (result.ok) {
       Flash.success(t("data_file.open_with_sucess"));
-    } else {
-      Flash.error(t("error.occurred", result.error));
     }
   }
   async onSave(ev) {
@@ -15207,8 +15200,6 @@ class Prefs {
     if (result.ok) {
       this.close();
       Flash.success(t("prefs.saved"));
-    } else {
-      Flash.error(result.errors);
     }
     return false;
   }
@@ -16712,7 +16703,7 @@ class Editing {
     container.innerHTML = "";
     const retour = await postToServer("/tasks/all", { dataPath: prefs.getValue("file") });
     if (retour.ok === false) {
-      return Flash.error(retour.error);
+      return;
     }
     const works = retour.works;
     DGet("span#tasks-count", this.section).innerHTML = works.length;

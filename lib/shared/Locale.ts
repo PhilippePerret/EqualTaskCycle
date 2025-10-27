@@ -85,7 +85,7 @@ class Locale {
       const { postToServer } = await import("./utils");
       const retour = await postToServer('/localization/get-all', {lang: lang});
       if (retour.ok) { 
-        console.log("Locales remontées : ", retour.locales);
+        // console.log("Locales remontées : ", retour.locales);
         this.locales = retour.locales 
       }
       return retour.ok;

@@ -38,7 +38,6 @@ export class Prefs { /* singleton */
       filePath: this.getValue('file')
     })
     if (result.ok) { Flash.success(t('data_file.open_with_sucess')) } 
-    else { Flash.error(t('error.occurred', result.error)) }
   }
 
   /**
@@ -51,8 +50,6 @@ export class Prefs { /* singleton */
     if (result.ok) {
       this.close();
       Flash.success(t('prefs.saved'))
-    } else {
-      Flash.error(result.errors);
     }
     return false;
   }
