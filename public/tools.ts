@@ -1,7 +1,9 @@
 import { t } from "../lib/Locale.js";
 import { DGet, stopEvent } from "./js/dom.js";
 import { Flash } from "./js/flash.js";
+import { ui } from "./ui.js";
 import { postToServer } from "./utils.js";
+import { Work } from "./work_client.js";
 
 interface ToolType {
   name: string;
@@ -37,6 +39,8 @@ class Tools { /* singleton */
     const retour = await postToServer('/tool/reset-cycle', {process: t('ui.tool.reset_cycle.name')});
     if (retour.ok){
       Flash.success(t('tool.cycle_reset'))
+      ui.toggleSection('work');
+      await Work.getCurrent();
     }
   }
 

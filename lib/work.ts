@@ -55,7 +55,7 @@ export class Work {
       } else if (prefs.data.shortest) {
         candidatId = ids[0] as string;
       } else {
-        candidatId = ids[ids.length - 1] as string;
+        candidatId = ids.pop() as string;
       }
       console.log("candidat ID", candidatId);
       const candidatData = this.get(candidatId as string).dataForClient;

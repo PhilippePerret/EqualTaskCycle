@@ -1,6 +1,5 @@
 import { clock } from "../lib/Clock.js";
 import type { RecType, RunTimeInfosType, WorkType } from "../lib/types.js";
-import { HOST } from "./js/constants.js";
 import { DGet } from "./js/dom.js";
 import { Flash } from "./js/flash.js";
 import { ui } from "./ui.js";

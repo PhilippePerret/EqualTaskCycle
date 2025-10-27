@@ -13974,6 +13974,8 @@ class Tools {
     const retour = await postToServer("/tool/reset-cycle", { process: t("ui.tool.reset_cycle.name") });
     if (retour.ok) {
       Flash.success(t("tool.cycle_reset"));
+      ui.toggleSection("work");
+      await Work.getCurrent();
     }
   }
   async openManual(ev) {
@@ -14025,7 +14027,9 @@ var tools;
 var init_tools = __esm(() => {
   init_Locale();
   init_flash();
+  init_ui();
   init_utils();
+  init_work_client();
   tools = Tools.getInstance();
 });
 
