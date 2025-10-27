@@ -16,13 +16,14 @@ export class Prefs { /* singleton */
   private constructor(){}
   public static getInstance(){return this.inst || (this.inst = new Prefs())}
 
-  public async init(){
+  public async init(): Promise<boolean> {
     const retour = await postToServer('/prefs/load', {process: 'Prefs.init'});
     if (retour.ok) {
       this.setData(retour.prefs);
       this.observeButtons();
       tools.init();
     }
+    return retour.ok;
   }
 
   public getLang(){ return this.data.lang || 'en' } /* <=========== TODO */

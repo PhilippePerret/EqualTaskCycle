@@ -14074,13 +14074,13 @@ class UI {
     clock.setClockStyle(data.clock);
     clock.setCounterMode(data.counter);
     ui.setUITheme(data.theme);
-    console.log("t('ui.app.mode')", t("ui.app.mode"));
     if (t("ui.app.mode") === "dev") {
       const o = document.createElement("DIV");
       o.id = "dev-light";
       o.innerHTML = "dev";
       document.body.appendChild(o);
     }
+    return true;
   }
   onStart(ev) {
     this.mask([this.btnStart]);
@@ -14601,6 +14601,7 @@ class Prefs {
       this.observeButtons();
       tools.init();
     }
+    return retour.ok;
   }
   getLang() {
     return this.data.lang || "en";

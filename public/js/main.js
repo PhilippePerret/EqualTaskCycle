@@ -14655,13 +14655,13 @@ class UI {
     clock.setClockStyle(data.clock);
     clock.setCounterMode(data.counter);
     ui.setUITheme(data.theme);
-    console.log("t('ui.app.mode')", t("ui.app.mode"));
     if (t("ui.app.mode") === "dev") {
       const o = document.createElement("DIV");
       o.id = "dev-light";
       o.innerHTML = "dev";
       document.body.appendChild(o);
     }
+    return true;
   }
   onStart(ev) {
     this.mask([this.btnStart]);
@@ -15182,6 +15182,7 @@ class Prefs {
       this.observeButtons();
       tools.init();
     }
+    return retour.ok;
   }
   getLang() {
     return this.data.lang || "en";
@@ -16816,41 +16817,44 @@ var editor = Editing.getIntance();
 
 // lib/client/main.ts
 class Client {
-  initObjetSync(objet) {}
   async init() {
     import_renderer.default.info("=== INITIALISATION CLIENT ===");
-    import_renderer.default.info("Prefs init…");
-    await prefs.init();
-    import_renderer.default.info("  -- ok");
-    import_renderer.default.info("Locales init…");
-    if (await loc.init(prefs.getLang())) {
-      import_renderer.default.info("  -- ok");
-    } else {
-      import_renderer.default.info("Un problème est servenu avec les locales…");
-    }
-    import_renderer.default.info("UI init…");
-    ui.init(prefs.getSavedData());
-    import_renderer.default.info("  -- ok");
-    import_renderer.default.info("Work init…");
-    if (await Work.init()) {
-      import_renderer.default.info("  -- ok");
-    } else {
-      import_renderer.default.info("Problem avec Work.init");
-    }
-    import_renderer.default.info("Editor init…");
-    if (editor.init()) {
-      import_renderer.default.info("  --ok");
-    } else {
-      import_renderer.default.info("Problem with Editor init");
-    }
-    import_renderer.default.info("Help init…");
-    if (help.init()) {
-      import_renderer.default.info("  -- ok");
-    } else {
-      import_renderer.default.info("Problem with help.init");
-    }
+    await this.initObjet(prefs, "Prefs");
+    await this.initObjet(loc, "Locale", prefs.getLang());
+    this.initObjetSync(ui, "UI", prefs.getSavedData());
+    await this.initObjet(Work, "Work");
+    this.initObjetSync(editor, "Editor");
+    this.initObjetSync(help, "Help");
     Flash.notice(`${t("app.is_ready")} <span id="mes123">(${t("help.show")})</span>`);
     DGet("span#mes123").addEventListener("click", help.show.bind(help, ["resume_home_page"]), { once: true, capture: true });
+  }
+  initObjetSync(objet, name, args) {
+    import_renderer.default.info(`${name} init…`);
+    let res;
+    if (args) {
+      res = objet.init(args);
+    } else {
+      res = objet.init();
+    }
+    if (res) {
+      import_renderer.default.info("  -- ok");
+    } else {
+      import_renderer.default.warn(`Problem with ${name} initialisation`);
+    }
+  }
+  async initObjet(objet, name, args) {
+    import_renderer.default.info(`${name} init…`);
+    let res;
+    if (args) {
+      res = await objet.init(args);
+    } else {
+      res = await objet.init();
+    }
+    if (res) {
+      import_renderer.default.info("  -- ok");
+    } else {
+      import_renderer.default.warn(`Problem with ${name} initialisation`);
+    }
   }
   static inst;
   constructor() {}
