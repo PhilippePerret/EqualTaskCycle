@@ -205,7 +205,7 @@ app.post('/localization/get-all', (req, res) => {
   log.info("->route /localization/get-all")
   const lang = req.body.lang;
   let retour = {ok: true, error: '', locales: loc.getLocales()};
-  retour.locales.app.mode = process.env.ETC_MODE;
+  retour.locales.ui.app.mode = process.env.ETC_MODE;
   res.json(retour);
 });
 

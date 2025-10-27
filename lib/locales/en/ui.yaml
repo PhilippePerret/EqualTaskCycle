@@ -1,11 +1,11 @@
 ---
 lang: en
 appName: "Equal Task Cycle"
-app:
-  name: "ETC (Equal Task Cycle)"
-  mode: '' # renseigné au chargement
 
 ui:
+  app:
+    name: "ETC (Equal Task Cycle)"
+    mode: '' # renseigné au chargement
   button:
     change: CHANGE
     close: Close
