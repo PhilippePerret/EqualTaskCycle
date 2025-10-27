@@ -15299,8 +15299,7 @@ class Work {
   data;
   static async init() {
     const res = await this.getCurrent();
-    console.log("Retour getCurrent:", res);
-    return res.ok;
+    return res;
   }
   static currentWork;
   static async addTimeToCurrentWork(time) {

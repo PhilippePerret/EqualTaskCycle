@@ -21,8 +21,7 @@ export class Work {
    */
   public static async init(): Promise<boolean>{
     const res = await this.getCurrent();
-    console.log("Retour getCurrent:", res);
-    return (res as any).ok;
+    return res;
   }
 
   public static currentWork: Work;
