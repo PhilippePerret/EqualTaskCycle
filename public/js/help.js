@@ -15439,7 +15439,7 @@ class Work {
 init_utils();
 
 class ActivityTracker {
-  static CHECK_INTERVAL = 15 * 60 * 1000;
+  static CHECK_INTERVAL = 1 * 60 * 1000;
   static timer;
   static inactiveUser;
   static startControl() {

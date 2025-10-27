@@ -4,11 +4,78 @@ help:
   manual:
     title: Manuel ETC
     ordre: >
-      intro
+      intro_manual
+      presentation
+      exemple_utilisation
       term
       task_data
       stop_report
       durcycvsdursess
+  intro_manual: 
+    title: Introduction au Manuel
+    level: '##'
+    text: |
+      Ce manual permet d'utiliser l'application ETC (prononcer « 
+      Etcétéra ») avec le plus de plaisir et d'efficité possible.
+
+  presentation:
+    title: Présentation
+    level: '##'
+    text: |
+      L'application ETC permet de gérer souplement des tâches parallèles
+      lorsque plusieurs gros chantiers sont en cours, de natures similaires
+      ou différentes, et que l'on veut s'assurer de leur consacrer le même
+      temps de travail (ou un temps défini), sans avoir à surveiller de ne
+      pas en oublier.
+
+      Elle permet aussi, si on le souhaite de présenter ces travaux dans
+      un ordre aléatoire ce qui permet de rompre avec une routine trop
+      ennuyeuse.
+
+      Mais pour bien comprendre, voyons comment tout cela se passe.
+  exemple_utilisation:
+    title: Exemple d'utilisation
+    level: '##'
+    text: |
+      Imaginons, pour faire simple, que vous avez ces différents projets
+      en cours :
+
+      * un livre sur le développement personnel,
+      * un programme de gestion de tâche,
+      * une extension de votre maison pour faire une nouvelle chambre,
+      * la lecture d'un ouvrage historique
+      * la traduction d'un ouvrage technique sur un appareil.
+
+      Cinq projets que vous menez de front mais auxquels vous n'êtes 
+      pas sûr(e) de consacrer le temps qu'il faudrait. Grâce à ETC, 
+      vous allez pouvoir le faire.
+
+      D'abord, vous ouvrez l'application après l'avoir chargée. Vous 
+      rejoignez en premier lieu les préférences (⚙️) afin de choisir
+      votre langue et les éléments d'interface que vous souhaitez (le
+      mode sombre ou clair, la taille de l'horloge — nous y reviendrons —,
+      etc.).
+
+      Vous refermez la fenêtre après avoir enregistré les nouvelles
+      informations puis vous ouvrez le panneau des données (✍🏽). C'est
+      dans ce panneau que vous pouvez définir vos travaux, vos projets,
+      vos tâches, pouvez les appeler comme vous le voulez.
+
+      {TODO : POURSUIVRE}
+
+
+  intro:
+    title: INTRODUCTION
+    level: "##"
+    text: |
+      Bienvenue dans l'aide modulaire de l'application ETC 
+      (Etcétéra) qui vous permet de travailler parallèlement plusieurs 
+      tâches.
+
+      Le fonctionnement de cette application est radicalement différent
+      de ceux que vous pouvez connaitre et s'adapte particulièrement aux
+      situations où vous avez des projets à mener de front, sans en oublier,
+      en leur consacrant un temps chaque jour ou chaque semaine.
   term:
     title: Terminologie
     level: '##'
@@ -37,18 +104,6 @@ help:
       | Durée | | Pour fixer une durée propre au travail. Si cette valeur n’est pas définie, c’est la valeur par défaut qui est utilisée. |
       | Durée session | | Optionnellement, on peut définir une durée pour la session différente de la durée pour le cycle. C’est subtile mais évident en fait. Pour bien comprendre consulter la partie hlink(Durée de cycle versus durée de session, duree_cycle_vs_duree_sess). |
 
-  intro:
-    title: INTRODUCTION
-    level: "##"
-    text: |
-      Bienvenue dans l'aide modulaire de l'application ETC 
-      (Etcétéra) qui vous permet de travailler parallèlement plusieurs 
-      tâches.
-
-      Le fonctionnement de cette application est radicalement différent
-      de ceux que vous pouvez connaitre et s'adapte particulièrement aux
-      situations où vous avez des projets à mener de front, sans en oublier,
-      en leur consacrant un temps chaque jour ou chaque semaine.
   stop_report:
     title: "Rapport d’arrêt (de tâche)"
     level: '##'

@@ -1,7 +1,7 @@
 # dependencies (bun install)
 node_modules
 
-_TASKS_.yaml
+TASKS.yaml
 
 tmp/
 

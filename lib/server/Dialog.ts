@@ -28,6 +28,7 @@
  * Pour les options de displayDialog :
  *  https://developer.apple.com/library/archive/documentation/LanguagesUtilities/Conceptual/MacAutomationScriptingGuide/DisplayDialogsandAlerts.html
  */
+import log from 'electron-log/main';
 
 type ButtonType = {
   text: string;
@@ -64,6 +65,7 @@ export class Dialog {
   ){}
 
   async show(values: string[] | undefined = undefined){
+    log.info('-> Dialog.show');
     this._built || this.build();
     const detempCode = this.detemplatize(String(this.code), values);
     console.log("detempCode = ", detempCode);
@@ -80,7 +82,7 @@ export class Dialog {
     // console.log("retour.text() = ", res);
     // res = retour.json();
     // console.log("retour.json() = ", JSON.stringify(res));
-
+    log.info('<- Dialog.show');
   }
 
   detemplatize(code: string, values: string[] | undefined): string{
@@ -96,6 +98,7 @@ export class Dialog {
   }
 
   build(){
+    log.info('-> Dialog.build()');
     this.analyseButtons();
     const o: string[] = [];
     o.push('const app = Application.currentApplication();');
@@ -114,6 +117,7 @@ export class Dialog {
     o.push('});');
     o.push('JSON.stringify(res);')
     this.code = o.join("\n").replace(/'/g, "'\\''");
+    log.info('<- Dialog.build()');
     this._built = true;
   }
 

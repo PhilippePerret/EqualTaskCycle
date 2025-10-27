@@ -8,6 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import { Dialog } from './Dialog';
 import { t } from '../shared/Locale';
+import log from 'electron-log/main';
 
 const fileWatcher = new Worker(path.join(__dirname, 'ActivityTracker_watcher.ts'));
 
@@ -55,6 +56,7 @@ export class ActivityTracker /* SERVER */ {
   private on?: boolean; // true if user work
 
   public async askUserIfWorking(){
+    log.info('-> ActivityTracker.askUserIfWorking')
     await this.askIfActifDialog.show();
     return {ok: true, userIsWorking: this.on === true}
   }
