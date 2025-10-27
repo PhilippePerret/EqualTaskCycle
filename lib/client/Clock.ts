@@ -41,7 +41,7 @@ class Clock {
    * (3 tailles, de très gros à petit)
    */
   public setClockStyle(style: string){
-    this.clockContainer.classList.add(style);
+    this.clockContainer.className = style;
   }
   /**
    * Affectation du mode de comptage, en mode "horloge" (défilage

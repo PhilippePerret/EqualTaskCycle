@@ -15890,7 +15890,7 @@ class Clock {
   }
   _clockcont;
   setClockStyle(style) {
-    this.clockContainer.classList.add(style);
+    this.clockContainer.className = style;
   }
   setCounterMode(mode = "clock") {
     this.counterMode = mode;
