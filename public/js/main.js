@@ -14655,6 +14655,13 @@ class UI {
     clock.setClockStyle(data.clock);
     clock.setCounterMode(data.counter);
     ui.setUITheme(data.theme);
+    console.log("t('ui.app.mode')", t("ui.app.mode"));
+    if (t("ui.app.mode") === "dev") {
+      const o = document.createElement("DIV");
+      o.id = "dev-light";
+      o.innerHTML = "dev";
+      document.body.appendChild(o);
+    }
   }
   onStart(ev) {
     this.mask([this.btnStart]);
@@ -16812,15 +16819,15 @@ class Client {
     import_renderer.default.info("Prefs init…");
     await prefs.init();
     import_renderer.default.info("  -- ok");
-    import_renderer.default.info("UI init…");
-    ui.init(prefs.getSavedData());
-    import_renderer.default.info("  -- ok");
     import_renderer.default.info("Locales init…");
     if (await loc.init(prefs.getLang())) {
       import_renderer.default.info("  -- ok");
     } else {
       import_renderer.default.info("Un problème est servenu avec les locales…");
     }
+    import_renderer.default.info("UI init…");
+    ui.init(prefs.getSavedData());
+    import_renderer.default.info("  -- ok");
     import_renderer.default.info("Work init…");
     if (await Work.init()) {
       import_renderer.default.info("  -- ok");

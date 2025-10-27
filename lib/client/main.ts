@@ -15,12 +15,12 @@ class Client { /* singleton */
     log.info('Prefs init…');
     await prefs.init();
     log.info('  -- ok');
-    log.info('UI init…');
-    ui.init(prefs.getSavedData());
-    log.info('  -- ok');
     log.info('Locales init…');
     if (await loc.init(prefs.getLang())) { log.info('  -- ok') }
     else { log.info('Un problème est servenu avec les locales…') }
+    log.info('UI init…');
+    ui.init(prefs.getSavedData());
+    log.info('  -- ok');
     log.info('Work init…');
     if (await Work.init()) {log.info('  -- ok')}
     else { log.info('Problem avec Work.init') }
