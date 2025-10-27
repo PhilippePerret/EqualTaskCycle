@@ -1,9 +1,22 @@
 ---
 help:
   show: Afficher l’aide
+  manual:
+    title: Manuel ETC
+    ordre: >
+      intro
+      term
+      task_data
+      stop_report
+      durcycvsdursess
   term:
     title: Terminologie
+    level: '##'
     text: |
+      Afin de bien saisir le sens des explications, il est important 
+      d’être au clair avec les termes employés dans l’application. Cette
+      petite section permet de tous les retrouver.
+
       | Terme | | Description |
       | --- | --- | --- |
       | Cycle | | Un *c.* est une boucle complète sur tous les travaux à effectuer. |
@@ -12,6 +25,7 @@ help:
       | --- | ---| --- |
   task_data:
     title: Données d’un travail
+    level: '##'
     text: |
       | Propriété | | Description |
       | --- | --- | --- |
@@ -25,6 +39,7 @@ help:
 
   intro:
     title: INTRODUCTION
+    level: "##"
     text: |
       Bienvenue dans l'aide modulaire de l'application ETC 
       (Etcétéra) qui vous permet de travailler parallèlement plusieurs 
@@ -36,6 +51,7 @@ help:
       en leur consacrant un temps chaque jour ou chaque semaine.
   stop_report:
     title: "Rapport d’arrêt (de tâche)"
+    level: '##'
     text: |
       Le *rapport de fin* apparait lorsque l’on arrête (STOP) le travail
       sur une tâche particulière.
@@ -53,6 +69,7 @@ help:
       Le format utilisable est le format [Markdown](https://fr.wikipedia.org/wiki/Markdown).
   task_list:
     title: Liste des travaux
+    level: '##'
     text: |
       La liste des travaux est la première chose à définir pour pouvoir
       utiliser l'application.
@@ -69,6 +86,7 @@ help:
 
   durcycvsdursess:
     title: Durée cycle versus durée session
+    level: '###'
     text: |
       Lorsqu’une durée de session est définie (nécessairement inférieure
       à la durée de cycle), l’application se comporte différemment avec 

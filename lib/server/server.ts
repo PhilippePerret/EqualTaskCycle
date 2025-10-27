@@ -225,7 +225,15 @@ app.post('/manual/produce', (req, res) => {
   } else {
     return res.json(Object.assign(data, {ok: false, error: 'manual.not_produced'}))
   }
+});
+
+app.post('/manual/open', (req, res) => {
+  log.info('->route /manual/open');
+  const lang = req.body.lang;
+  manual.open(lang);
+  return {ok: true}
 })
+
 
 app.listen(PORT, () => {
   log.info(`Server running on ${HOST}`);

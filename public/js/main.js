@@ -15120,6 +15120,7 @@ class Tools {
   }
   async openManual(ev) {
     stopEvent(ev);
+    await postToServer("/manual/open", { lang: prefs.getLang() });
   }
   async produceManual(ev) {
     stopEvent(ev);

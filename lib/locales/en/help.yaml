@@ -1,7 +1,16 @@
 help:
   show: Show help
+  manual:
+    title: ETC Manual
+    ordre: >
+      intro
+      term
+      task_data
+      stop_report
+      durcycvsdursess
   term:
     title: Terminology
+    level: '##'
     text: |
       | Term | | Description |
       | --- | --- | --- |
@@ -10,6 +19,7 @@ help:
       | Time spent | | The *spent t.* corresponds to the time dedicated to the work/project during the current cycle. |
   stop_report:
     title: Stop Report
+    level: '##'
     text: |
       The *end report* appears when you stop (STOP) working
       on a specific task.
@@ -26,6 +36,7 @@ help:
       The supported format is [Markdown](https://en.wikipedia.org/wiki/Markdown).
   task_data:
     title: Task data
+    level: '##'
     text: |
       | Property | | Description |
       | --- | --- | --- |
@@ -38,6 +49,7 @@ help:
       | Session duration | | Optionally, you can define a session duration different from the cycle duration. Subtle, yet clear in practice. For full understanding, consult hlink(Cycle duration versus session duration, duree_cycle_vs_duree_sess). |
   intro:
     title: INTRODUCTION
+    level: '##'
     text: |
       Welcome to the modular help system of the ETC application
       (Etcetera), which allows you to work on several tasks in parallel.
@@ -49,6 +61,7 @@ help:
       or each week to each one.
   task_list:
     title: Task list
+    level: '##'
     text: |
       The task list is the first thing to define in order to use
       the application.
@@ -73,6 +86,7 @@ help:
 
   durcycvsdursess:
     title: Cycle duration versus session duration
+    level: '###'
     text: |
       When a session duration is defined (necessarily shorter
       than the cycle duration), the application behaves differently

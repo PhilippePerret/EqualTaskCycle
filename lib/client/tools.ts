@@ -49,13 +49,14 @@ class Tools { /* singleton */
 
   private async openManual(ev: Event){
     stopEvent(ev);
+    await postToServer('/manual/open', {lang: prefs.getLang()});
   }
 
   // --- //
 
   private async produceManual(ev: Event){
     stopEvent(ev);
-    const retour = await postToServer('/manual/produce', {lang: prefs.getLang()})
+    const retour = await postToServer('/manual/produce', {lang: prefs.getLang()});
     if (retour.ok) { Flash.success(t('manual.produced')) }
   }
 
