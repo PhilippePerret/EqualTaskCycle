@@ -13,7 +13,7 @@ import log from 'electron-log/main';
 const fileWatcher = new Worker(path.join(__dirname, 'ActivityTracker_watcher.ts'));
 
 export class ActivityTracker /* SERVER */ {
-  public static getInstance(){
+  public static singleton(){
     return this._inst || (this._inst = new ActivityTracker());
   }; private static _inst: ActivityTracker;
   private constructor(){}
@@ -61,6 +61,12 @@ export class ActivityTracker /* SERVER */ {
     return {ok: true, userIsWorking: this.on === true}
   }
 
+  public init(){
+    log.info("-> ActivityTracker.init")
+    this.askIfActifDialog; // pour forcer sa construction
+    log.info(`[ActivityTracker.init] Typeof this._dialog: ${typeof this._dialog}`);
+  }
+
   private get askIfActifDialog(){
     return this._dialog || (this._dialog = this.getDialog())
   }; private _dialog?: Dialog;
@@ -82,7 +88,7 @@ export class ActivityTracker /* SERVER */ {
   }
 }
 
-export const activTracker = ActivityTracker.getInstance();
+export const activTracker = ActivityTracker.singleton();
 
 /**
  * @api

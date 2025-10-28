@@ -23,7 +23,9 @@ console.log("MAIN_HTML_FILE = %s", MAIN_HTML_FILE);
 app.get('/', (_req, res) => {
   // log("-> route /")
   log.info("->route /");
-  loc.init('fr');
+  prefs.load();
+  loc.init(prefs.data.lang);
+  activTracker.init(); // pour préparer le dialog localisé
   res.send(tf(MAIN_HTML_FILE));
 });
 
@@ -34,7 +36,7 @@ app.use(express.static('public'));
 app.post('/prefs/load', (req, res) => {
   log.info('->route /prefs/load');
   const data = req.body // process seulement
-  const dprefs = prefs.load();
+  const dprefs = prefs.loaded ? prefs.data : prefs.load();
   Object.assign(data, {
     ok: true, 
     prefs: dprefs

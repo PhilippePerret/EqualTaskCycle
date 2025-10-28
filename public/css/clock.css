@@ -22,8 +22,9 @@ div#clock-container.medium {
 }
 
 div#clock-container.mini {
-  position: absolute;
+  position: fixed;
   top: 12px;
+  left: 70px;
 }
 
 div#clock {

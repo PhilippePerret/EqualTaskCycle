@@ -3,6 +3,7 @@ import path from 'path';
 import yaml from 'js-yaml';
 import { readFileSync } from "fs";
 
+
 const LOCALES_FOLDER = path.resolve(path.join(__dirname,'..','locales'));
 
 // const SERVER_SIDE = typeof window === 'undefined';
@@ -58,8 +59,27 @@ class Locale {
    */
   public translate(route: string): string {
     const translated = route.split('.').reduce((obj, key) => obj?.[key], this.locales) ;
-    return 'string' === typeof translated ? translated : `[LOC: ${route}]`;
+    if ('string' === typeof translated) {
+      this._loading_confirmed = true;
+      return translated;
+    } else {
+      // En cas de route non trouvée, si une première route trouvée
+      // n'a pas confirmé que les données étaient bien chargées, on
+      // fait un test avec une route qu'on sait exister. Elle ne 
+      // renvoie pas le texte attendu, on recharge les locales en 
+      // signalant l'erreur.
+      if (this._loading_confirmed){
+        // Vraiment une locale qui n'existe pas
+        return `[LOC: ${route}]`;
+      } else {
+        // Fatale Error
+        const side = typeof window === 'undefined' ? 'server' : 'client';
+        throw new Error(`Locales should be loaded (${side} side)`);
+      }
+    }
   }
+
+  private _loading_confirmed: boolean = false;
 
 
   private replacementMethod(tout: string, route:string): string {
@@ -74,13 +94,7 @@ class Locale {
   public async init(lang: string): Promise<boolean> {
     // console.log("Initialisation des locales (%s)", lang);
     if ( typeof window === 'undefined' /* server side */) {
-      this.locales = {}
-      const folderLang = path.join(LOCALES_FOLDER, lang);
-      this.BASEFILES.forEach((base: string) => {
-        const pathLocale = path.join(folderLang, `${base}.yaml`)
-        Object.assign(this.locales, yaml.load(readFileSync(pathLocale, 'utf8')));
-      })
-      return true;
+      return this.initServerSide(lang);
     } else /* client side */ {
       const { postToServer } = await import("./utils");
       const retour = await postToServer('/localization/get-all', {lang: lang});
@@ -92,12 +106,25 @@ class Locale {
     }
     // console.log("Toutes les locales : ", this.locales);
   }
+
+  private initServerSide(lang: string){
+    this.locales = {}
+    const folderLang = path.join(LOCALES_FOLDER, lang);
+    this.BASEFILES.forEach((base: string) => {
+      const pathLocale = path.join(folderLang, `${base}.yaml`)
+      Object.assign(this.locales, yaml.load(readFileSync(pathLocale, 'utf8')));
+    })
+    return true;
+  }
+
+
+
   private locales!: RecType;
 
 
   private constructor(){}
-  public static getInstance(){return this.inst || (this.inst = new Locale())}
+  public static singleton(){return this.inst || (this.inst = new Locale())}
   private static inst: Locale;
 }
 
-export const loc = Locale.getInstance();
+export const loc = Locale.singleton();

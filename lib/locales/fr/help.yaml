@@ -34,7 +34,7 @@ help:
 
       Mais pour bien comprendre, voyons comment tout cela se passe.
   exemple_utilisation:
-    title: Exemple d'utilisation
+    title: Exemple complet d'utilisation
     level: '##'
     text: |
       Imaginons, pour faire simple, que vous avez ces différents projets
@@ -46,9 +46,13 @@ help:
       * la lecture d'un ouvrage historique
       * la traduction d'un ouvrage technique sur un appareil.
 
-      Cinq projets que vous menez de front mais auxquels vous n'êtes 
-      pas sûr(e) de consacrer le temps qu'il faudrait. Grâce à ETC, 
-      vous allez pouvoir le faire.
+      Cinq projets que vous menez de front, qui représente d'après
+      vos estimations, chacun, une centaine d'heures de trvail,
+      mais auxquels vous n'êtes 
+      pas sûr(e), dans votre organisation actuelle,
+      de consacrer le temps qu'il faudrait.
+      
+      Grâce à ETC, vous allez pouvoir le faire.
 
       D'abord, vous ouvrez l'application après l'avoir chargée. Vous 
       rejoignez en premier lieu les préférences (⚙️) afin de choisir
@@ -59,9 +63,69 @@ help:
       Vous refermez la fenêtre après avoir enregistré les nouvelles
       informations puis vous ouvrez le panneau des données (✍🏽). C'est
       dans ce panneau que vous pouvez définir vos travaux, vos projets,
-      vos tâches, pouvez les appeler comme vous le voulez.
+      vos tâches (ou quel que soit le nom que vous leur donnez.
 
-      {TODO : POURSUIVRE}
+      Grâce au bouton « ➕ » vous pouvez créer un nouveau travail. Vous
+      pouvez trouver dans la section help(task_data) toutes les informations
+      sur les propriétés.
+
+      Enregistrer lorsque vous en avez terminé. Vous rejoignez alors le
+      panneau principal avant votre première tâche. Vous pouvez en changer
+      une fois (et une seule fois par session de travail, c'est le principe
+      de cette façon de travailler) en cliquant le bouton t(ui.button.change).
+
+      Et vous démarrez votre travail en cliquant sur le bouton t(ui.button.start). 
+      Une horloge se met en route (ou un
+      compte à rebours selon vos préférences) qui déroulera le temps 
+      jusqu'à la durée par défaut (120 minutes) ou celle que vous avez 
+      définie dans vos préférences.
+
+      Une fois l'échéance arrivée, l'application vous prévient et vous
+      pouvez arrêter en cliquant le bouton t(ui.button.stop). Une page 
+      de rapport s'ouvre alors, que vous pouvez remplir. Cette help(stop_report)
+      est très important car c'est lui que vous trouverez en bas de votre 
+      tâche la prochaine fois que vous l'aborderez (au prochain *cycle*).
+      Remplissez-le donc avec soin.
+
+      Le prochain travail apparait (choisi au hasard ou en prenant le suivant
+      en fonction de vos préférences) et vous poursuivez votre travail.
+
+      Les travaux s'enchainent ainsi, peut-être le lendemain et les jours
+      suivants, jusqu'à ce qu'ils soient TOUS passés en revue. Une fois que
+      TOUS les travaux ont été effectués une première fois, un nouveau 
+      cycle reprend.
+
+      Bien entendu, si vous avez achevé un de ces travaux, vous pouvez
+      le désactiver (ou le détruire) depuis le panneau des éditions des
+      tâches (✍🏽).
+
+      Bien entendu, vous pouvez définir une durée de cycle différente pour 
+      chaque travail, afin de lui donner plus ou moins d'importance dans 
+      chaque cycle. Vous pouvez vouloir que le temps consacré à la traduction
+      soit moins long, vous lui attribuez une durée propre de 90 minutes 
+      dans ses données.
+      
+      Vous pouvez vouloir aussi que le temps consacré à la maison soit 
+      plus long, vous lui donnez une durée de 3 heures. Notez que dans ce
+      cas, cela ne signifie nullement que vous allez devoir, à chaque 
+      cycle, consacrer 3 heures à la maison d'UN SEUL COUP. Non, vous 
+      pouvez par exemple ne consacrer qu'une heure à chaque fois. Mais,
+      pour que le cycle soit terminé et que les tâches soient proposées
+      à nouveau, il faudra que vous ayez fait vos trois sessions de 3
+      heures sur le travail de votre maison.
+
+      C'est cela qu'il faut comprendre, c'est qu'au bout d'un cycle,
+      vous aurez consacré ce temps à chaque tâche :
+
+      | Tâche | Temps |
+      | --- | --- |
+      | Livre développement perso | 2 heures |
+      | Programme des tâches | 2 heures |
+      | Extension de la maison | 3 heures |
+      | Lecture livre histoire | 2 heures |
+      | Traduction | 1 heure |
+      | --- | --- |
+
 
 
   intro:

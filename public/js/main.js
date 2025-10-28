@@ -14313,20 +14313,25 @@ class Locale {
   }
   translate(route) {
     const translated = route.split(".").reduce((obj, key2) => obj?.[key2], this.locales);
-    return typeof translated === "string" ? translated : `[LOC: ${route}]`;
+    if (typeof translated === "string") {
+      this._loading_confirmed = true;
+      return translated;
+    } else {
+      if (this._loading_confirmed) {
+        return `[LOC: ${route}]`;
+      } else {
+        const side = typeof window === "undefined" ? "server" : "client";
+        throw new Error(`Locales should be loaded (${side} side)`);
+      }
+    }
   }
+  _loading_confirmed = false;
   replacementMethod(tout, route) {
     return this.translate(route);
   }
   async init(lang) {
     if (typeof window === "undefined") {
-      this.locales = {};
-      const folderLang = path_default.join(LOCALES_FOLDER, lang);
-      this.BASEFILES.forEach((base) => {
-        const pathLocale = path_default.join(folderLang, `${base}.yaml`);
-        Object.assign(this.locales, js_yaml_default.load(readFileSync(pathLocale, "utf8")));
-      });
-      return true;
+      return this.initServerSide(lang);
     } else {
       const { postToServer: postToServer2 } = await Promise.resolve().then(() => (init_utils(), exports_utils));
       const retour = await postToServer2("/localization/get-all", { lang });
@@ -14336,9 +14341,18 @@ class Locale {
       return retour.ok;
     }
   }
+  initServerSide(lang) {
+    this.locales = {};
+    const folderLang = path_default.join(LOCALES_FOLDER, lang);
+    this.BASEFILES.forEach((base) => {
+      const pathLocale = path_default.join(folderLang, `${base}.yaml`);
+      Object.assign(this.locales, js_yaml_default.load(readFileSync(pathLocale, "utf8")));
+    });
+    return true;
+  }
   locales;
   constructor() {}
-  static getInstance() {
+  static singleton() {
     return this.inst || (this.inst = new Locale);
   }
   static inst;
@@ -14348,11 +14362,11 @@ var init_Locale = __esm(() => {
   init_path();
   init_js_yaml();
   LOCALES_FOLDER = path_default.resolve(path_default.join(__dirname, "..", "locales"));
-  loc = Locale.getInstance();
+  loc = Locale.singleton();
 });
 
 // lib/client/main.ts
-var import_renderer = __toESM(require_renderer2(), 1);
+var import_renderer2 = __toESM(require_renderer2(), 1);
 init_Locale();
 // lib/client/work.ts
 init_flash();
@@ -14603,7 +14617,7 @@ class Work {
 init_utils();
 
 class ActivityTracker {
-  static CHECK_INTERVAL = 1 * 60 * 1000;
+  static CHECK_INTERVAL = 3 * 60 * 1000;
   static timer;
   static inactiveUser;
   static startControl() {
@@ -16805,10 +16819,143 @@ class Editing {
 }
 var editor = Editing.getIntance();
 
+// lib/client/Dialog.ts
+var import_renderer = __toESM(require_renderer2(), 1);
+
+class Dialog {
+  data;
+  _built = false;
+  code;
+  tableButtons;
+  defaultButton;
+  cancelButton;
+  buttonList;
+  fallbackButtons = [
+    { text: "Cancel", onclick: () => {} },
+    { text: "OK", onclick: () => {} }
+  ];
+  fallbackIcon = "note";
+  fallbackOnTimeout = () => {};
+  timer;
+  cancelFunction;
+  defaultFunction;
+  box;
+  constructor(data) {
+    this.data = data;
+  }
+  show(values2 = undefined) {
+    import_renderer.default.info("-> Dialog.show");
+    this._built || this.build();
+    const detempCode = this.detemplatize(String(this.code), values2);
+    this.box.classList.remove("hidden");
+    this.courtcircuiteKeyboard();
+    if (this.data.timeout) {
+      this.timer = setTimeout(this.onTimeout.bind(this), this.data.timeout * 1000);
+    }
+    import_renderer.default.info("<- Dialog.show");
+  }
+  close() {
+    this.decourcircuiteKeyboard();
+    this.box.classList.add("hidden");
+  }
+  onClickButton(callback, ev) {
+    ev && stopEvent(ev);
+    this.close();
+    return callback && callback();
+  }
+  onCancel() {
+    return this.onClickButton(this.cancelFunction);
+  }
+  onDefault() {
+    return this.onClickButton(this.defaultFunction);
+  }
+  courtcircuiteKeyboard() {
+    this._oldKeyDownFunction = window.onkeydown;
+    window.onkeydown = (ev) => {
+      if (ev.code === "Escape") {
+        this.onCancel();
+      } else if (ev.code === "Enter") {
+        this.onDefault();
+      }
+      return false;
+    };
+  }
+  decourcircuiteKeyboard() {
+    window.onkeydown = this._oldKeyDownFunction;
+  }
+  _oldKeyDownFunction;
+  onTimeout(ev) {
+    clearTimeout(this.timer);
+    delete this.timer;
+    (this.data.onTimeout || this.fallbackOnTimeout)();
+  }
+  detemplatize(code2, values2) {
+    if (values2 === undefined) {
+      return code2;
+    } else {
+      values2.forEach((value, i2) => {
+        const reg = new RegExp(`_${i2}_`, "g");
+        code2 = code2.replace(reg, value);
+      });
+      return code2;
+    }
+  }
+  build() {
+    import_renderer.default.info("-> Dialog.build()");
+    const o = document.createElement("DIV");
+    o.className = "dialog hidden";
+    if (this.data.title) {
+      const t2 = document.createElement("DIV");
+      t2.className = "dialog-title";
+      t2.innerHTML = this.formatted_title;
+      o.appendChild(t2);
+    }
+    const m2 = document.createElement("DIV");
+    m2.className = "dialog-message";
+    m2.innerHTML = this.formatted_message;
+    o.appendChild(m2);
+    const i2 = document.createElement("IMG");
+    i2.className = "dialog-icon";
+    o.appendChild(i2);
+    i2.setAttribute("src", this.data.icon);
+    const bts = document.createElement("DIV");
+    bts.className = "buttons";
+    o.appendChild(bts);
+    this.data.buttons.forEach((bouton) => {
+      const b2 = document.createElement("BUTTON");
+      b2.innerHTML = bouton.text;
+      b2.addEventListener("click", this.onClickButton.bind(this, bouton.onclick));
+      if (bouton.default === true) {
+        this.defaultFunction = bouton.onclick;
+        b2.classList.add("default");
+      } else if (bouton.cancel === true) {
+        this.cancelFunction = bouton.onclick;
+        b2.classList.add("cancel");
+      }
+      bts.appendChild(b2);
+    });
+    import_renderer.default.info("<- Dialog.build()");
+    this.box = o;
+    document.body.appendChild(this.box);
+    this._built = true;
+  }
+  get formatted_message() {
+    return this.commonReplacements(this.data.message);
+  }
+  get formatted_title() {
+    return this.commonReplacements(this.data.title);
+  }
+  commonReplacements(str2) {
+    return str2.replace(/'/g, "’").split(`
+
+`).map((s) => `<p>${s}</p>`).join("");
+  }
+}
+
 // lib/client/main.ts
 class Client {
   async init() {
-    import_renderer.default.info("=== INITIALISATION CLIENT ===");
+    import_renderer2.default.info("=== INITIALISATION CLIENT ===");
     await this.initObjet(prefs, "Prefs");
     await this.initObjet(loc, "Locale", prefs.getLang());
     this.initObjetSync(ui, "UI", prefs.getSavedData());
@@ -16817,9 +16964,27 @@ class Client {
     this.initObjetSync(help, "Help");
     Flash.notice(`${t("app.is_ready")} <span id="mes123">(${t("help.show")})</span>`);
     DGet("span#mes123").addEventListener("click", help.show.bind(help, ["resume_home_page"]), { once: true, capture: true });
+    const dialog = new Dialog({
+      title: "Pour essai et réglage",
+      message: `Ceci est le message pour essayer la boite de dialogue.
+
+En multiligne en plus pour faire un test sérieux`,
+      icon: "images/icon.png",
+      buttons: [
+        { text: "NON", onclick: this.onRespondNo.bind(this), cancel: true },
+        { text: "OUI", onclick: this.onRespondYes.bind(this), default: true }
+      ]
+    });
+    dialog.show();
+  }
+  onRespondYes() {
+    console.log("Il a répondu oui");
+  }
+  onRespondNo() {
+    console.log("Il a répondu non");
   }
   initObjetSync(objet, name, args) {
-    import_renderer.default.info(`${name} init…`);
+    import_renderer2.default.info(`${name} init…`);
     let res;
     if (args) {
       res = objet.init(args);
@@ -16827,13 +16992,13 @@ class Client {
       res = objet.init();
     }
     if (res) {
-      import_renderer.default.info("  -- ok");
+      import_renderer2.default.info("  -- ok");
     } else {
-      import_renderer.default.warn(`Problem with ${name} initialisation`);
+      import_renderer2.default.warn(`Problem with ${name} initialisation`);
     }
   }
   async initObjet(objet, name, args) {
-    import_renderer.default.info(`${name} init…`);
+    import_renderer2.default.info(`${name} init…`);
     let res;
     if (args) {
       res = await objet.init(args);
@@ -16841,9 +17006,9 @@ class Client {
       res = await objet.init();
     }
     if (res) {
-      import_renderer.default.info("  -- ok");
+      import_renderer2.default.info("  -- ok");
     } else {
-      import_renderer.default.warn(`Problem with ${name} initialisation`);
+      import_renderer2.default.warn(`Problem with ${name} initialisation`);
     }
   }
   static inst;

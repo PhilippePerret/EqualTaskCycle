@@ -10,7 +10,9 @@ let server = null;
 
 const path = require('path');
 
-const ICON_PATH = path.join(path.resolve(__dirname, 'icon.png'));
+const ICON_PATH = app.isPackaged
+  ? path.join(process.resourcesPath, 'app.asar.unpacked', 'electron', 'icon.png')
+  : path.join(__dirname, 'icon.png');
 
 if (existsSync(ICON_PATH)) {
   // console.log("Icon path: ", ICON_PATH);

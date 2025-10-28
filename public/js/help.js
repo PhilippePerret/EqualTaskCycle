@@ -13645,20 +13645,25 @@ class Locale {
   }
   translate(route) {
     const translated = route.split(".").reduce((obj, key2) => obj?.[key2], this.locales);
-    return typeof translated === "string" ? translated : `[LOC: ${route}]`;
+    if (typeof translated === "string") {
+      this._loading_confirmed = true;
+      return translated;
+    } else {
+      if (this._loading_confirmed) {
+        return `[LOC: ${route}]`;
+      } else {
+        const side = typeof window === "undefined" ? "server" : "client";
+        throw new Error(`Locales should be loaded (${side} side)`);
+      }
+    }
   }
+  _loading_confirmed = false;
   replacementMethod(tout, route) {
     return this.translate(route);
   }
   async init(lang) {
     if (typeof window === "undefined") {
-      this.locales = {};
-      const folderLang = path_default.join(LOCALES_FOLDER, lang);
-      this.BASEFILES.forEach((base) => {
-        const pathLocale = path_default.join(folderLang, `${base}.yaml`);
-        Object.assign(this.locales, js_yaml_default.load(readFileSync(pathLocale, "utf8")));
-      });
-      return true;
+      return this.initServerSide(lang);
     } else {
       const { postToServer } = await Promise.resolve().then(() => (init_utils(), exports_utils));
       const retour = await postToServer("/localization/get-all", { lang });
@@ -13668,9 +13673,18 @@ class Locale {
       return retour.ok;
     }
   }
+  initServerSide(lang) {
+    this.locales = {};
+    const folderLang = path_default.join(LOCALES_FOLDER, lang);
+    this.BASEFILES.forEach((base) => {
+      const pathLocale = path_default.join(folderLang, `${base}.yaml`);
+      Object.assign(this.locales, js_yaml_default.load(readFileSync(pathLocale, "utf8")));
+    });
+    return true;
+  }
   locales;
   constructor() {}
-  static getInstance() {
+  static singleton() {
     return this.inst || (this.inst = new Locale);
   }
   static inst;
@@ -13680,7 +13694,7 @@ var init_Locale = __esm(() => {
   init_path();
   init_js_yaml();
   LOCALES_FOLDER = path_default.resolve(path_default.join(__dirname, "..", "locales"));
-  loc = Locale.getInstance();
+  loc = Locale.singleton();
 });
 
 // lib/shared/utils.ts
@@ -15439,7 +15453,7 @@ class Work {
 init_utils();
 
 class ActivityTracker {
-  static CHECK_INTERVAL = 1 * 60 * 1000;
+  static CHECK_INTERVAL = 3 * 60 * 1000;
   static timer;
   static inactiveUser;
   static startControl() {

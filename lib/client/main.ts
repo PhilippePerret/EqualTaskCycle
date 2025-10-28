@@ -7,6 +7,7 @@ import { Flash } from '../../public/js/flash';
 import { DGet } from '../../public/js/dom';
 import { help } from './help';
 import { editor } from './editing';
+import { Dialog } from './Dialog';
 
 class Client { /* singleton */
 
@@ -26,7 +27,22 @@ class Client { /* singleton */
       help.show.bind(help, ['resume_home_page']),
       {once: true, capture: true}
     )
+
+    // Pour essayer la boite de dialogue
+    const dialog = new Dialog({
+      title: "Pour essai et réglage",
+      message: "Ceci est le message pour essayer la boite de dialogue.\n\nEn multiligne en plus pour faire un test sérieux",
+      icon: 'images/icon.png',
+      buttons: [
+        {text: "NON", onclick: this.onRespondNo.bind(this), cancel: true},
+        {text: "OUI", onclick: this.onRespondYes.bind(this), default: true}
+      ]
+    });
+    dialog.show();
   }
+  
+  public onRespondYes(){ console.log("Il a répondu oui")}
+  public onRespondNo(){ console.log("Il a répondu non")}
 
 
   private initObjetSync(objet: any, name: string, args?: any){

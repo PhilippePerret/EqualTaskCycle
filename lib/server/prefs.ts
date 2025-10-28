@@ -25,7 +25,7 @@ class Prefs { /* singleton */
 
   private static inst: Prefs;
   private constructor(){}
-  public static getInstance(){
+  public static singleton(){
     return this.inst || (this.inst = new Prefs());
   }
 
@@ -35,6 +35,7 @@ class Prefs { /* singleton */
 
   load(){
     const data: PrefsDataType = Object.assign({}, this.DEFAULT_DATA);
+    this.loaded = true;
     if (existsSync(this.fpath)) {
       return Object.assign(data, JSON.parse(readFileSync(this.fpath,'utf8')));
     } else {
@@ -42,6 +43,7 @@ class Prefs { /* singleton */
       return data;
     }
   }
+  public loaded: boolean = false; 
 
   save(data: RecType){
     const report: ReportType = {ok: true, errors: []};
@@ -58,4 +60,4 @@ class Prefs { /* singleton */
   }
 }
 
-export const prefs = Prefs.getInstance();
+export const prefs = Prefs.singleton();
