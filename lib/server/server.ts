@@ -81,6 +81,7 @@ app.post('/work/save-session', (req, res) => {
 app.post('/task/current', (req, res) => {
   log.info("-> /task/current");
   let result = {ok: true, error: ''};
+  const options = req.body
   try {
     const dprefs = prefs.load();
     existsSync(dprefs.file) || Work.buildPrimoFile();
@@ -89,7 +90,7 @@ app.post('/task/current', (req, res) => {
     }
     Work.inited || Work.init();
     Object.assign(result, {
-      task: Work.getCurrentWork(),
+      task: Work.getCurrentWork(options),
       options: { canChange: runtime.lastChangeIsFarEnough()}
     });
   } catch(err) {

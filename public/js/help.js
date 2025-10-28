@@ -17705,9 +17705,9 @@ class Work {
     return this._obj || (this._obj = DGet("section#current-work-container"));
   }
   static _obj;
-  static async getCurrent() {
-    const retour = await postToServer("/task/current", { process: "Work::getCurrent" });
-    console.log("retour:", retour);
+  static async getCurrent(options = {}) {
+    Object.assign(options, { process: "Work::getCurrent" });
+    const retour = await postToServer("/task/current", options);
     if (retour.ok === false) {
       return false;
     }
@@ -18096,9 +18096,11 @@ class UI {
   async onChange(ev) {
     ev && stopEvent2(ev);
     const curwork = Work.currentWork;
-    const result = await postToServer("/task/change", { workId: curwork.id });
-    if (result.ok === false) {
-      Flash.error(t("error.occurred", [result.error]));
+    const result = await postToServer("/task/change", { process: "UI.onChange", workId: curwork.id });
+    if (result.ok) {
+      if (await Work.getCurrent({ but: curwork.id })) {
+        this.btnChange.hide();
+      }
     }
     return false;
   }

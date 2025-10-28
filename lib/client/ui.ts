@@ -170,9 +170,11 @@ export class UI {
   private async onChange(ev: Event){
     ev && stopEvent(ev);
     const curwork: Work = Work.currentWork;
-    const result = await postToServer('/task/change', {workId: curwork.id});
-    if ( result.ok === false ) {
-      Flash.error(t('error.occurred', [result.error]));
+    const result = await postToServer('/task/change', {process: 'UI.onChange', workId: curwork.id});
+    if ( result.ok ) {
+      if (await Work.getCurrent({but: curwork.id})) {
+        (this.btnChange as Button).hide();
+      }
     }
     return false;
   }

@@ -18,6 +18,10 @@ span[onclick] {
   cursor: pointer;
 }
 
+ul.contains-task-list {
+  list-style: none;
+}
+
 div#dev-light {
   position: fixed;
   bottom: 60px;

@@ -77,13 +77,14 @@ export class Work {
   private static _obj: HTMLElement | null;
 
   /**
-   * Récupère la tâche courante côté serveur et l'affiche
-   * (récupère aussi les préférences et les options et les
-   *  applique)
+   * Récupère la tâche courante côté serveur et l'affiche.
+   * 
+   * options peut définir but: <task id> pour exclure une
+   * tâche des résultats.
    */
-  public static async getCurrent(): Promise<boolean> {
-    const retour: RecType = await postToServer('/task/current', {process: 'Work::getCurrent'});
-    console.log("retour:", retour);
+  public static async getCurrent(options: RecType = {}): Promise<boolean> {
+    Object.assign(options, {process: 'Work::getCurrent'})
+    const retour: RecType = await postToServer('/task/current', options);
     if (retour.ok === false) { return false}
     if (retour.task.ok === false) {
       // <= il n'y aucune tâche active
