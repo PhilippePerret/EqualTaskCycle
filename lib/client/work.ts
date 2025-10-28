@@ -108,8 +108,10 @@ export class Work {
 
   constructor(
     private data: WorkType & RunTimeInfosType
-  ){
-    // console.log("this.data", this.data);
+  ){}
+
+  public updateData(newData: WorkType){
+    this.data = Object.assign(this.data, newData);
   }
 
   public get id(){ return this.data.id; }

@@ -6,6 +6,7 @@ import { ui } from "./ui";
 import { listenBtn, postToServer } from "../shared/utils";
 import { nanoid } from 'nanoid';
 import { t } from '../shared/Locale';
+import { Work } from "./work";
 
 
 class Editing {
@@ -134,9 +135,24 @@ class Editing {
     owork.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
+  /**
+   * Pour enregistrer les nouvelles données sur les tâches.
+   * 
+   * Note : la tâche courante a peut-être été modifiée, il faut 
+   * l'actualiser.
+   */
   private async onSaveData(){
-    const retour = await postToServer('/tasks/save', this.collectTaskData());
-    if (retour.ok){ Flash.success(t('task.saved')); }
+    const collectedData = this.collectTaskData();
+    const retour = await postToServer('/tasks/save', collectedData);
+    if (retour.ok){ 
+      Flash.success(t('task.saved'));
+      // On actualise la tâche affichée (courante)
+      const curWId = Work.currentWork.id;
+      const curWData = collectedData.find(w => w.id === curWId);
+      const curWork = Work.currentWork;
+      curWork.updateData(curWData as WorkType);
+      curWork.dispatchData();
+    }
   }
 
   // Pour finir l'édition et revenir au panneau principal

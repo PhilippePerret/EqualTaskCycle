@@ -17553,6 +17553,9 @@ class Work {
   constructor(data) {
     this.data = data;
   }
+  updateData(newData) {
+    this.data = Object.assign(this.data, newData);
+  }
   get id() {
     return this.data.id;
   }
@@ -18629,7 +18632,6 @@ var nanoid = (size = 21) => {
 
 // lib/client/editing.ts
 init_Locale();
-
 class Editing {
   get section() {
     return DGet("section#editing");
@@ -18742,9 +18744,15 @@ class Editing {
     owork.scrollIntoView({ behavior: "smooth", block: "start" });
   }
   async onSaveData() {
-    const retour = await postToServer("/tasks/save", this.collectTaskData());
+    const collectedData = this.collectTaskData();
+    const retour = await postToServer("/tasks/save", collectedData);
     if (retour.ok) {
       Flash.success(t("task.saved"));
+      const curWId = Work.currentWork.id;
+      const curWData = collectedData.find((w) => w.id === curWId);
+      const curWork = Work.currentWork;
+      curWork.updateData(curWData);
+      curWork.dispatchData();
     }
   }
   stopEditing() {

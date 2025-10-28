@@ -17726,6 +17726,9 @@ class Work {
   constructor(data) {
     this.data = data;
   }
+  updateData(newData) {
+    this.data = Object.assign(this.data, newData);
+  }
   get id() {
     return this.data.id;
   }
