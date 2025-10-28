@@ -17313,7 +17313,7 @@ class Locale {
     return this.locales;
   }
   translateText(texte) {
-    return texte.replace(/\bt\((.+?)\)/g, this.replacementMethod.bind(this));
+    return texte.replaceAll(/\bt\((.+?)\)/g, this.replacementMethod.bind(this));
   }
   translate(route) {
     const translated = route.split(".").reduce((obj, key2) => obj?.[key2], this.locales);
@@ -18530,27 +18530,29 @@ class Help {
     this.isOpened() || ui.toggleHelp();
     this.content.innerHTML = "";
     this.texts = helpIds.map((helpId) => {
-      let texte = HELP_TEXTS[helpId];
-      if (texte.indexOf("help(")) {
-        texte = texte.replace(/\bhelp\((.+?)\)/g, (_tout, liste) => {
-          return liste.split(",").map((hid) => {
-            hid = hid.trim();
-            return HELP_TEXTS[hid];
-          }).join(`
-
-`);
+      let texte = tt(HELP_TEXTS[helpId]);
+      while (texte.match(/\bt\(/)) {
+        texte = tt(texte);
+      }
+      console.log("TEXTE INI", texte);
+      if (texte.match(/help\((.+?)\)/)) {
+        console.info("contient help(");
+        texte = texte.replaceAll(/help\((.+?)\)/g, (_tout, hid) => {
+          hid = hid.trim();
+          console.log("HID = ", hid);
+          const fullIdTitle = `help.${hid}.title`;
+          return `<a href="#help-${hid}">${t("ui.thing.guil_open")}${t(fullIdTitle)}${t("ui.thing.guil_close")}</a>`;
         });
+      } else {
+        console.warn("Ne contient pas help(...)");
       }
       return `<a id="help-${helpId}" name="${helpId}"></a>
 
-` + this.finalizeText(tt(texte)).trim().concat(`
+` + this.finalizeText(texte).trim().concat(`
 
 ---`);
     });
-    this.timer = setInterval(() => {
-      this.writeText.bind(this)();
-      DGet(`a#help-${helpIds[0]}`).scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 500);
+    this.writeText.bind(this)();
   }
   timer;
   finalizeText(text7) {
@@ -18559,7 +18561,7 @@ class Help {
       return `<span onclick="help.show(['${hid}'])">${tit}</span>`;
     });
     while (text7.match(/\bt\(/)) {
-      text7 = loc.translateText(text7);
+      text7 = tt(text7);
     }
     return text7;
   }

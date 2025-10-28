@@ -49,7 +49,7 @@ class Locale {
 
   public translateText(texte: string){
     // console.log("-> Locale.translateText")
-    return texte.replace(/\bt\((.+?)\)/g, this.replacementMethod.bind(this));
+    return texte.replaceAll(/\bt\((.+?)\)/g, this.replacementMethod.bind(this));
   }
 
   /**

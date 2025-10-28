@@ -1,7 +1,7 @@
 import type { RecType } from "../shared/types";
 import { DGet } from "../../public/js/dom";
 import { ui } from "./ui";
-import { loc, tt } from "../shared/Locale";
+import { loc, tt, t } from "../shared/Locale";
 import { listenBtn, markdown } from "../shared/utils";
 
 /**
@@ -93,29 +93,36 @@ class Help { /* singleton */
     this.isOpened() || ui.toggleHelp();
     this.content.innerHTML = '';
     this.texts = helpIds.map((helpId: string) => {
-      let texte = HELP_TEXTS[helpId];
-      // Est-ce un texte contenant d'autres textes d'aide ?
-      if (texte.indexOf('help(')) {
-        texte = texte.replace(/\bhelp\((.+?)\)/g, (_tout: string, liste: string) => {
-          return liste.split(',').map((hid: string) => {
-            hid = hid.trim();
-            // console.log("Aide: %s", hid, HELP_TEXTS[hid]);
-            return HELP_TEXTS[hid];
-          }).join("\n\n");
+      let texte = tt(HELP_TEXTS[helpId]);
+      while(texte.match(/\bt\(/)) { texte = tt(texte) }
+      console.log("TEXTE INI", texte);
+      // Est-ce un lien vers une autre partie de
+      // l'aide ?
+      if (texte.match(/help\((.+?)\)/)) {
+        console.info("contient help(");
+        texte = texte.replaceAll(/help\((.+?)\)/g, (_tout: string, hid: string) => {
+          hid = hid.trim();
+          console.log("HID = ", hid);
+          const fullIdTitle = `help.${hid}.title`;
+          // const fullIdText  =  `help.${hid}.text`;
+          return `<a href="#help-${hid}">${t('ui.thing.guil_open')}${t(fullIdTitle)}${t('ui.thing.guil_close')}</a>`
         })
+      } else {
+        console.warn("Ne contient pas help(...)")
       }
 
       // console.log("texte = ", texte);
       return `<a id="help-${helpId}" name="${helpId}"></a>\n\n` 
-      + this.finalizeText(tt(texte))
+      + this.finalizeText(texte)
       .trim()
       .concat("\n\n---")
     });
+    this.writeText.bind(this)();
 
-    this.timer = setInterval(() => {
-      this.writeText.bind(this)();
-      (DGet(`a#help-${helpIds[0]}`) as HTMLElement).scrollIntoView({behavior: 'smooth', block: 'start'});
-    }, 500);
+    // this.timer = setInterval(() => {
+    //   this.writeText.bind(this)();
+    //   (DGet(`a#help-${helpIds[0]}`) as HTMLElement).scrollIntoView({behavior: 'smooth', block: 'start'});
+    // }, 500);
   }
   private timer?: NodeJS.Timeout;
 
@@ -125,7 +132,7 @@ class Help { /* singleton */
       const [tit, hid] = args.split(',').map((s: string) => s.trim());
       return `<span onclick="help.show(['${hid}'])">${tit}</span>`;
     });
-    while(text.match(/\bt\(/)) { text = loc.translateText(text) }
+    while(text.match(/\bt\(/)) { text = tt(text) }
     return text;
   }
 

@@ -279,7 +279,7 @@ help:
       | Dossier | | Le chemin d’accès au dossier. Cette information est très importante car c’est elle qui permettra de suivre l’activité sur le travail. |
       | Script | | La force de cette app est de permettre de définir un script à exécuter n’importe quand au cours du travail (souvent avant). Ce script, qui peut être dans n’importe quel langage, permet d’ouvrir à tous les possibles. |
       | Durée | | Pour fixer une durée propre au travail. Si cette valeur n’est pas définie, c’est la valeur par défaut qui est utilisée. |
-      | Durée session | | Optionnellement, on peut définir une durée pour la session différente de la durée pour le cycle. C’est subtile mais évident en fait. Pour bien comprendre consulter la partie hlink(Durée de cycle versus durée de session, duree_cycle_vs_duree_sess). |
+      | Durée session | | Optionnellement, on peut définir une durée pour la session différente de la durée pour le cycle. C’est subtile mais évident en fait. Pour bien comprendre consulter la partie help(durcycvsdursess). |
 
   stop_report:
     title: "Rapport d’arrêt (de tâche)"

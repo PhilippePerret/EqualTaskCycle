@@ -38,6 +38,8 @@ ui:
     Chronometer: Chronomètre
     Countdown: Compte à rebours
     Duration: Durée
+    guil_close: ' »'
+    guil_open: '« '
     minute: minute
     minutes: minutes
     Folder: Dossier

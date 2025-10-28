@@ -38,6 +38,8 @@ ui:
     Chronometer: Carhronometer
     Countdown: Countdown
     Duration: Duration
+    guil_close: '"'
+    guil_open: '"'
     minute: minute
     minutes: minutes
     Folder: Folder
