@@ -33,8 +33,8 @@ FOLDERS.forEach((folder: string) => {
     // console.log("entry:", entry);
     // console.log("-> Doit être traité");
     const code = fs.readFileSync(fpath, 'utf8');
-    if ( code.match(/t\(/) === null ) { return }
-    code.matchAll(/\b(?:t|help)\((["'])?([a-zA-Z0-9_\.]+?)\1?(\)|\,.+?\))/g).forEach((found: RegExpExecArray) => {
+    if ( code.match(/(t|help)\(/) === null ) { return }
+    code.matchAll(/\bt\((["'])?([a-zA-Z0-9_\.]+?)\1?(\)|\,.+?\))/g).forEach((found: RegExpExecArray) => {
       let route: string | undefined, params: string | undefined;
       [route, params] = (found[2] as string).split(',');
       if (route && route !== 'route' /* la fonction elle-même */) {
@@ -44,6 +44,22 @@ FOLDERS.forEach((folder: string) => {
         COLLECTED_ROUTES[route].files.push(fpath);
       }
     })
+    code.matchAll(/\bhelp\((["'])?([a-zA-Z0-9_\.]+?)\1?(\)|\,.+?\))/g).forEach((found: RegExpExecArray) => {
+      let route: string | undefined, params: string | undefined;
+      [route, params] = (found[2] as string).split(',');
+      if (route && route !== 'route' /* la fonction elle-même */) {
+        [
+          `help.${route}.title`,
+          `help.${route}.text`
+        ].forEach((fullroute: string) => {
+          if ( undefined === COLLECTED_ROUTES[fullroute]) {
+            Object.assign(COLLECTED_ROUTES, {[fullroute]: {files: [], defined: true}})
+          }
+          COLLECTED_ROUTES[fullroute].files.push(fpath);
+        })
+      }
+    })
+
   })
 });
 

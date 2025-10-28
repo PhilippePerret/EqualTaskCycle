@@ -59,8 +59,8 @@ help:
       
       Grâce à ETC, vous allez pouvoir organiser tout ça. D'abord vous
       avez commencé par définir votre liste de tâches 
-      (help(help.define_tasks.title)) et vous avez réglé vos préférences 
-      (help(help.set_preferences.title)).
+      (help(define_tasks)) et vous avez réglé vos préférences 
+      (help(set_preferences)).
 
       Comment ? En travaillant par *CYCLE*. 
       
@@ -178,7 +178,7 @@ help:
       là pour parler de ce que vous avez fait (même si vous pouvez bien 
       entendu vous en servir pour ça), mais plutôt pour dire ce qu'il 
       faudra faire à la reprise du travail, pour qu'elle soit rapide et
-      efficace (pour en savoir plus, consultez help(help.stop_report.title)).
+      efficace (pour en savoir plus, consultez help(stop_report)).
 
       Dans ce panneau, un bouton t(ui.button.dont_save_time_and_report) 
       vous permet de renoncer à l'enregistrement de ce temps de travail,
@@ -202,7 +202,7 @@ help:
       * l'apparence de l'**horloge** (ou du chronomètre),
       * le **mode de décompte du temps**, soit continu, soit en compte à rebours,
       * le **chemin d'accès au fichier des tâches** (qui se créera avec les
-      tâches que vous définirez — help(help.define_tasks.title)),
+      tâches que vous définirez — help(define_tasks)),
       * le mode de **choix des tâches**, aléatoire ou continu suivant 
       l'ordre dans la liste que vous avez établie,
 
@@ -228,7 +228,7 @@ help:
 
       Remplissez les champs avec les informations que vous souhaitez
       (même si les propriétés sont assez explicites, vous trouverez dans 
-      la section help(help.task_data.title) toutes les informations précises).
+      la section help(task_data) toutes les informations précises).
 
       Lorsque vous avez établi votre liste, que vous avez organisé les
       tâches dans l'ordre grâce aux flèches, pouvez enregistrer la liste
