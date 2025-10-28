@@ -7,8 +7,8 @@ import log from 'electron-log/renderer';
 
 export class ActivityTracker /* CLIENT */ {
 
-  // private static CHECK_INTERVAL = 15 * 60 * 1000;
-  private static CHECK_INTERVAL = 3 * 60 * 1000; // test avec 1 minute
+  private static CHECK_INTERVAL = 15 * 60 * 1000;
+  // private static CHECK_INTERVAL = 3 * 60 * 1000; // test avec 1 minute
   private static timer: NodeJS.Timeout | undefined;
   private static inactiveUser: boolean;
 

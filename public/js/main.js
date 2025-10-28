@@ -17758,7 +17758,7 @@ init_Locale();
 var import_renderer2 = __toESM(require_renderer2(), 1);
 
 class ActivityTracker {
-  static CHECK_INTERVAL = 3 * 60 * 1000;
+  static CHECK_INTERVAL = 15 * 60 * 1000;
   static timer;
   static inactiveUser;
   static startControl() {
