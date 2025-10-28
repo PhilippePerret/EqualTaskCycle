@@ -1,9 +1,8 @@
 import type { RecType } from "../shared/types";
 import { DGet } from "../../public/js/dom";
-import { marked } from 'marked';
 import { ui } from "./ui";
 import { loc, tt } from "../shared/Locale";
-import { listenBtn } from "../shared/utils";
+import { listenBtn, markdown } from "../shared/utils";
 
 /**
  * Module pour la gestion de l'aide
@@ -133,7 +132,7 @@ class Help { /* singleton */
   private writeText(){
     var text: string | undefined;
     if ( (text = this.texts.shift()) ) {
-      this.write(marked.parse(text) as string);
+      this.write(markdown(text) as string);
     } else {
       clearInterval(this.timer);
       delete this.timer;

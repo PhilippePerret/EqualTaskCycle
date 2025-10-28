@@ -3,12 +3,9 @@ import type { RecType, RunTimeInfosType, WorkType } from "../shared/types.js";
 import { DGet } from "../../public/js/dom.js";
 import { Flash } from "../../public/js/flash.js";
 import { ui } from "./ui.js";
-import { prefs } from "./prefs.js";
-import { help } from "./help.js";
-import { editor } from "./editing.js";
 import { EndWorkReport } from "./stop_report.js";
 import { markdown, postToServer } from "../shared/utils.js";
-import { loc, t } from "../shared/Locale.js";
+import { t } from "../shared/Locale.js";
 
 export class Work {
 
@@ -147,6 +144,8 @@ export class Work {
           case 'cycleTime':
           case 'leftTime':
             return clock.time2horloge(v);
+          case 'content': 
+            return markdown(v);
           case 'report':
             if ( v ) {
               return markdown(`---\n\n# ${t('ui.title.stop_report')}\n\n` + v);

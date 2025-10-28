@@ -7051,8 +7051,3223 @@ var init_remark_parse = __esm(() => {
   init_lib6();
 });
 
+// node_modules/ccount/index.js
+function ccount(value, character) {
+  const source = String(value);
+  if (typeof character !== "string") {
+    throw new TypeError("Expected character");
+  }
+  let count = 0;
+  let index2 = source.indexOf(character);
+  while (index2 !== -1) {
+    count++;
+    index2 = source.indexOf(character, index2 + character.length);
+  }
+  return count;
+}
+
+// node_modules/escape-string-regexp/index.js
+function escapeStringRegexp(string3) {
+  if (typeof string3 !== "string") {
+    throw new TypeError("Expected a string");
+  }
+  return string3.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&").replace(/-/g, "\\x2d");
+}
+
+// node_modules/unist-util-is/lib/index.js
+function anyFactory(tests) {
+  const checks = [];
+  let index2 = -1;
+  while (++index2 < tests.length) {
+    checks[index2] = convert(tests[index2]);
+  }
+  return castFactory(any);
+  function any(...parameters) {
+    let index3 = -1;
+    while (++index3 < checks.length) {
+      if (checks[index3].apply(this, parameters))
+        return true;
+    }
+    return false;
+  }
+}
+function propertiesFactory(check) {
+  const checkAsRecord = check;
+  return castFactory(all2);
+  function all2(node2) {
+    const nodeAsRecord = node2;
+    let key;
+    for (key in check) {
+      if (nodeAsRecord[key] !== checkAsRecord[key])
+        return false;
+    }
+    return true;
+  }
+}
+function typeFactory(check) {
+  return castFactory(type);
+  function type(node2) {
+    return node2 && node2.type === check;
+  }
+}
+function castFactory(testFunction) {
+  return check;
+  function check(value, index2, parent) {
+    return Boolean(looksLikeANode(value) && testFunction.call(this, value, typeof index2 === "number" ? index2 : undefined, parent || undefined));
+  }
+}
+function ok2() {
+  return true;
+}
+function looksLikeANode(value) {
+  return value !== null && typeof value === "object" && "type" in value;
+}
+var convert = function(test) {
+  if (test === null || test === undefined) {
+    return ok2;
+  }
+  if (typeof test === "function") {
+    return castFactory(test);
+  }
+  if (typeof test === "object") {
+    return Array.isArray(test) ? anyFactory(test) : propertiesFactory(test);
+  }
+  if (typeof test === "string") {
+    return typeFactory(test);
+  }
+  throw new Error("Expected function, string, or object as test");
+};
+
+// node_modules/unist-util-is/index.js
+var init_unist_util_is = () => {};
+
+// node_modules/unist-util-visit-parents/lib/color.js
+function color(d) {
+  return d;
+}
+
+// node_modules/unist-util-visit-parents/lib/index.js
+function visitParents(tree, test, visitor, reverse) {
+  let check;
+  if (typeof test === "function" && typeof visitor !== "function") {
+    reverse = visitor;
+    visitor = test;
+  } else {
+    check = test;
+  }
+  const is2 = convert(check);
+  const step = reverse ? -1 : 1;
+  factory(tree, undefined, [])();
+  function factory(node2, index2, parents) {
+    const value = node2 && typeof node2 === "object" ? node2 : {};
+    if (typeof value.type === "string") {
+      const name = typeof value.tagName === "string" ? value.tagName : typeof value.name === "string" ? value.name : undefined;
+      Object.defineProperty(visit, "name", {
+        value: "node (" + color(node2.type + (name ? "<" + name + ">" : "")) + ")"
+      });
+    }
+    return visit;
+    function visit() {
+      let result = empty;
+      let subresult;
+      let offset;
+      let grandparents;
+      if (!test || is2(node2, index2, parents[parents.length - 1] || undefined)) {
+        result = toResult(visitor(node2, parents));
+        if (result[0] === EXIT) {
+          return result;
+        }
+      }
+      if ("children" in node2 && node2.children) {
+        const nodeAsParent = node2;
+        if (nodeAsParent.children && result[0] !== SKIP) {
+          offset = (reverse ? nodeAsParent.children.length : -1) + step;
+          grandparents = parents.concat(nodeAsParent);
+          while (offset > -1 && offset < nodeAsParent.children.length) {
+            const child = nodeAsParent.children[offset];
+            subresult = factory(child, offset, grandparents)();
+            if (subresult[0] === EXIT) {
+              return subresult;
+            }
+            offset = typeof subresult[1] === "number" ? subresult[1] : offset + step;
+          }
+        }
+      }
+      return result;
+    }
+  }
+}
+function toResult(value) {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  if (typeof value === "number") {
+    return [CONTINUE, value];
+  }
+  return value === null || value === undefined ? empty : [value];
+}
+var empty, CONTINUE = true, EXIT = false, SKIP = "skip";
+var init_lib7 = __esm(() => {
+  init_unist_util_is();
+  empty = [];
+});
+
+// node_modules/unist-util-visit-parents/index.js
+var init_unist_util_visit_parents = __esm(() => {
+  init_lib7();
+});
+
+// node_modules/mdast-util-find-and-replace/lib/index.js
+function findAndReplace(tree, list2, options) {
+  const settings = options || {};
+  const ignored = convert(settings.ignore || []);
+  const pairs = toPairs(list2);
+  let pairIndex = -1;
+  while (++pairIndex < pairs.length) {
+    visitParents(tree, "text", visitor);
+  }
+  function visitor(node2, parents) {
+    let index2 = -1;
+    let grandparent;
+    while (++index2 < parents.length) {
+      const parent = parents[index2];
+      const siblings = grandparent ? grandparent.children : undefined;
+      if (ignored(parent, siblings ? siblings.indexOf(parent) : undefined, grandparent)) {
+        return;
+      }
+      grandparent = parent;
+    }
+    if (grandparent) {
+      return handler(node2, parents);
+    }
+  }
+  function handler(node2, parents) {
+    const parent = parents[parents.length - 1];
+    const find = pairs[pairIndex][0];
+    const replace = pairs[pairIndex][1];
+    let start = 0;
+    const siblings = parent.children;
+    const index2 = siblings.indexOf(node2);
+    let change = false;
+    let nodes = [];
+    find.lastIndex = 0;
+    let match = find.exec(node2.value);
+    while (match) {
+      const position2 = match.index;
+      const matchObject = {
+        index: match.index,
+        input: match.input,
+        stack: [...parents, node2]
+      };
+      let value = replace(...match, matchObject);
+      if (typeof value === "string") {
+        value = value.length > 0 ? { type: "text", value } : undefined;
+      }
+      if (value === false) {
+        find.lastIndex = position2 + 1;
+      } else {
+        if (start !== position2) {
+          nodes.push({
+            type: "text",
+            value: node2.value.slice(start, position2)
+          });
+        }
+        if (Array.isArray(value)) {
+          nodes.push(...value);
+        } else if (value) {
+          nodes.push(value);
+        }
+        start = position2 + match[0].length;
+        change = true;
+      }
+      if (!find.global) {
+        break;
+      }
+      match = find.exec(node2.value);
+    }
+    if (change) {
+      if (start < node2.value.length) {
+        nodes.push({ type: "text", value: node2.value.slice(start) });
+      }
+      parent.children.splice(index2, 1, ...nodes);
+    } else {
+      nodes = [node2];
+    }
+    return index2 + nodes.length;
+  }
+}
+function toPairs(tupleOrList) {
+  const result = [];
+  if (!Array.isArray(tupleOrList)) {
+    throw new TypeError("Expected find and replace tuple or list of tuples");
+  }
+  const list2 = !tupleOrList[0] || Array.isArray(tupleOrList[0]) ? tupleOrList : [tupleOrList];
+  let index2 = -1;
+  while (++index2 < list2.length) {
+    const tuple = list2[index2];
+    result.push([toExpression(tuple[0]), toFunction(tuple[1])]);
+  }
+  return result;
+}
+function toExpression(find) {
+  return typeof find === "string" ? new RegExp(escapeStringRegexp(find), "g") : find;
+}
+function toFunction(replace) {
+  return typeof replace === "function" ? replace : function() {
+    return replace;
+  };
+}
+var init_lib8 = __esm(() => {
+  init_unist_util_visit_parents();
+  init_unist_util_is();
+});
+
+// node_modules/mdast-util-find-and-replace/index.js
+var init_mdast_util_find_and_replace = __esm(() => {
+  init_lib8();
+});
+
+// node_modules/mdast-util-gfm-autolink-literal/lib/index.js
+function gfmAutolinkLiteralFromMarkdown() {
+  return {
+    transforms: [transformGfmAutolinkLiterals],
+    enter: {
+      literalAutolink: enterLiteralAutolink,
+      literalAutolinkEmail: enterLiteralAutolinkValue,
+      literalAutolinkHttp: enterLiteralAutolinkValue,
+      literalAutolinkWww: enterLiteralAutolinkValue
+    },
+    exit: {
+      literalAutolink: exitLiteralAutolink,
+      literalAutolinkEmail: exitLiteralAutolinkEmail,
+      literalAutolinkHttp: exitLiteralAutolinkHttp,
+      literalAutolinkWww: exitLiteralAutolinkWww
+    }
+  };
+}
+function gfmAutolinkLiteralToMarkdown() {
+  return {
+    unsafe: [
+      {
+        character: "@",
+        before: "[+\\-.\\w]",
+        after: "[\\-.\\w]",
+        inConstruct,
+        notInConstruct
+      },
+      {
+        character: ".",
+        before: "[Ww]",
+        after: "[\\-.\\w]",
+        inConstruct,
+        notInConstruct
+      },
+      {
+        character: ":",
+        before: "[ps]",
+        after: "\\/",
+        inConstruct,
+        notInConstruct
+      }
+    ]
+  };
+}
+function enterLiteralAutolink(token) {
+  this.enter({ type: "link", title: null, url: "", children: [] }, token);
+}
+function enterLiteralAutolinkValue(token) {
+  this.config.enter.autolinkProtocol.call(this, token);
+}
+function exitLiteralAutolinkHttp(token) {
+  this.config.exit.autolinkProtocol.call(this, token);
+}
+function exitLiteralAutolinkWww(token) {
+  this.config.exit.data.call(this, token);
+  const node2 = this.stack[this.stack.length - 1];
+  ok(node2.type === "link");
+  node2.url = "http://" + this.sliceSerialize(token);
+}
+function exitLiteralAutolinkEmail(token) {
+  this.config.exit.autolinkEmail.call(this, token);
+}
+function exitLiteralAutolink(token) {
+  this.exit(token);
+}
+function transformGfmAutolinkLiterals(tree) {
+  findAndReplace(tree, [
+    [/(https?:\/\/|www(?=\.))([-.\w]+)([^ \t\r\n]*)/gi, findUrl],
+    [/(?<=^|\s|\p{P}|\p{S})([-.\w+]+)@([-\w]+(?:\.[-\w]+)+)/gu, findEmail]
+  ], { ignore: ["link", "linkReference"] });
+}
+function findUrl(_, protocol, domain, path, match) {
+  let prefix = "";
+  if (!previous2(match)) {
+    return false;
+  }
+  if (/^w/i.test(protocol)) {
+    domain = protocol + domain;
+    protocol = "";
+    prefix = "http://";
+  }
+  if (!isCorrectDomain(domain)) {
+    return false;
+  }
+  const parts = splitUrl(domain + path);
+  if (!parts[0])
+    return false;
+  const result = {
+    type: "link",
+    title: null,
+    url: prefix + protocol + parts[0],
+    children: [{ type: "text", value: protocol + parts[0] }]
+  };
+  if (parts[1]) {
+    return [result, { type: "text", value: parts[1] }];
+  }
+  return result;
+}
+function findEmail(_, atext, label, match) {
+  if (!previous2(match, true) || /[-\d_]$/.test(label)) {
+    return false;
+  }
+  return {
+    type: "link",
+    title: null,
+    url: "mailto:" + atext + "@" + label,
+    children: [{ type: "text", value: atext + "@" + label }]
+  };
+}
+function isCorrectDomain(domain) {
+  const parts = domain.split(".");
+  if (parts.length < 2 || parts[parts.length - 1] && (/_/.test(parts[parts.length - 1]) || !/[a-zA-Z\d]/.test(parts[parts.length - 1])) || parts[parts.length - 2] && (/_/.test(parts[parts.length - 2]) || !/[a-zA-Z\d]/.test(parts[parts.length - 2]))) {
+    return false;
+  }
+  return true;
+}
+function splitUrl(url) {
+  const trailExec = /[!"&'),.:;<>?\]}]+$/.exec(url);
+  if (!trailExec) {
+    return [url, undefined];
+  }
+  url = url.slice(0, trailExec.index);
+  let trail = trailExec[0];
+  let closingParenIndex = trail.indexOf(")");
+  const openingParens = ccount(url, "(");
+  let closingParens = ccount(url, ")");
+  while (closingParenIndex !== -1 && openingParens > closingParens) {
+    url += trail.slice(0, closingParenIndex + 1);
+    trail = trail.slice(closingParenIndex + 1);
+    closingParenIndex = trail.indexOf(")");
+    closingParens++;
+  }
+  return [url, trail];
+}
+function previous2(match, email) {
+  const code = match.input.charCodeAt(match.index - 1);
+  return (match.index === 0 || unicodeWhitespace(code) || unicodePunctuation(code)) && (!email || code !== 47);
+}
+var inConstruct = "phrasing", notInConstruct;
+var init_lib9 = __esm(() => {
+  init_development();
+  init_dev4();
+  init_mdast_util_find_and_replace();
+  notInConstruct = ["autolink", "link", "image", "label"];
+});
+
+// node_modules/mdast-util-gfm-autolink-literal/index.js
+var init_mdast_util_gfm_autolink_literal = __esm(() => {
+  init_lib9();
+});
+
+// node_modules/mdast-util-gfm-footnote/lib/index.js
+function enterFootnoteCallString() {
+  this.buffer();
+}
+function enterFootnoteCall(token) {
+  this.enter({ type: "footnoteReference", identifier: "", label: "" }, token);
+}
+function enterFootnoteDefinitionLabelString() {
+  this.buffer();
+}
+function enterFootnoteDefinition(token) {
+  this.enter({ type: "footnoteDefinition", identifier: "", label: "", children: [] }, token);
+}
+function exitFootnoteCallString(token) {
+  const label = this.resume();
+  const node2 = this.stack[this.stack.length - 1];
+  ok(node2.type === "footnoteReference");
+  node2.identifier = normalizeIdentifier(this.sliceSerialize(token)).toLowerCase();
+  node2.label = label;
+}
+function exitFootnoteCall(token) {
+  this.exit(token);
+}
+function exitFootnoteDefinitionLabelString(token) {
+  const label = this.resume();
+  const node2 = this.stack[this.stack.length - 1];
+  ok(node2.type === "footnoteDefinition");
+  node2.identifier = normalizeIdentifier(this.sliceSerialize(token)).toLowerCase();
+  node2.label = label;
+}
+function exitFootnoteDefinition(token) {
+  this.exit(token);
+}
+function footnoteReferencePeek() {
+  return "[";
+}
+function footnoteReference(node2, _, state, info) {
+  const tracker = state.createTracker(info);
+  let value = tracker.move("[^");
+  const exit2 = state.enter("footnoteReference");
+  const subexit = state.enter("reference");
+  value += tracker.move(state.safe(state.associationId(node2), { after: "]", before: value }));
+  subexit();
+  exit2();
+  value += tracker.move("]");
+  return value;
+}
+function gfmFootnoteFromMarkdown() {
+  return {
+    enter: {
+      gfmFootnoteCallString: enterFootnoteCallString,
+      gfmFootnoteCall: enterFootnoteCall,
+      gfmFootnoteDefinitionLabelString: enterFootnoteDefinitionLabelString,
+      gfmFootnoteDefinition: enterFootnoteDefinition
+    },
+    exit: {
+      gfmFootnoteCallString: exitFootnoteCallString,
+      gfmFootnoteCall: exitFootnoteCall,
+      gfmFootnoteDefinitionLabelString: exitFootnoteDefinitionLabelString,
+      gfmFootnoteDefinition: exitFootnoteDefinition
+    }
+  };
+}
+function gfmFootnoteToMarkdown(options) {
+  let firstLineBlank = false;
+  if (options && options.firstLineBlank) {
+    firstLineBlank = true;
+  }
+  return {
+    handlers: { footnoteDefinition, footnoteReference },
+    unsafe: [{ character: "[", inConstruct: ["label", "phrasing", "reference"] }]
+  };
+  function footnoteDefinition(node2, _, state, info) {
+    const tracker = state.createTracker(info);
+    let value = tracker.move("[^");
+    const exit2 = state.enter("footnoteDefinition");
+    const subexit = state.enter("label");
+    value += tracker.move(state.safe(state.associationId(node2), { before: value, after: "]" }));
+    subexit();
+    value += tracker.move("]:");
+    if (node2.children && node2.children.length > 0) {
+      tracker.shift(4);
+      value += tracker.move((firstLineBlank ? `
+` : " ") + state.indentLines(state.containerFlow(node2, tracker.current()), firstLineBlank ? mapAll : mapExceptFirst));
+    }
+    exit2();
+    return value;
+  }
+}
+function mapExceptFirst(line, index2, blank) {
+  return index2 === 0 ? line : mapAll(line, index2, blank);
+}
+function mapAll(line, index2, blank) {
+  return (blank ? "" : "    ") + line;
+}
+var init_lib10 = __esm(() => {
+  init_development();
+  init_dev3();
+  footnoteReference.peek = footnoteReferencePeek;
+});
+
+// node_modules/mdast-util-gfm-footnote/index.js
+var init_mdast_util_gfm_footnote = __esm(() => {
+  init_lib10();
+});
+
+// node_modules/mdast-util-gfm-strikethrough/lib/index.js
+function gfmStrikethroughFromMarkdown() {
+  return {
+    canContainEols: ["delete"],
+    enter: { strikethrough: enterStrikethrough },
+    exit: { strikethrough: exitStrikethrough }
+  };
+}
+function gfmStrikethroughToMarkdown() {
+  return {
+    unsafe: [
+      {
+        character: "~",
+        inConstruct: "phrasing",
+        notInConstruct: constructsWithoutStrikethrough
+      }
+    ],
+    handlers: { delete: handleDelete }
+  };
+}
+function enterStrikethrough(token) {
+  this.enter({ type: "delete", children: [] }, token);
+}
+function exitStrikethrough(token) {
+  this.exit(token);
+}
+function handleDelete(node2, _, state, info) {
+  const tracker = state.createTracker(info);
+  const exit2 = state.enter("strikethrough");
+  let value = tracker.move("~~");
+  value += state.containerPhrasing(node2, {
+    ...tracker.current(),
+    before: value,
+    after: "~"
+  });
+  value += tracker.move("~~");
+  exit2();
+  return value;
+}
+function peekDelete() {
+  return "~";
+}
+var constructsWithoutStrikethrough;
+var init_lib11 = __esm(() => {
+  constructsWithoutStrikethrough = [
+    "autolink",
+    "destinationLiteral",
+    "destinationRaw",
+    "reference",
+    "titleQuote",
+    "titleApostrophe"
+  ];
+  handleDelete.peek = peekDelete;
+});
+
+// node_modules/mdast-util-gfm-strikethrough/index.js
+var init_mdast_util_gfm_strikethrough = __esm(() => {
+  init_lib11();
+});
+
+// node_modules/markdown-table/index.js
+function defaultStringLength(value) {
+  return value.length;
+}
+function markdownTable(table, options) {
+  const settings = options || {};
+  const align = (settings.align || []).concat();
+  const stringLength = settings.stringLength || defaultStringLength;
+  const alignments = [];
+  const cellMatrix = [];
+  const sizeMatrix = [];
+  const longestCellByColumn = [];
+  let mostCellsPerRow = 0;
+  let rowIndex = -1;
+  while (++rowIndex < table.length) {
+    const row2 = [];
+    const sizes2 = [];
+    let columnIndex2 = -1;
+    if (table[rowIndex].length > mostCellsPerRow) {
+      mostCellsPerRow = table[rowIndex].length;
+    }
+    while (++columnIndex2 < table[rowIndex].length) {
+      const cell = serialize(table[rowIndex][columnIndex2]);
+      if (settings.alignDelimiters !== false) {
+        const size = stringLength(cell);
+        sizes2[columnIndex2] = size;
+        if (longestCellByColumn[columnIndex2] === undefined || size > longestCellByColumn[columnIndex2]) {
+          longestCellByColumn[columnIndex2] = size;
+        }
+      }
+      row2.push(cell);
+    }
+    cellMatrix[rowIndex] = row2;
+    sizeMatrix[rowIndex] = sizes2;
+  }
+  let columnIndex = -1;
+  if (typeof align === "object" && "length" in align) {
+    while (++columnIndex < mostCellsPerRow) {
+      alignments[columnIndex] = toAlignment(align[columnIndex]);
+    }
+  } else {
+    const code = toAlignment(align);
+    while (++columnIndex < mostCellsPerRow) {
+      alignments[columnIndex] = code;
+    }
+  }
+  columnIndex = -1;
+  const row = [];
+  const sizes = [];
+  while (++columnIndex < mostCellsPerRow) {
+    const code = alignments[columnIndex];
+    let before = "";
+    let after = "";
+    if (code === 99) {
+      before = ":";
+      after = ":";
+    } else if (code === 108) {
+      before = ":";
+    } else if (code === 114) {
+      after = ":";
+    }
+    let size = settings.alignDelimiters === false ? 1 : Math.max(1, longestCellByColumn[columnIndex] - before.length - after.length);
+    const cell = before + "-".repeat(size) + after;
+    if (settings.alignDelimiters !== false) {
+      size = before.length + size + after.length;
+      if (size > longestCellByColumn[columnIndex]) {
+        longestCellByColumn[columnIndex] = size;
+      }
+      sizes[columnIndex] = size;
+    }
+    row[columnIndex] = cell;
+  }
+  cellMatrix.splice(1, 0, row);
+  sizeMatrix.splice(1, 0, sizes);
+  rowIndex = -1;
+  const lines = [];
+  while (++rowIndex < cellMatrix.length) {
+    const row2 = cellMatrix[rowIndex];
+    const sizes2 = sizeMatrix[rowIndex];
+    columnIndex = -1;
+    const line = [];
+    while (++columnIndex < mostCellsPerRow) {
+      const cell = row2[columnIndex] || "";
+      let before = "";
+      let after = "";
+      if (settings.alignDelimiters !== false) {
+        const size = longestCellByColumn[columnIndex] - (sizes2[columnIndex] || 0);
+        const code = alignments[columnIndex];
+        if (code === 114) {
+          before = " ".repeat(size);
+        } else if (code === 99) {
+          if (size % 2) {
+            before = " ".repeat(size / 2 + 0.5);
+            after = " ".repeat(size / 2 - 0.5);
+          } else {
+            before = " ".repeat(size / 2);
+            after = before;
+          }
+        } else {
+          after = " ".repeat(size);
+        }
+      }
+      if (settings.delimiterStart !== false && !columnIndex) {
+        line.push("|");
+      }
+      if (settings.padding !== false && !(settings.alignDelimiters === false && cell === "") && (settings.delimiterStart !== false || columnIndex)) {
+        line.push(" ");
+      }
+      if (settings.alignDelimiters !== false) {
+        line.push(before);
+      }
+      line.push(cell);
+      if (settings.alignDelimiters !== false) {
+        line.push(after);
+      }
+      if (settings.padding !== false) {
+        line.push(" ");
+      }
+      if (settings.delimiterEnd !== false || columnIndex !== mostCellsPerRow - 1) {
+        line.push("|");
+      }
+    }
+    lines.push(settings.delimiterEnd === false ? line.join("").replace(/ +$/, "") : line.join(""));
+  }
+  return lines.join(`
+`);
+}
+function serialize(value) {
+  return value === null || value === undefined ? "" : String(value);
+}
+function toAlignment(value) {
+  const code = typeof value === "string" ? value.codePointAt(0) : 0;
+  return code === 67 || code === 99 ? 99 : code === 76 || code === 108 ? 108 : code === 82 || code === 114 ? 114 : 0;
+}
+
+// node_modules/zwitch/index.js
+function zwitch(key, options) {
+  const settings = options || {};
+  function one2(value, ...parameters) {
+    let fn = one2.invalid;
+    const handlers = one2.handlers;
+    if (value && own3.call(value, key)) {
+      const id = String(value[key]);
+      fn = own3.call(handlers, id) ? handlers[id] : one2.unknown;
+    }
+    if (fn) {
+      return fn.call(this, value, ...parameters);
+    }
+  }
+  one2.handlers = settings.handlers || {};
+  one2.invalid = settings.invalid;
+  one2.unknown = settings.unknown;
+  return one2;
+}
+var own3;
+var init_zwitch = __esm(() => {
+  own3 = {}.hasOwnProperty;
+});
+
+// node_modules/mdast-util-to-markdown/lib/handle/blockquote.js
+function blockquote(node2, _, state, info) {
+  const exit2 = state.enter("blockquote");
+  const tracker = state.createTracker(info);
+  tracker.move("> ");
+  tracker.shift(2);
+  const value = state.indentLines(state.containerFlow(node2, tracker.current()), map);
+  exit2();
+  return value;
+}
+function map(line, _, blank) {
+  return ">" + (blank ? "" : " ") + line;
+}
+
+// node_modules/mdast-util-to-markdown/lib/util/pattern-in-scope.js
+function patternInScope(stack, pattern) {
+  return listInScope(stack, pattern.inConstruct, true) && !listInScope(stack, pattern.notInConstruct, false);
+}
+function listInScope(stack, list2, none) {
+  if (typeof list2 === "string") {
+    list2 = [list2];
+  }
+  if (!list2 || list2.length === 0) {
+    return none;
+  }
+  let index2 = -1;
+  while (++index2 < list2.length) {
+    if (stack.includes(list2[index2])) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// node_modules/mdast-util-to-markdown/lib/handle/break.js
+function hardBreak(_, _1, state, info) {
+  let index2 = -1;
+  while (++index2 < state.unsafe.length) {
+    if (state.unsafe[index2].character === `
+` && patternInScope(state.stack, state.unsafe[index2])) {
+      return /[ \t]/.test(info.before) ? "" : " ";
+    }
+  }
+  return "\\\n";
+}
+var init_break = () => {};
+
+// node_modules/longest-streak/index.js
+function longestStreak(value, substring) {
+  const source = String(value);
+  let index2 = source.indexOf(substring);
+  let expected = index2;
+  let count = 0;
+  let max = 0;
+  if (typeof substring !== "string") {
+    throw new TypeError("Expected substring");
+  }
+  while (index2 !== -1) {
+    if (index2 === expected) {
+      if (++count > max) {
+        max = count;
+      }
+    } else {
+      count = 1;
+    }
+    expected = index2 + substring.length;
+    index2 = source.indexOf(substring, expected);
+  }
+  return max;
+}
+
+// node_modules/mdast-util-to-markdown/lib/util/format-code-as-indented.js
+function formatCodeAsIndented(node2, state) {
+  return Boolean(state.options.fences === false && node2.value && !node2.lang && /[^ \r\n]/.test(node2.value) && !/^[\t ]*(?:[\r\n]|$)|(?:^|[\r\n])[\t ]*$/.test(node2.value));
+}
+
+// node_modules/mdast-util-to-markdown/lib/util/check-fence.js
+function checkFence(state) {
+  const marker = state.options.fence || "`";
+  if (marker !== "`" && marker !== "~") {
+    throw new Error("Cannot serialize code with `" + marker + "` for `options.fence`, expected `` ` `` or `~`");
+  }
+  return marker;
+}
+
+// node_modules/mdast-util-to-markdown/lib/handle/code.js
+function code(node2, _, state, info) {
+  const marker = checkFence(state);
+  const raw = node2.value || "";
+  const suffix = marker === "`" ? "GraveAccent" : "Tilde";
+  if (formatCodeAsIndented(node2, state)) {
+    const exit3 = state.enter("codeIndented");
+    const value2 = state.indentLines(raw, map2);
+    exit3();
+    return value2;
+  }
+  const tracker = state.createTracker(info);
+  const sequence = marker.repeat(Math.max(longestStreak(raw, marker) + 1, 3));
+  const exit2 = state.enter("codeFenced");
+  let value = tracker.move(sequence);
+  if (node2.lang) {
+    const subexit = state.enter(`codeFencedLang${suffix}`);
+    value += tracker.move(state.safe(node2.lang, {
+      before: value,
+      after: " ",
+      encode: ["`"],
+      ...tracker.current()
+    }));
+    subexit();
+  }
+  if (node2.lang && node2.meta) {
+    const subexit = state.enter(`codeFencedMeta${suffix}`);
+    value += tracker.move(" ");
+    value += tracker.move(state.safe(node2.meta, {
+      before: value,
+      after: `
+`,
+      encode: ["`"],
+      ...tracker.current()
+    }));
+    subexit();
+  }
+  value += tracker.move(`
+`);
+  if (raw) {
+    value += tracker.move(raw + `
+`);
+  }
+  value += tracker.move(sequence);
+  exit2();
+  return value;
+}
+function map2(line, _, blank) {
+  return (blank ? "" : "    ") + line;
+}
+var init_code = () => {};
+
+// node_modules/mdast-util-to-markdown/lib/util/check-quote.js
+function checkQuote(state) {
+  const marker = state.options.quote || '"';
+  if (marker !== '"' && marker !== "'") {
+    throw new Error("Cannot serialize title with `" + marker + "` for `options.quote`, expected `\"`, or `'`");
+  }
+  return marker;
+}
+
+// node_modules/mdast-util-to-markdown/lib/handle/definition.js
+function definition2(node2, _, state, info) {
+  const quote = checkQuote(state);
+  const suffix = quote === '"' ? "Quote" : "Apostrophe";
+  const exit2 = state.enter("definition");
+  let subexit = state.enter("label");
+  const tracker = state.createTracker(info);
+  let value = tracker.move("[");
+  value += tracker.move(state.safe(state.associationId(node2), {
+    before: value,
+    after: "]",
+    ...tracker.current()
+  }));
+  value += tracker.move("]: ");
+  subexit();
+  if (!node2.url || /[\0- \u007F]/.test(node2.url)) {
+    subexit = state.enter("destinationLiteral");
+    value += tracker.move("<");
+    value += tracker.move(state.safe(node2.url, { before: value, after: ">", ...tracker.current() }));
+    value += tracker.move(">");
+  } else {
+    subexit = state.enter("destinationRaw");
+    value += tracker.move(state.safe(node2.url, {
+      before: value,
+      after: node2.title ? " " : `
+`,
+      ...tracker.current()
+    }));
+  }
+  subexit();
+  if (node2.title) {
+    subexit = state.enter(`title${suffix}`);
+    value += tracker.move(" " + quote);
+    value += tracker.move(state.safe(node2.title, {
+      before: value,
+      after: quote,
+      ...tracker.current()
+    }));
+    value += tracker.move(quote);
+    subexit();
+  }
+  exit2();
+  return value;
+}
+var init_definition2 = () => {};
+
+// node_modules/mdast-util-to-markdown/lib/util/check-emphasis.js
+function checkEmphasis(state) {
+  const marker = state.options.emphasis || "*";
+  if (marker !== "*" && marker !== "_") {
+    throw new Error("Cannot serialize emphasis with `" + marker + "` for `options.emphasis`, expected `*`, or `_`");
+  }
+  return marker;
+}
+
+// node_modules/mdast-util-to-markdown/lib/util/encode-character-reference.js
+function encodeCharacterReference(code2) {
+  return "&#x" + code2.toString(16).toUpperCase() + ";";
+}
+
+// node_modules/mdast-util-to-markdown/lib/util/encode-info.js
+function encodeInfo(outside, inside, marker) {
+  const outsideKind = classifyCharacter(outside);
+  const insideKind = classifyCharacter(inside);
+  if (outsideKind === undefined) {
+    return insideKind === undefined ? marker === "_" ? { inside: true, outside: true } : { inside: false, outside: false } : insideKind === 1 ? { inside: true, outside: true } : { inside: false, outside: true };
+  }
+  if (outsideKind === 1) {
+    return insideKind === undefined ? { inside: false, outside: false } : insideKind === 1 ? { inside: true, outside: true } : { inside: false, outside: false };
+  }
+  return insideKind === undefined ? { inside: false, outside: false } : insideKind === 1 ? { inside: true, outside: false } : { inside: false, outside: false };
+}
+var init_encode_info = __esm(() => {
+  init_dev7();
+});
+
+// node_modules/mdast-util-to-markdown/lib/handle/emphasis.js
+function emphasis(node2, _, state, info) {
+  const marker = checkEmphasis(state);
+  const exit2 = state.enter("emphasis");
+  const tracker = state.createTracker(info);
+  const before = tracker.move(marker);
+  let between = tracker.move(state.containerPhrasing(node2, {
+    after: marker,
+    before,
+    ...tracker.current()
+  }));
+  const betweenHead = between.charCodeAt(0);
+  const open = encodeInfo(info.before.charCodeAt(info.before.length - 1), betweenHead, marker);
+  if (open.inside) {
+    between = encodeCharacterReference(betweenHead) + between.slice(1);
+  }
+  const betweenTail = between.charCodeAt(between.length - 1);
+  const close = encodeInfo(info.after.charCodeAt(0), betweenTail, marker);
+  if (close.inside) {
+    between = between.slice(0, -1) + encodeCharacterReference(betweenTail);
+  }
+  const after = tracker.move(marker);
+  exit2();
+  state.attentionEncodeSurroundingInfo = {
+    after: close.outside,
+    before: open.outside
+  };
+  return before + between + after;
+}
+function emphasisPeek(_, _1, state) {
+  return state.options.emphasis || "*";
+}
+var init_emphasis = __esm(() => {
+  init_encode_info();
+  emphasis.peek = emphasisPeek;
+});
+
+// node_modules/unist-util-visit/lib/index.js
+function visit(tree, testOrVisitor, visitorOrReverse, maybeReverse) {
+  let reverse;
+  let test;
+  let visitor;
+  if (typeof testOrVisitor === "function" && typeof visitorOrReverse !== "function") {
+    test = undefined;
+    visitor = testOrVisitor;
+    reverse = visitorOrReverse;
+  } else {
+    test = testOrVisitor;
+    visitor = visitorOrReverse;
+    reverse = maybeReverse;
+  }
+  visitParents(tree, test, overload, reverse);
+  function overload(node2, parents) {
+    const parent = parents[parents.length - 1];
+    const index2 = parent ? parent.children.indexOf(node2) : undefined;
+    return visitor(node2, index2, parent);
+  }
+}
+var init_lib12 = __esm(() => {
+  init_unist_util_visit_parents();
+  init_unist_util_visit_parents();
+});
+
+// node_modules/unist-util-visit/index.js
+var init_unist_util_visit = __esm(() => {
+  init_lib12();
+});
+
+// node_modules/mdast-util-to-markdown/lib/util/format-heading-as-setext.js
+function formatHeadingAsSetext(node2, state) {
+  let literalWithBreak = false;
+  visit(node2, function(node3) {
+    if ("value" in node3 && /\r?\n|\r/.test(node3.value) || node3.type === "break") {
+      literalWithBreak = true;
+      return EXIT;
+    }
+  });
+  return Boolean((!node2.depth || node2.depth < 3) && toString(node2) && (state.options.setext || literalWithBreak));
+}
+var init_format_heading_as_setext = __esm(() => {
+  init_unist_util_visit();
+  init_mdast_util_to_string();
+});
+
+// node_modules/mdast-util-to-markdown/lib/handle/heading.js
+function heading(node2, _, state, info) {
+  const rank = Math.max(Math.min(6, node2.depth || 1), 1);
+  const tracker = state.createTracker(info);
+  if (formatHeadingAsSetext(node2, state)) {
+    const exit3 = state.enter("headingSetext");
+    const subexit2 = state.enter("phrasing");
+    const value2 = state.containerPhrasing(node2, {
+      ...tracker.current(),
+      before: `
+`,
+      after: `
+`
+    });
+    subexit2();
+    exit3();
+    return value2 + `
+` + (rank === 1 ? "=" : "-").repeat(value2.length - (Math.max(value2.lastIndexOf("\r"), value2.lastIndexOf(`
+`)) + 1));
+  }
+  const sequence = "#".repeat(rank);
+  const exit2 = state.enter("headingAtx");
+  const subexit = state.enter("phrasing");
+  tracker.move(sequence + " ");
+  let value = state.containerPhrasing(node2, {
+    before: "# ",
+    after: `
+`,
+    ...tracker.current()
+  });
+  if (/^[\t ]/.test(value)) {
+    value = encodeCharacterReference(value.charCodeAt(0)) + value.slice(1);
+  }
+  value = value ? sequence + " " + value : sequence;
+  if (state.options.closeAtx) {
+    value += " " + sequence;
+  }
+  subexit();
+  exit2();
+  return value;
+}
+var init_heading = __esm(() => {
+  init_format_heading_as_setext();
+});
+
+// node_modules/mdast-util-to-markdown/lib/handle/html.js
+function html(node2) {
+  return node2.value || "";
+}
+function htmlPeek() {
+  return "<";
+}
+var init_html = __esm(() => {
+  html.peek = htmlPeek;
+});
+
+// node_modules/mdast-util-to-markdown/lib/handle/image.js
+function image(node2, _, state, info) {
+  const quote = checkQuote(state);
+  const suffix = quote === '"' ? "Quote" : "Apostrophe";
+  const exit2 = state.enter("image");
+  let subexit = state.enter("label");
+  const tracker = state.createTracker(info);
+  let value = tracker.move("![");
+  value += tracker.move(state.safe(node2.alt, { before: value, after: "]", ...tracker.current() }));
+  value += tracker.move("](");
+  subexit();
+  if (!node2.url && node2.title || /[\0- \u007F]/.test(node2.url)) {
+    subexit = state.enter("destinationLiteral");
+    value += tracker.move("<");
+    value += tracker.move(state.safe(node2.url, { before: value, after: ">", ...tracker.current() }));
+    value += tracker.move(">");
+  } else {
+    subexit = state.enter("destinationRaw");
+    value += tracker.move(state.safe(node2.url, {
+      before: value,
+      after: node2.title ? " " : ")",
+      ...tracker.current()
+    }));
+  }
+  subexit();
+  if (node2.title) {
+    subexit = state.enter(`title${suffix}`);
+    value += tracker.move(" " + quote);
+    value += tracker.move(state.safe(node2.title, {
+      before: value,
+      after: quote,
+      ...tracker.current()
+    }));
+    value += tracker.move(quote);
+    subexit();
+  }
+  value += tracker.move(")");
+  exit2();
+  return value;
+}
+function imagePeek() {
+  return "!";
+}
+var init_image = __esm(() => {
+  image.peek = imagePeek;
+});
+
+// node_modules/mdast-util-to-markdown/lib/handle/image-reference.js
+function imageReference(node2, _, state, info) {
+  const type = node2.referenceType;
+  const exit2 = state.enter("imageReference");
+  let subexit = state.enter("label");
+  const tracker = state.createTracker(info);
+  let value = tracker.move("![");
+  const alt = state.safe(node2.alt, {
+    before: value,
+    after: "]",
+    ...tracker.current()
+  });
+  value += tracker.move(alt + "][");
+  subexit();
+  const stack = state.stack;
+  state.stack = [];
+  subexit = state.enter("reference");
+  const reference = state.safe(state.associationId(node2), {
+    before: value,
+    after: "]",
+    ...tracker.current()
+  });
+  subexit();
+  state.stack = stack;
+  exit2();
+  if (type === "full" || !alt || alt !== reference) {
+    value += tracker.move(reference + "]");
+  } else if (type === "shortcut") {
+    value = value.slice(0, -1);
+  } else {
+    value += tracker.move("]");
+  }
+  return value;
+}
+function imageReferencePeek() {
+  return "!";
+}
+var init_image_reference = __esm(() => {
+  imageReference.peek = imageReferencePeek;
+});
+
+// node_modules/mdast-util-to-markdown/lib/handle/inline-code.js
+function inlineCode(node2, _, state) {
+  let value = node2.value || "";
+  let sequence = "`";
+  let index2 = -1;
+  while (new RegExp("(^|[^`])" + sequence + "([^`]|$)").test(value)) {
+    sequence += "`";
+  }
+  if (/[^ \r\n]/.test(value) && (/^[ \r\n]/.test(value) && /[ \r\n]$/.test(value) || /^`|`$/.test(value))) {
+    value = " " + value + " ";
+  }
+  while (++index2 < state.unsafe.length) {
+    const pattern = state.unsafe[index2];
+    const expression = state.compilePattern(pattern);
+    let match;
+    if (!pattern.atBreak)
+      continue;
+    while (match = expression.exec(value)) {
+      let position2 = match.index;
+      if (value.charCodeAt(position2) === 10 && value.charCodeAt(position2 - 1) === 13) {
+        position2--;
+      }
+      value = value.slice(0, position2) + " " + value.slice(match.index + 1);
+    }
+  }
+  return sequence + value + sequence;
+}
+function inlineCodePeek() {
+  return "`";
+}
+var init_inline_code = __esm(() => {
+  inlineCode.peek = inlineCodePeek;
+});
+
+// node_modules/mdast-util-to-markdown/lib/util/format-link-as-autolink.js
+function formatLinkAsAutolink(node2, state) {
+  const raw = toString(node2);
+  return Boolean(!state.options.resourceLink && node2.url && !node2.title && node2.children && node2.children.length === 1 && node2.children[0].type === "text" && (raw === node2.url || "mailto:" + raw === node2.url) && /^[a-z][a-z+.-]+:/i.test(node2.url) && !/[\0- <>\u007F]/.test(node2.url));
+}
+var init_format_link_as_autolink = __esm(() => {
+  init_mdast_util_to_string();
+});
+
+// node_modules/mdast-util-to-markdown/lib/handle/link.js
+function link(node2, _, state, info) {
+  const quote = checkQuote(state);
+  const suffix = quote === '"' ? "Quote" : "Apostrophe";
+  const tracker = state.createTracker(info);
+  let exit2;
+  let subexit;
+  if (formatLinkAsAutolink(node2, state)) {
+    const stack = state.stack;
+    state.stack = [];
+    exit2 = state.enter("autolink");
+    let value2 = tracker.move("<");
+    value2 += tracker.move(state.containerPhrasing(node2, {
+      before: value2,
+      after: ">",
+      ...tracker.current()
+    }));
+    value2 += tracker.move(">");
+    exit2();
+    state.stack = stack;
+    return value2;
+  }
+  exit2 = state.enter("link");
+  subexit = state.enter("label");
+  let value = tracker.move("[");
+  value += tracker.move(state.containerPhrasing(node2, {
+    before: value,
+    after: "](",
+    ...tracker.current()
+  }));
+  value += tracker.move("](");
+  subexit();
+  if (!node2.url && node2.title || /[\0- \u007F]/.test(node2.url)) {
+    subexit = state.enter("destinationLiteral");
+    value += tracker.move("<");
+    value += tracker.move(state.safe(node2.url, { before: value, after: ">", ...tracker.current() }));
+    value += tracker.move(">");
+  } else {
+    subexit = state.enter("destinationRaw");
+    value += tracker.move(state.safe(node2.url, {
+      before: value,
+      after: node2.title ? " " : ")",
+      ...tracker.current()
+    }));
+  }
+  subexit();
+  if (node2.title) {
+    subexit = state.enter(`title${suffix}`);
+    value += tracker.move(" " + quote);
+    value += tracker.move(state.safe(node2.title, {
+      before: value,
+      after: quote,
+      ...tracker.current()
+    }));
+    value += tracker.move(quote);
+    subexit();
+  }
+  value += tracker.move(")");
+  exit2();
+  return value;
+}
+function linkPeek(node2, _, state) {
+  return formatLinkAsAutolink(node2, state) ? "<" : "[";
+}
+var init_link = __esm(() => {
+  init_format_link_as_autolink();
+  link.peek = linkPeek;
+});
+
+// node_modules/mdast-util-to-markdown/lib/handle/link-reference.js
+function linkReference(node2, _, state, info) {
+  const type = node2.referenceType;
+  const exit2 = state.enter("linkReference");
+  let subexit = state.enter("label");
+  const tracker = state.createTracker(info);
+  let value = tracker.move("[");
+  const text3 = state.containerPhrasing(node2, {
+    before: value,
+    after: "]",
+    ...tracker.current()
+  });
+  value += tracker.move(text3 + "][");
+  subexit();
+  const stack = state.stack;
+  state.stack = [];
+  subexit = state.enter("reference");
+  const reference = state.safe(state.associationId(node2), {
+    before: value,
+    after: "]",
+    ...tracker.current()
+  });
+  subexit();
+  state.stack = stack;
+  exit2();
+  if (type === "full" || !text3 || text3 !== reference) {
+    value += tracker.move(reference + "]");
+  } else if (type === "shortcut") {
+    value = value.slice(0, -1);
+  } else {
+    value += tracker.move("]");
+  }
+  return value;
+}
+function linkReferencePeek() {
+  return "[";
+}
+var init_link_reference = __esm(() => {
+  linkReference.peek = linkReferencePeek;
+});
+
+// node_modules/mdast-util-to-markdown/lib/util/check-bullet.js
+function checkBullet(state) {
+  const marker = state.options.bullet || "*";
+  if (marker !== "*" && marker !== "+" && marker !== "-") {
+    throw new Error("Cannot serialize items with `" + marker + "` for `options.bullet`, expected `*`, `+`, or `-`");
+  }
+  return marker;
+}
+
+// node_modules/mdast-util-to-markdown/lib/util/check-bullet-other.js
+function checkBulletOther(state) {
+  const bullet = checkBullet(state);
+  const bulletOther = state.options.bulletOther;
+  if (!bulletOther) {
+    return bullet === "*" ? "-" : "*";
+  }
+  if (bulletOther !== "*" && bulletOther !== "+" && bulletOther !== "-") {
+    throw new Error("Cannot serialize items with `" + bulletOther + "` for `options.bulletOther`, expected `*`, `+`, or `-`");
+  }
+  if (bulletOther === bullet) {
+    throw new Error("Expected `bullet` (`" + bullet + "`) and `bulletOther` (`" + bulletOther + "`) to be different");
+  }
+  return bulletOther;
+}
+var init_check_bullet_other = () => {};
+
+// node_modules/mdast-util-to-markdown/lib/util/check-bullet-ordered.js
+function checkBulletOrdered(state) {
+  const marker = state.options.bulletOrdered || ".";
+  if (marker !== "." && marker !== ")") {
+    throw new Error("Cannot serialize items with `" + marker + "` for `options.bulletOrdered`, expected `.` or `)`");
+  }
+  return marker;
+}
+
+// node_modules/mdast-util-to-markdown/lib/util/check-rule.js
+function checkRule(state) {
+  const marker = state.options.rule || "*";
+  if (marker !== "*" && marker !== "-" && marker !== "_") {
+    throw new Error("Cannot serialize rules with `" + marker + "` for `options.rule`, expected `*`, `-`, or `_`");
+  }
+  return marker;
+}
+
+// node_modules/mdast-util-to-markdown/lib/handle/list.js
+function list2(node2, parent, state, info) {
+  const exit2 = state.enter("list");
+  const bulletCurrent = state.bulletCurrent;
+  let bullet = node2.ordered ? checkBulletOrdered(state) : checkBullet(state);
+  const bulletOther = node2.ordered ? bullet === "." ? ")" : "." : checkBulletOther(state);
+  let useDifferentMarker = parent && state.bulletLastUsed ? bullet === state.bulletLastUsed : false;
+  if (!node2.ordered) {
+    const firstListItem = node2.children ? node2.children[0] : undefined;
+    if ((bullet === "*" || bullet === "-") && firstListItem && (!firstListItem.children || !firstListItem.children[0]) && state.stack[state.stack.length - 1] === "list" && state.stack[state.stack.length - 2] === "listItem" && state.stack[state.stack.length - 3] === "list" && state.stack[state.stack.length - 4] === "listItem" && state.indexStack[state.indexStack.length - 1] === 0 && state.indexStack[state.indexStack.length - 2] === 0 && state.indexStack[state.indexStack.length - 3] === 0) {
+      useDifferentMarker = true;
+    }
+    if (checkRule(state) === bullet && firstListItem) {
+      let index2 = -1;
+      while (++index2 < node2.children.length) {
+        const item = node2.children[index2];
+        if (item && item.type === "listItem" && item.children && item.children[0] && item.children[0].type === "thematicBreak") {
+          useDifferentMarker = true;
+          break;
+        }
+      }
+    }
+  }
+  if (useDifferentMarker) {
+    bullet = bulletOther;
+  }
+  state.bulletCurrent = bullet;
+  const value = state.containerFlow(node2, info);
+  state.bulletLastUsed = bullet;
+  state.bulletCurrent = bulletCurrent;
+  exit2();
+  return value;
+}
+var init_list2 = __esm(() => {
+  init_check_bullet_other();
+});
+
+// node_modules/mdast-util-to-markdown/lib/util/check-list-item-indent.js
+function checkListItemIndent(state) {
+  const style = state.options.listItemIndent || "one";
+  if (style !== "tab" && style !== "one" && style !== "mixed") {
+    throw new Error("Cannot serialize items with `" + style + "` for `options.listItemIndent`, expected `tab`, `one`, or `mixed`");
+  }
+  return style;
+}
+
+// node_modules/mdast-util-to-markdown/lib/handle/list-item.js
+function listItem(node2, parent, state, info) {
+  const listItemIndent = checkListItemIndent(state);
+  let bullet = state.bulletCurrent || checkBullet(state);
+  if (parent && parent.type === "list" && parent.ordered) {
+    bullet = (typeof parent.start === "number" && parent.start > -1 ? parent.start : 1) + (state.options.incrementListMarker === false ? 0 : parent.children.indexOf(node2)) + bullet;
+  }
+  let size = bullet.length + 1;
+  if (listItemIndent === "tab" || listItemIndent === "mixed" && (parent && parent.type === "list" && parent.spread || node2.spread)) {
+    size = Math.ceil(size / 4) * 4;
+  }
+  const tracker = state.createTracker(info);
+  tracker.move(bullet + " ".repeat(size - bullet.length));
+  tracker.shift(size);
+  const exit2 = state.enter("listItem");
+  const value = state.indentLines(state.containerFlow(node2, tracker.current()), map3);
+  exit2();
+  return value;
+  function map3(line, index2, blank) {
+    if (index2) {
+      return (blank ? "" : " ".repeat(size)) + line;
+    }
+    return (blank ? bullet : bullet + " ".repeat(size - bullet.length)) + line;
+  }
+}
+var init_list_item = () => {};
+
+// node_modules/mdast-util-to-markdown/lib/handle/paragraph.js
+function paragraph(node2, _, state, info) {
+  const exit2 = state.enter("paragraph");
+  const subexit = state.enter("phrasing");
+  const value = state.containerPhrasing(node2, info);
+  subexit();
+  exit2();
+  return value;
+}
+
+// node_modules/mdast-util-phrasing/lib/index.js
+var phrasing;
+var init_lib13 = __esm(() => {
+  init_unist_util_is();
+  phrasing = convert([
+    "break",
+    "delete",
+    "emphasis",
+    "footnote",
+    "footnoteReference",
+    "image",
+    "imageReference",
+    "inlineCode",
+    "inlineMath",
+    "link",
+    "linkReference",
+    "mdxJsxTextElement",
+    "mdxTextExpression",
+    "strong",
+    "text",
+    "textDirective"
+  ]);
+});
+
+// node_modules/mdast-util-phrasing/index.js
+var init_mdast_util_phrasing = __esm(() => {
+  init_lib13();
+});
+
+// node_modules/mdast-util-to-markdown/lib/handle/root.js
+function root(node2, _, state, info) {
+  const hasPhrasing = node2.children.some(function(d) {
+    return phrasing(d);
+  });
+  const container = hasPhrasing ? state.containerPhrasing : state.containerFlow;
+  return container.call(state, node2, info);
+}
+var init_root = __esm(() => {
+  init_mdast_util_phrasing();
+});
+
+// node_modules/mdast-util-to-markdown/lib/util/check-strong.js
+function checkStrong(state) {
+  const marker = state.options.strong || "*";
+  if (marker !== "*" && marker !== "_") {
+    throw new Error("Cannot serialize strong with `" + marker + "` for `options.strong`, expected `*`, or `_`");
+  }
+  return marker;
+}
+
+// node_modules/mdast-util-to-markdown/lib/handle/strong.js
+function strong(node2, _, state, info) {
+  const marker = checkStrong(state);
+  const exit2 = state.enter("strong");
+  const tracker = state.createTracker(info);
+  const before = tracker.move(marker + marker);
+  let between = tracker.move(state.containerPhrasing(node2, {
+    after: marker,
+    before,
+    ...tracker.current()
+  }));
+  const betweenHead = between.charCodeAt(0);
+  const open = encodeInfo(info.before.charCodeAt(info.before.length - 1), betweenHead, marker);
+  if (open.inside) {
+    between = encodeCharacterReference(betweenHead) + between.slice(1);
+  }
+  const betweenTail = between.charCodeAt(between.length - 1);
+  const close = encodeInfo(info.after.charCodeAt(0), betweenTail, marker);
+  if (close.inside) {
+    between = between.slice(0, -1) + encodeCharacterReference(betweenTail);
+  }
+  const after = tracker.move(marker + marker);
+  exit2();
+  state.attentionEncodeSurroundingInfo = {
+    after: close.outside,
+    before: open.outside
+  };
+  return before + between + after;
+}
+function strongPeek(_, _1, state) {
+  return state.options.strong || "*";
+}
+var init_strong = __esm(() => {
+  init_encode_info();
+  strong.peek = strongPeek;
+});
+
+// node_modules/mdast-util-to-markdown/lib/handle/text.js
+function text3(node2, _, state, info) {
+  return state.safe(node2.value, info);
+}
+
+// node_modules/mdast-util-to-markdown/lib/util/check-rule-repetition.js
+function checkRuleRepetition(state) {
+  const repetition = state.options.ruleRepetition || 3;
+  if (repetition < 3) {
+    throw new Error("Cannot serialize rules with repetition `" + repetition + "` for `options.ruleRepetition`, expected `3` or more");
+  }
+  return repetition;
+}
+
+// node_modules/mdast-util-to-markdown/lib/handle/thematic-break.js
+function thematicBreak2(_, _1, state) {
+  const value = (checkRule(state) + (state.options.ruleSpaces ? " " : "")).repeat(checkRuleRepetition(state));
+  return state.options.ruleSpaces ? value.slice(0, -1) : value;
+}
+var init_thematic_break2 = () => {};
+
+// node_modules/mdast-util-to-markdown/lib/handle/index.js
+var handle;
+var init_handle = __esm(() => {
+  init_break();
+  init_code();
+  init_definition2();
+  init_emphasis();
+  init_heading();
+  init_html();
+  init_image();
+  init_image_reference();
+  init_inline_code();
+  init_link();
+  init_link_reference();
+  init_list2();
+  init_list_item();
+  init_root();
+  init_strong();
+  init_thematic_break2();
+  handle = {
+    blockquote,
+    break: hardBreak,
+    code,
+    definition: definition2,
+    emphasis,
+    hardBreak,
+    heading,
+    html,
+    image,
+    imageReference,
+    inlineCode,
+    link,
+    linkReference,
+    list: list2,
+    listItem,
+    paragraph,
+    root,
+    strong,
+    text: text3,
+    thematicBreak: thematicBreak2
+  };
+});
+
+// node_modules/mdast-util-to-markdown/index.js
+var init_mdast_util_to_markdown = __esm(() => {
+  init_handle();
+});
+
+// node_modules/mdast-util-gfm-table/lib/index.js
+function gfmTableFromMarkdown() {
+  return {
+    enter: {
+      table: enterTable,
+      tableData: enterCell,
+      tableHeader: enterCell,
+      tableRow: enterRow
+    },
+    exit: {
+      codeText: exitCodeText,
+      table: exitTable,
+      tableData: exit2,
+      tableHeader: exit2,
+      tableRow: exit2
+    }
+  };
+}
+function enterTable(token) {
+  const align = token._align;
+  ok(align, "expected `_align` on table");
+  this.enter({
+    type: "table",
+    align: align.map(function(d) {
+      return d === "none" ? null : d;
+    }),
+    children: []
+  }, token);
+  this.data.inTable = true;
+}
+function exitTable(token) {
+  this.exit(token);
+  this.data.inTable = undefined;
+}
+function enterRow(token) {
+  this.enter({ type: "tableRow", children: [] }, token);
+}
+function exit2(token) {
+  this.exit(token);
+}
+function enterCell(token) {
+  this.enter({ type: "tableCell", children: [] }, token);
+}
+function exitCodeText(token) {
+  let value = this.resume();
+  if (this.data.inTable) {
+    value = value.replace(/\\([\\|])/g, replace);
+  }
+  const node2 = this.stack[this.stack.length - 1];
+  ok(node2.type === "inlineCode");
+  node2.value = value;
+  this.exit(token);
+}
+function replace($0, $1) {
+  return $1 === "|" ? $1 : $0;
+}
+function gfmTableToMarkdown(options) {
+  const settings = options || {};
+  const padding = settings.tableCellPadding;
+  const alignDelimiters = settings.tablePipeAlign;
+  const stringLength = settings.stringLength;
+  const around = padding ? " " : "|";
+  return {
+    unsafe: [
+      { character: "\r", inConstruct: "tableCell" },
+      { character: `
+`, inConstruct: "tableCell" },
+      { atBreak: true, character: "|", after: "[	 :-]" },
+      { character: "|", inConstruct: "tableCell" },
+      { atBreak: true, character: ":", after: "-" },
+      { atBreak: true, character: "-", after: "[:|-]" }
+    ],
+    handlers: {
+      inlineCode: inlineCodeWithTable,
+      table: handleTable,
+      tableCell: handleTableCell,
+      tableRow: handleTableRow
+    }
+  };
+  function handleTable(node2, _, state, info) {
+    return serializeData(handleTableAsData(node2, state, info), node2.align);
+  }
+  function handleTableRow(node2, _, state, info) {
+    const row = handleTableRowAsData(node2, state, info);
+    const value = serializeData([row]);
+    return value.slice(0, value.indexOf(`
+`));
+  }
+  function handleTableCell(node2, _, state, info) {
+    const exit3 = state.enter("tableCell");
+    const subexit = state.enter("phrasing");
+    const value = state.containerPhrasing(node2, {
+      ...info,
+      before: around,
+      after: around
+    });
+    subexit();
+    exit3();
+    return value;
+  }
+  function serializeData(matrix, align) {
+    return markdownTable(matrix, {
+      align,
+      alignDelimiters,
+      padding,
+      stringLength
+    });
+  }
+  function handleTableAsData(node2, state, info) {
+    const children = node2.children;
+    let index2 = -1;
+    const result = [];
+    const subexit = state.enter("table");
+    while (++index2 < children.length) {
+      result[index2] = handleTableRowAsData(children[index2], state, info);
+    }
+    subexit();
+    return result;
+  }
+  function handleTableRowAsData(node2, state, info) {
+    const children = node2.children;
+    let index2 = -1;
+    const result = [];
+    const subexit = state.enter("tableRow");
+    while (++index2 < children.length) {
+      result[index2] = handleTableCell(children[index2], node2, state, info);
+    }
+    subexit();
+    return result;
+  }
+  function inlineCodeWithTable(node2, parent, state) {
+    let value = handle.inlineCode(node2, parent, state);
+    if (state.stack.includes("tableCell")) {
+      value = value.replace(/\|/g, "\\$&");
+    }
+    return value;
+  }
+}
+var init_lib14 = __esm(() => {
+  init_development();
+  init_mdast_util_to_markdown();
+});
+
+// node_modules/mdast-util-gfm-table/index.js
+var init_mdast_util_gfm_table = __esm(() => {
+  init_lib14();
+});
+
+// node_modules/mdast-util-gfm-task-list-item/lib/index.js
+function gfmTaskListItemFromMarkdown() {
+  return {
+    exit: {
+      taskListCheckValueChecked: exitCheck,
+      taskListCheckValueUnchecked: exitCheck,
+      paragraph: exitParagraphWithTaskListItem
+    }
+  };
+}
+function gfmTaskListItemToMarkdown() {
+  return {
+    unsafe: [{ atBreak: true, character: "-", after: "[:|-]" }],
+    handlers: { listItem: listItemWithTaskListItem }
+  };
+}
+function exitCheck(token) {
+  const node2 = this.stack[this.stack.length - 2];
+  ok(node2.type === "listItem");
+  node2.checked = token.type === "taskListCheckValueChecked";
+}
+function exitParagraphWithTaskListItem(token) {
+  const parent = this.stack[this.stack.length - 2];
+  if (parent && parent.type === "listItem" && typeof parent.checked === "boolean") {
+    const node2 = this.stack[this.stack.length - 1];
+    ok(node2.type === "paragraph");
+    const head = node2.children[0];
+    if (head && head.type === "text") {
+      const siblings = parent.children;
+      let index2 = -1;
+      let firstParaghraph;
+      while (++index2 < siblings.length) {
+        const sibling = siblings[index2];
+        if (sibling.type === "paragraph") {
+          firstParaghraph = sibling;
+          break;
+        }
+      }
+      if (firstParaghraph === node2) {
+        head.value = head.value.slice(1);
+        if (head.value.length === 0) {
+          node2.children.shift();
+        } else if (node2.position && head.position && typeof head.position.start.offset === "number") {
+          head.position.start.column++;
+          head.position.start.offset++;
+          node2.position.start = Object.assign({}, head.position.start);
+        }
+      }
+    }
+  }
+  this.exit(token);
+}
+function listItemWithTaskListItem(node2, parent, state, info) {
+  const head = node2.children[0];
+  const checkable = typeof node2.checked === "boolean" && head && head.type === "paragraph";
+  const checkbox = "[" + (node2.checked ? "x" : " ") + "] ";
+  const tracker = state.createTracker(info);
+  if (checkable) {
+    tracker.move(checkbox);
+  }
+  let value = handle.listItem(node2, parent, state, {
+    ...info,
+    ...tracker.current()
+  });
+  if (checkable) {
+    value = value.replace(/^(?:[*+-]|\d+\.)([\r\n]| {1,3})/, check);
+  }
+  return value;
+  function check($0) {
+    return $0 + checkbox;
+  }
+}
+var init_lib15 = __esm(() => {
+  init_development();
+  init_mdast_util_to_markdown();
+});
+
+// node_modules/mdast-util-gfm-task-list-item/index.js
+var init_mdast_util_gfm_task_list_item = __esm(() => {
+  init_lib15();
+});
+
+// node_modules/mdast-util-gfm/lib/index.js
+function gfmFromMarkdown() {
+  return [
+    gfmAutolinkLiteralFromMarkdown(),
+    gfmFootnoteFromMarkdown(),
+    gfmStrikethroughFromMarkdown(),
+    gfmTableFromMarkdown(),
+    gfmTaskListItemFromMarkdown()
+  ];
+}
+function gfmToMarkdown(options) {
+  return {
+    extensions: [
+      gfmAutolinkLiteralToMarkdown(),
+      gfmFootnoteToMarkdown(options),
+      gfmStrikethroughToMarkdown(),
+      gfmTableToMarkdown(options),
+      gfmTaskListItemToMarkdown()
+    ]
+  };
+}
+var init_lib16 = __esm(() => {
+  init_mdast_util_gfm_autolink_literal();
+  init_mdast_util_gfm_footnote();
+  init_mdast_util_gfm_strikethrough();
+  init_mdast_util_gfm_table();
+  init_mdast_util_gfm_task_list_item();
+});
+
+// node_modules/mdast-util-gfm/index.js
+var init_mdast_util_gfm = __esm(() => {
+  init_lib16();
+});
+
+// node_modules/micromark-extension-gfm-autolink-literal/dev/lib/syntax.js
+function gfmAutolinkLiteral() {
+  return { text: text4 };
+}
+function tokenizeEmailAutolink(effects, ok3, nok) {
+  const self2 = this;
+  let dot;
+  let data;
+  return start;
+  function start(code3) {
+    if (!gfmAtext(code3) || !previousEmail.call(self2, self2.previous) || previousUnbalanced(self2.events)) {
+      return nok(code3);
+    }
+    effects.enter("literalAutolink");
+    effects.enter("literalAutolinkEmail");
+    return atext(code3);
+  }
+  function atext(code3) {
+    if (gfmAtext(code3)) {
+      effects.consume(code3);
+      return atext;
+    }
+    if (code3 === codes.atSign) {
+      effects.consume(code3);
+      return emailDomain;
+    }
+    return nok(code3);
+  }
+  function emailDomain(code3) {
+    if (code3 === codes.dot) {
+      return effects.check(emailDomainDotTrail, emailDomainAfter, emailDomainDot)(code3);
+    }
+    if (code3 === codes.dash || code3 === codes.underscore || asciiAlphanumeric(code3)) {
+      data = true;
+      effects.consume(code3);
+      return emailDomain;
+    }
+    return emailDomainAfter(code3);
+  }
+  function emailDomainDot(code3) {
+    effects.consume(code3);
+    dot = true;
+    return emailDomain;
+  }
+  function emailDomainAfter(code3) {
+    if (data && dot && asciiAlpha(self2.previous)) {
+      effects.exit("literalAutolinkEmail");
+      effects.exit("literalAutolink");
+      return ok3(code3);
+    }
+    return nok(code3);
+  }
+}
+function tokenizeWwwAutolink(effects, ok3, nok) {
+  const self2 = this;
+  return wwwStart;
+  function wwwStart(code3) {
+    if (code3 !== codes.uppercaseW && code3 !== codes.lowercaseW || !previousWww.call(self2, self2.previous) || previousUnbalanced(self2.events)) {
+      return nok(code3);
+    }
+    effects.enter("literalAutolink");
+    effects.enter("literalAutolinkWww");
+    return effects.check(wwwPrefix, effects.attempt(domain, effects.attempt(path, wwwAfter), nok), nok)(code3);
+  }
+  function wwwAfter(code3) {
+    effects.exit("literalAutolinkWww");
+    effects.exit("literalAutolink");
+    return ok3(code3);
+  }
+}
+function tokenizeProtocolAutolink(effects, ok3, nok) {
+  const self2 = this;
+  let buffer = "";
+  let seen = false;
+  return protocolStart;
+  function protocolStart(code3) {
+    if ((code3 === codes.uppercaseH || code3 === codes.lowercaseH) && previousProtocol.call(self2, self2.previous) && !previousUnbalanced(self2.events)) {
+      effects.enter("literalAutolink");
+      effects.enter("literalAutolinkHttp");
+      buffer += String.fromCodePoint(code3);
+      effects.consume(code3);
+      return protocolPrefixInside;
+    }
+    return nok(code3);
+  }
+  function protocolPrefixInside(code3) {
+    if (asciiAlpha(code3) && buffer.length < 5) {
+      buffer += String.fromCodePoint(code3);
+      effects.consume(code3);
+      return protocolPrefixInside;
+    }
+    if (code3 === codes.colon) {
+      const protocol = buffer.toLowerCase();
+      if (protocol === "http" || protocol === "https") {
+        effects.consume(code3);
+        return protocolSlashesInside;
+      }
+    }
+    return nok(code3);
+  }
+  function protocolSlashesInside(code3) {
+    if (code3 === codes.slash) {
+      effects.consume(code3);
+      if (seen) {
+        return afterProtocol;
+      }
+      seen = true;
+      return protocolSlashesInside;
+    }
+    return nok(code3);
+  }
+  function afterProtocol(code3) {
+    return code3 === codes.eof || asciiControl(code3) || markdownLineEndingOrSpace(code3) || unicodeWhitespace(code3) || unicodePunctuation(code3) ? nok(code3) : effects.attempt(domain, effects.attempt(path, protocolAfter), nok)(code3);
+  }
+  function protocolAfter(code3) {
+    effects.exit("literalAutolinkHttp");
+    effects.exit("literalAutolink");
+    return ok3(code3);
+  }
+}
+function tokenizeWwwPrefix(effects, ok3, nok) {
+  let size = 0;
+  return wwwPrefixInside;
+  function wwwPrefixInside(code3) {
+    if ((code3 === codes.uppercaseW || code3 === codes.lowercaseW) && size < 3) {
+      size++;
+      effects.consume(code3);
+      return wwwPrefixInside;
+    }
+    if (code3 === codes.dot && size === 3) {
+      effects.consume(code3);
+      return wwwPrefixAfter;
+    }
+    return nok(code3);
+  }
+  function wwwPrefixAfter(code3) {
+    return code3 === codes.eof ? nok(code3) : ok3(code3);
+  }
+}
+function tokenizeDomain(effects, ok3, nok) {
+  let underscoreInLastSegment;
+  let underscoreInLastLastSegment;
+  let seen;
+  return domainInside;
+  function domainInside(code3) {
+    if (code3 === codes.dot || code3 === codes.underscore) {
+      return effects.check(trail, domainAfter, domainAtPunctuation)(code3);
+    }
+    if (code3 === codes.eof || markdownLineEndingOrSpace(code3) || unicodeWhitespace(code3) || code3 !== codes.dash && unicodePunctuation(code3)) {
+      return domainAfter(code3);
+    }
+    seen = true;
+    effects.consume(code3);
+    return domainInside;
+  }
+  function domainAtPunctuation(code3) {
+    if (code3 === codes.underscore) {
+      underscoreInLastSegment = true;
+    } else {
+      underscoreInLastLastSegment = underscoreInLastSegment;
+      underscoreInLastSegment = undefined;
+    }
+    effects.consume(code3);
+    return domainInside;
+  }
+  function domainAfter(code3) {
+    if (underscoreInLastLastSegment || underscoreInLastSegment || !seen) {
+      return nok(code3);
+    }
+    return ok3(code3);
+  }
+}
+function tokenizePath(effects, ok3) {
+  let sizeOpen = 0;
+  let sizeClose = 0;
+  return pathInside;
+  function pathInside(code3) {
+    if (code3 === codes.leftParenthesis) {
+      sizeOpen++;
+      effects.consume(code3);
+      return pathInside;
+    }
+    if (code3 === codes.rightParenthesis && sizeClose < sizeOpen) {
+      return pathAtPunctuation(code3);
+    }
+    if (code3 === codes.exclamationMark || code3 === codes.quotationMark || code3 === codes.ampersand || code3 === codes.apostrophe || code3 === codes.rightParenthesis || code3 === codes.asterisk || code3 === codes.comma || code3 === codes.dot || code3 === codes.colon || code3 === codes.semicolon || code3 === codes.lessThan || code3 === codes.questionMark || code3 === codes.rightSquareBracket || code3 === codes.underscore || code3 === codes.tilde) {
+      return effects.check(trail, ok3, pathAtPunctuation)(code3);
+    }
+    if (code3 === codes.eof || markdownLineEndingOrSpace(code3) || unicodeWhitespace(code3)) {
+      return ok3(code3);
+    }
+    effects.consume(code3);
+    return pathInside;
+  }
+  function pathAtPunctuation(code3) {
+    if (code3 === codes.rightParenthesis) {
+      sizeClose++;
+    }
+    effects.consume(code3);
+    return pathInside;
+  }
+}
+function tokenizeTrail(effects, ok3, nok) {
+  return trail2;
+  function trail2(code3) {
+    if (code3 === codes.exclamationMark || code3 === codes.quotationMark || code3 === codes.apostrophe || code3 === codes.rightParenthesis || code3 === codes.asterisk || code3 === codes.comma || code3 === codes.dot || code3 === codes.colon || code3 === codes.semicolon || code3 === codes.questionMark || code3 === codes.underscore || code3 === codes.tilde) {
+      effects.consume(code3);
+      return trail2;
+    }
+    if (code3 === codes.ampersand) {
+      effects.consume(code3);
+      return trailCharacterReferenceStart;
+    }
+    if (code3 === codes.rightSquareBracket) {
+      effects.consume(code3);
+      return trailBracketAfter;
+    }
+    if (code3 === codes.lessThan || code3 === codes.eof || markdownLineEndingOrSpace(code3) || unicodeWhitespace(code3)) {
+      return ok3(code3);
+    }
+    return nok(code3);
+  }
+  function trailBracketAfter(code3) {
+    if (code3 === codes.eof || code3 === codes.leftParenthesis || code3 === codes.leftSquareBracket || markdownLineEndingOrSpace(code3) || unicodeWhitespace(code3)) {
+      return ok3(code3);
+    }
+    return trail2(code3);
+  }
+  function trailCharacterReferenceStart(code3) {
+    return asciiAlpha(code3) ? trailCharacterReferenceInside(code3) : nok(code3);
+  }
+  function trailCharacterReferenceInside(code3) {
+    if (code3 === codes.semicolon) {
+      effects.consume(code3);
+      return trail2;
+    }
+    if (asciiAlpha(code3)) {
+      effects.consume(code3);
+      return trailCharacterReferenceInside;
+    }
+    return nok(code3);
+  }
+}
+function tokenizeEmailDomainDotTrail(effects, ok3, nok) {
+  return start;
+  function start(code3) {
+    effects.consume(code3);
+    return after;
+  }
+  function after(code3) {
+    return asciiAlphanumeric(code3) ? nok(code3) : ok3(code3);
+  }
+}
+function previousWww(code3) {
+  return code3 === codes.eof || code3 === codes.leftParenthesis || code3 === codes.asterisk || code3 === codes.underscore || code3 === codes.leftSquareBracket || code3 === codes.rightSquareBracket || code3 === codes.tilde || markdownLineEndingOrSpace(code3);
+}
+function previousProtocol(code3) {
+  return !asciiAlpha(code3);
+}
+function previousEmail(code3) {
+  return !(code3 === codes.slash || gfmAtext(code3));
+}
+function gfmAtext(code3) {
+  return code3 === codes.plusSign || code3 === codes.dash || code3 === codes.dot || code3 === codes.underscore || asciiAlphanumeric(code3);
+}
+function previousUnbalanced(events) {
+  let index2 = events.length;
+  let result = false;
+  while (index2--) {
+    const token = events[index2][1];
+    if ((token.type === "labelLink" || token.type === "labelImage") && !token._balanced) {
+      result = true;
+      break;
+    }
+    if (token._gfmAutolinkLiteralWalkedInto) {
+      result = false;
+      break;
+    }
+  }
+  if (events.length > 0 && !result) {
+    events[events.length - 1][1]._gfmAutolinkLiteralWalkedInto = true;
+  }
+  return result;
+}
+var wwwPrefix, domain, path, trail, emailDomainDotTrail, wwwAutolink, protocolAutolink, emailAutolink, text4, code2;
+var init_syntax = __esm(() => {
+  init_dev4();
+  init_default();
+  wwwPrefix = { tokenize: tokenizeWwwPrefix, partial: true };
+  domain = { tokenize: tokenizeDomain, partial: true };
+  path = { tokenize: tokenizePath, partial: true };
+  trail = { tokenize: tokenizeTrail, partial: true };
+  emailDomainDotTrail = {
+    tokenize: tokenizeEmailDomainDotTrail,
+    partial: true
+  };
+  wwwAutolink = {
+    name: "wwwAutolink",
+    tokenize: tokenizeWwwAutolink,
+    previous: previousWww
+  };
+  protocolAutolink = {
+    name: "protocolAutolink",
+    tokenize: tokenizeProtocolAutolink,
+    previous: previousProtocol
+  };
+  emailAutolink = {
+    name: "emailAutolink",
+    tokenize: tokenizeEmailAutolink,
+    previous: previousEmail
+  };
+  text4 = {};
+  code2 = codes.digit0;
+  while (code2 < codes.leftCurlyBrace) {
+    text4[code2] = emailAutolink;
+    code2++;
+    if (code2 === codes.colon)
+      code2 = codes.uppercaseA;
+    else if (code2 === codes.leftSquareBracket)
+      code2 = codes.lowercaseA;
+  }
+  text4[codes.plusSign] = emailAutolink;
+  text4[codes.dash] = emailAutolink;
+  text4[codes.dot] = emailAutolink;
+  text4[codes.underscore] = emailAutolink;
+  text4[codes.uppercaseH] = [emailAutolink, protocolAutolink];
+  text4[codes.lowercaseH] = [emailAutolink, protocolAutolink];
+  text4[codes.uppercaseW] = [emailAutolink, wwwAutolink];
+  text4[codes.lowercaseW] = [emailAutolink, wwwAutolink];
+});
+
+// node_modules/micromark-extension-gfm-autolink-literal/dev/index.js
+var init_dev17 = __esm(() => {
+  init_syntax();
+});
+
+// node_modules/micromark-extension-gfm-footnote/dev/lib/syntax.js
+function gfmFootnote() {
+  return {
+    document: {
+      [codes.leftSquareBracket]: {
+        name: "gfmFootnoteDefinition",
+        tokenize: tokenizeDefinitionStart,
+        continuation: { tokenize: tokenizeDefinitionContinuation },
+        exit: gfmFootnoteDefinitionEnd
+      }
+    },
+    text: {
+      [codes.leftSquareBracket]: {
+        name: "gfmFootnoteCall",
+        tokenize: tokenizeGfmFootnoteCall
+      },
+      [codes.rightSquareBracket]: {
+        name: "gfmPotentialFootnoteCall",
+        add: "after",
+        tokenize: tokenizePotentialGfmFootnoteCall,
+        resolveTo: resolveToPotentialGfmFootnoteCall
+      }
+    }
+  };
+}
+function tokenizePotentialGfmFootnoteCall(effects, ok3, nok) {
+  const self2 = this;
+  let index2 = self2.events.length;
+  const defined = self2.parser.gfmFootnotes || (self2.parser.gfmFootnotes = []);
+  let labelStart;
+  while (index2--) {
+    const token = self2.events[index2][1];
+    if (token.type === types.labelImage) {
+      labelStart = token;
+      break;
+    }
+    if (token.type === "gfmFootnoteCall" || token.type === types.labelLink || token.type === types.label || token.type === types.image || token.type === types.link) {
+      break;
+    }
+  }
+  return start;
+  function start(code3) {
+    ok(code3 === codes.rightSquareBracket, "expected `]`");
+    if (!labelStart || !labelStart._balanced) {
+      return nok(code3);
+    }
+    const id = normalizeIdentifier(self2.sliceSerialize({ start: labelStart.end, end: self2.now() }));
+    if (id.codePointAt(0) !== codes.caret || !defined.includes(id.slice(1))) {
+      return nok(code3);
+    }
+    effects.enter("gfmFootnoteCallLabelMarker");
+    effects.consume(code3);
+    effects.exit("gfmFootnoteCallLabelMarker");
+    return ok3(code3);
+  }
+}
+function resolveToPotentialGfmFootnoteCall(events, context) {
+  let index2 = events.length;
+  let labelStart;
+  while (index2--) {
+    if (events[index2][1].type === types.labelImage && events[index2][0] === "enter") {
+      labelStart = events[index2][1];
+      break;
+    }
+  }
+  ok(labelStart, "expected `labelStart` to resolve");
+  events[index2 + 1][1].type = types.data;
+  events[index2 + 3][1].type = "gfmFootnoteCallLabelMarker";
+  const call = {
+    type: "gfmFootnoteCall",
+    start: Object.assign({}, events[index2 + 3][1].start),
+    end: Object.assign({}, events[events.length - 1][1].end)
+  };
+  const marker = {
+    type: "gfmFootnoteCallMarker",
+    start: Object.assign({}, events[index2 + 3][1].end),
+    end: Object.assign({}, events[index2 + 3][1].end)
+  };
+  marker.end.column++;
+  marker.end.offset++;
+  marker.end._bufferIndex++;
+  const string3 = {
+    type: "gfmFootnoteCallString",
+    start: Object.assign({}, marker.end),
+    end: Object.assign({}, events[events.length - 1][1].start)
+  };
+  const chunk = {
+    type: types.chunkString,
+    contentType: "string",
+    start: Object.assign({}, string3.start),
+    end: Object.assign({}, string3.end)
+  };
+  const replacement = [
+    events[index2 + 1],
+    events[index2 + 2],
+    ["enter", call, context],
+    events[index2 + 3],
+    events[index2 + 4],
+    ["enter", marker, context],
+    ["exit", marker, context],
+    ["enter", string3, context],
+    ["enter", chunk, context],
+    ["exit", chunk, context],
+    ["exit", string3, context],
+    events[events.length - 2],
+    events[events.length - 1],
+    ["exit", call, context]
+  ];
+  events.splice(index2, events.length - index2 + 1, ...replacement);
+  return events;
+}
+function tokenizeGfmFootnoteCall(effects, ok3, nok) {
+  const self2 = this;
+  const defined = self2.parser.gfmFootnotes || (self2.parser.gfmFootnotes = []);
+  let size = 0;
+  let data;
+  return start;
+  function start(code3) {
+    ok(code3 === codes.leftSquareBracket, "expected `[`");
+    effects.enter("gfmFootnoteCall");
+    effects.enter("gfmFootnoteCallLabelMarker");
+    effects.consume(code3);
+    effects.exit("gfmFootnoteCallLabelMarker");
+    return callStart;
+  }
+  function callStart(code3) {
+    if (code3 !== codes.caret)
+      return nok(code3);
+    effects.enter("gfmFootnoteCallMarker");
+    effects.consume(code3);
+    effects.exit("gfmFootnoteCallMarker");
+    effects.enter("gfmFootnoteCallString");
+    effects.enter("chunkString").contentType = "string";
+    return callData;
+  }
+  function callData(code3) {
+    if (size > constants.linkReferenceSizeMax || code3 === codes.rightSquareBracket && !data || code3 === codes.eof || code3 === codes.leftSquareBracket || markdownLineEndingOrSpace(code3)) {
+      return nok(code3);
+    }
+    if (code3 === codes.rightSquareBracket) {
+      effects.exit("chunkString");
+      const token = effects.exit("gfmFootnoteCallString");
+      if (!defined.includes(normalizeIdentifier(self2.sliceSerialize(token)))) {
+        return nok(code3);
+      }
+      effects.enter("gfmFootnoteCallLabelMarker");
+      effects.consume(code3);
+      effects.exit("gfmFootnoteCallLabelMarker");
+      effects.exit("gfmFootnoteCall");
+      return ok3;
+    }
+    if (!markdownLineEndingOrSpace(code3)) {
+      data = true;
+    }
+    size++;
+    effects.consume(code3);
+    return code3 === codes.backslash ? callEscape : callData;
+  }
+  function callEscape(code3) {
+    if (code3 === codes.leftSquareBracket || code3 === codes.backslash || code3 === codes.rightSquareBracket) {
+      effects.consume(code3);
+      size++;
+      return callData;
+    }
+    return callData(code3);
+  }
+}
+function tokenizeDefinitionStart(effects, ok3, nok) {
+  const self2 = this;
+  const defined = self2.parser.gfmFootnotes || (self2.parser.gfmFootnotes = []);
+  let identifier;
+  let size = 0;
+  let data;
+  return start;
+  function start(code3) {
+    ok(code3 === codes.leftSquareBracket, "expected `[`");
+    effects.enter("gfmFootnoteDefinition")._container = true;
+    effects.enter("gfmFootnoteDefinitionLabel");
+    effects.enter("gfmFootnoteDefinitionLabelMarker");
+    effects.consume(code3);
+    effects.exit("gfmFootnoteDefinitionLabelMarker");
+    return labelAtMarker;
+  }
+  function labelAtMarker(code3) {
+    if (code3 === codes.caret) {
+      effects.enter("gfmFootnoteDefinitionMarker");
+      effects.consume(code3);
+      effects.exit("gfmFootnoteDefinitionMarker");
+      effects.enter("gfmFootnoteDefinitionLabelString");
+      effects.enter("chunkString").contentType = "string";
+      return labelInside;
+    }
+    return nok(code3);
+  }
+  function labelInside(code3) {
+    if (size > constants.linkReferenceSizeMax || code3 === codes.rightSquareBracket && !data || code3 === codes.eof || code3 === codes.leftSquareBracket || markdownLineEndingOrSpace(code3)) {
+      return nok(code3);
+    }
+    if (code3 === codes.rightSquareBracket) {
+      effects.exit("chunkString");
+      const token = effects.exit("gfmFootnoteDefinitionLabelString");
+      identifier = normalizeIdentifier(self2.sliceSerialize(token));
+      effects.enter("gfmFootnoteDefinitionLabelMarker");
+      effects.consume(code3);
+      effects.exit("gfmFootnoteDefinitionLabelMarker");
+      effects.exit("gfmFootnoteDefinitionLabel");
+      return labelAfter;
+    }
+    if (!markdownLineEndingOrSpace(code3)) {
+      data = true;
+    }
+    size++;
+    effects.consume(code3);
+    return code3 === codes.backslash ? labelEscape : labelInside;
+  }
+  function labelEscape(code3) {
+    if (code3 === codes.leftSquareBracket || code3 === codes.backslash || code3 === codes.rightSquareBracket) {
+      effects.consume(code3);
+      size++;
+      return labelInside;
+    }
+    return labelInside(code3);
+  }
+  function labelAfter(code3) {
+    if (code3 === codes.colon) {
+      effects.enter("definitionMarker");
+      effects.consume(code3);
+      effects.exit("definitionMarker");
+      if (!defined.includes(identifier)) {
+        defined.push(identifier);
+      }
+      return factorySpace(effects, whitespaceAfter, "gfmFootnoteDefinitionWhitespace");
+    }
+    return nok(code3);
+  }
+  function whitespaceAfter(code3) {
+    return ok3(code3);
+  }
+}
+function tokenizeDefinitionContinuation(effects, ok3, nok) {
+  return effects.check(blankLine, ok3, effects.attempt(indent, ok3, nok));
+}
+function gfmFootnoteDefinitionEnd(effects) {
+  effects.exit("gfmFootnoteDefinition");
+}
+function tokenizeIndent2(effects, ok3, nok) {
+  const self2 = this;
+  return factorySpace(effects, afterPrefix, "gfmFootnoteDefinitionIndent", constants.tabSize + 1);
+  function afterPrefix(code3) {
+    const tail = self2.events[self2.events.length - 1];
+    return tail && tail[1].type === "gfmFootnoteDefinitionIndent" && tail[2].sliceSerialize(tail[1], true).length === constants.tabSize ? ok3(code3) : nok(code3);
+  }
+}
+var indent;
+var init_syntax2 = __esm(() => {
+  init_development();
+  init_dev13();
+  init_dev6();
+  init_dev4();
+  init_dev3();
+  init_default();
+  indent = { tokenize: tokenizeIndent2, partial: true };
+});
+
+// node_modules/micromark-extension-gfm-footnote/dev/index.js
+var init_dev18 = __esm(() => {
+  init_syntax2();
+});
+
+// node_modules/micromark-extension-gfm-strikethrough/dev/lib/syntax.js
+function gfmStrikethrough(options) {
+  const options_ = options || {};
+  let single = options_.singleTilde;
+  const tokenizer = {
+    name: "strikethrough",
+    tokenize: tokenizeStrikethrough,
+    resolveAll: resolveAllStrikethrough
+  };
+  if (single === null || single === undefined) {
+    single = true;
+  }
+  return {
+    text: { [codes.tilde]: tokenizer },
+    insideSpan: { null: [tokenizer] },
+    attentionMarkers: { null: [codes.tilde] }
+  };
+  function resolveAllStrikethrough(events, context) {
+    let index2 = -1;
+    while (++index2 < events.length) {
+      if (events[index2][0] === "enter" && events[index2][1].type === "strikethroughSequenceTemporary" && events[index2][1]._close) {
+        let open = index2;
+        while (open--) {
+          if (events[open][0] === "exit" && events[open][1].type === "strikethroughSequenceTemporary" && events[open][1]._open && events[index2][1].end.offset - events[index2][1].start.offset === events[open][1].end.offset - events[open][1].start.offset) {
+            events[index2][1].type = "strikethroughSequence";
+            events[open][1].type = "strikethroughSequence";
+            const strikethrough = {
+              type: "strikethrough",
+              start: Object.assign({}, events[open][1].start),
+              end: Object.assign({}, events[index2][1].end)
+            };
+            const text5 = {
+              type: "strikethroughText",
+              start: Object.assign({}, events[open][1].end),
+              end: Object.assign({}, events[index2][1].start)
+            };
+            const nextEvents = [
+              ["enter", strikethrough, context],
+              ["enter", events[open][1], context],
+              ["exit", events[open][1], context],
+              ["enter", text5, context]
+            ];
+            const insideSpan2 = context.parser.constructs.insideSpan.null;
+            if (insideSpan2) {
+              splice(nextEvents, nextEvents.length, 0, resolveAll(insideSpan2, events.slice(open + 1, index2), context));
+            }
+            splice(nextEvents, nextEvents.length, 0, [
+              ["exit", text5, context],
+              ["enter", events[index2][1], context],
+              ["exit", events[index2][1], context],
+              ["exit", strikethrough, context]
+            ]);
+            splice(events, open - 1, index2 - open + 3, nextEvents);
+            index2 = open + nextEvents.length - 2;
+            break;
+          }
+        }
+      }
+    }
+    index2 = -1;
+    while (++index2 < events.length) {
+      if (events[index2][1].type === "strikethroughSequenceTemporary") {
+        events[index2][1].type = types.data;
+      }
+    }
+    return events;
+  }
+  function tokenizeStrikethrough(effects, ok3, nok) {
+    const previous3 = this.previous;
+    const events = this.events;
+    let size = 0;
+    return start;
+    function start(code3) {
+      ok(code3 === codes.tilde, "expected `~`");
+      if (previous3 === codes.tilde && events[events.length - 1][1].type !== types.characterEscape) {
+        return nok(code3);
+      }
+      effects.enter("strikethroughSequenceTemporary");
+      return more(code3);
+    }
+    function more(code3) {
+      const before = classifyCharacter(previous3);
+      if (code3 === codes.tilde) {
+        if (size > 1)
+          return nok(code3);
+        effects.consume(code3);
+        size++;
+        return more;
+      }
+      if (size < 2 && !single)
+        return nok(code3);
+      const token = effects.exit("strikethroughSequenceTemporary");
+      const after = classifyCharacter(code3);
+      token._open = !after || after === constants.attentionSideAfter && Boolean(before);
+      token._close = !before || before === constants.attentionSideAfter && Boolean(after);
+      return ok3(code3);
+    }
+  }
+}
+var init_syntax3 = __esm(() => {
+  init_development();
+  init_dev();
+  init_dev7();
+  init_default();
+});
+
+// node_modules/micromark-extension-gfm-strikethrough/dev/index.js
+var init_dev19 = __esm(() => {
+  init_syntax3();
+});
+
+// node_modules/micromark-extension-gfm-table/dev/lib/edit-map.js
+class EditMap {
+  constructor() {
+    this.map = [];
+  }
+  add(index2, remove, add) {
+    addImplementation(this, index2, remove, add);
+  }
+  consume(events) {
+    this.map.sort(function(a, b) {
+      return a[0] - b[0];
+    });
+    if (this.map.length === 0) {
+      return;
+    }
+    let index2 = this.map.length;
+    const vecs = [];
+    while (index2 > 0) {
+      index2 -= 1;
+      vecs.push(events.slice(this.map[index2][0] + this.map[index2][1]), this.map[index2][2]);
+      events.length = this.map[index2][0];
+    }
+    vecs.push(events.slice());
+    events.length = 0;
+    let slice = vecs.pop();
+    while (slice) {
+      for (const element2 of slice) {
+        events.push(element2);
+      }
+      slice = vecs.pop();
+    }
+    this.map.length = 0;
+  }
+}
+function addImplementation(editMap, at, remove, add) {
+  let index2 = 0;
+  if (remove === 0 && add.length === 0) {
+    return;
+  }
+  while (index2 < editMap.map.length) {
+    if (editMap.map[index2][0] === at) {
+      editMap.map[index2][1] += remove;
+      editMap.map[index2][2].push(...add);
+      return;
+    }
+    index2 += 1;
+  }
+  editMap.map.push([at, remove, add]);
+}
+
+// node_modules/micromark-extension-gfm-table/dev/lib/infer.js
+function gfmTableAlign(events, index2) {
+  ok(events[index2][1].type === "table", "expected table");
+  let inDelimiterRow = false;
+  const align = [];
+  while (index2 < events.length) {
+    const event = events[index2];
+    if (inDelimiterRow) {
+      if (event[0] === "enter") {
+        if (event[1].type === "tableContent") {
+          align.push(events[index2 + 1][1].type === "tableDelimiterMarker" ? "left" : "none");
+        }
+      } else if (event[1].type === "tableContent") {
+        if (events[index2 - 1][1].type === "tableDelimiterMarker") {
+          const alignIndex = align.length - 1;
+          align[alignIndex] = align[alignIndex] === "left" ? "center" : "right";
+        }
+      } else if (event[1].type === "tableDelimiterRow") {
+        break;
+      }
+    } else if (event[0] === "enter" && event[1].type === "tableDelimiterRow") {
+      inDelimiterRow = true;
+    }
+    index2 += 1;
+  }
+  return align;
+}
+var init_infer = __esm(() => {
+  init_development();
+});
+
+// node_modules/micromark-extension-gfm-table/dev/lib/syntax.js
+function gfmTable() {
+  return {
+    flow: {
+      null: { name: "table", tokenize: tokenizeTable, resolveAll: resolveTable }
+    }
+  };
+}
+function tokenizeTable(effects, ok3, nok) {
+  const self2 = this;
+  let size = 0;
+  let sizeB = 0;
+  let seen;
+  return start;
+  function start(code3) {
+    let index2 = self2.events.length - 1;
+    while (index2 > -1) {
+      const type = self2.events[index2][1].type;
+      if (type === types.lineEnding || type === types.linePrefix)
+        index2--;
+      else
+        break;
+    }
+    const tail = index2 > -1 ? self2.events[index2][1].type : null;
+    const next = tail === "tableHead" || tail === "tableRow" ? bodyRowStart : headRowBefore;
+    if (next === bodyRowStart && self2.parser.lazy[self2.now().line]) {
+      return nok(code3);
+    }
+    return next(code3);
+  }
+  function headRowBefore(code3) {
+    effects.enter("tableHead");
+    effects.enter("tableRow");
+    return headRowStart(code3);
+  }
+  function headRowStart(code3) {
+    if (code3 === codes.verticalBar) {
+      return headRowBreak(code3);
+    }
+    seen = true;
+    sizeB += 1;
+    return headRowBreak(code3);
+  }
+  function headRowBreak(code3) {
+    if (code3 === codes.eof) {
+      return nok(code3);
+    }
+    if (markdownLineEnding(code3)) {
+      if (sizeB > 1) {
+        sizeB = 0;
+        self2.interrupt = true;
+        effects.exit("tableRow");
+        effects.enter(types.lineEnding);
+        effects.consume(code3);
+        effects.exit(types.lineEnding);
+        return headDelimiterStart;
+      }
+      return nok(code3);
+    }
+    if (markdownSpace(code3)) {
+      return factorySpace(effects, headRowBreak, types.whitespace)(code3);
+    }
+    sizeB += 1;
+    if (seen) {
+      seen = false;
+      size += 1;
+    }
+    if (code3 === codes.verticalBar) {
+      effects.enter("tableCellDivider");
+      effects.consume(code3);
+      effects.exit("tableCellDivider");
+      seen = true;
+      return headRowBreak;
+    }
+    effects.enter(types.data);
+    return headRowData(code3);
+  }
+  function headRowData(code3) {
+    if (code3 === codes.eof || code3 === codes.verticalBar || markdownLineEndingOrSpace(code3)) {
+      effects.exit(types.data);
+      return headRowBreak(code3);
+    }
+    effects.consume(code3);
+    return code3 === codes.backslash ? headRowEscape : headRowData;
+  }
+  function headRowEscape(code3) {
+    if (code3 === codes.backslash || code3 === codes.verticalBar) {
+      effects.consume(code3);
+      return headRowData;
+    }
+    return headRowData(code3);
+  }
+  function headDelimiterStart(code3) {
+    self2.interrupt = false;
+    if (self2.parser.lazy[self2.now().line]) {
+      return nok(code3);
+    }
+    effects.enter("tableDelimiterRow");
+    seen = false;
+    if (markdownSpace(code3)) {
+      ok(self2.parser.constructs.disable.null, "expected `disabled.null`");
+      return factorySpace(effects, headDelimiterBefore, types.linePrefix, self2.parser.constructs.disable.null.includes("codeIndented") ? undefined : constants.tabSize)(code3);
+    }
+    return headDelimiterBefore(code3);
+  }
+  function headDelimiterBefore(code3) {
+    if (code3 === codes.dash || code3 === codes.colon) {
+      return headDelimiterValueBefore(code3);
+    }
+    if (code3 === codes.verticalBar) {
+      seen = true;
+      effects.enter("tableCellDivider");
+      effects.consume(code3);
+      effects.exit("tableCellDivider");
+      return headDelimiterCellBefore;
+    }
+    return headDelimiterNok(code3);
+  }
+  function headDelimiterCellBefore(code3) {
+    if (markdownSpace(code3)) {
+      return factorySpace(effects, headDelimiterValueBefore, types.whitespace)(code3);
+    }
+    return headDelimiterValueBefore(code3);
+  }
+  function headDelimiterValueBefore(code3) {
+    if (code3 === codes.colon) {
+      sizeB += 1;
+      seen = true;
+      effects.enter("tableDelimiterMarker");
+      effects.consume(code3);
+      effects.exit("tableDelimiterMarker");
+      return headDelimiterLeftAlignmentAfter;
+    }
+    if (code3 === codes.dash) {
+      sizeB += 1;
+      return headDelimiterLeftAlignmentAfter(code3);
+    }
+    if (code3 === codes.eof || markdownLineEnding(code3)) {
+      return headDelimiterCellAfter(code3);
+    }
+    return headDelimiterNok(code3);
+  }
+  function headDelimiterLeftAlignmentAfter(code3) {
+    if (code3 === codes.dash) {
+      effects.enter("tableDelimiterFiller");
+      return headDelimiterFiller(code3);
+    }
+    return headDelimiterNok(code3);
+  }
+  function headDelimiterFiller(code3) {
+    if (code3 === codes.dash) {
+      effects.consume(code3);
+      return headDelimiterFiller;
+    }
+    if (code3 === codes.colon) {
+      seen = true;
+      effects.exit("tableDelimiterFiller");
+      effects.enter("tableDelimiterMarker");
+      effects.consume(code3);
+      effects.exit("tableDelimiterMarker");
+      return headDelimiterRightAlignmentAfter;
+    }
+    effects.exit("tableDelimiterFiller");
+    return headDelimiterRightAlignmentAfter(code3);
+  }
+  function headDelimiterRightAlignmentAfter(code3) {
+    if (markdownSpace(code3)) {
+      return factorySpace(effects, headDelimiterCellAfter, types.whitespace)(code3);
+    }
+    return headDelimiterCellAfter(code3);
+  }
+  function headDelimiterCellAfter(code3) {
+    if (code3 === codes.verticalBar) {
+      return headDelimiterBefore(code3);
+    }
+    if (code3 === codes.eof || markdownLineEnding(code3)) {
+      if (!seen || size !== sizeB) {
+        return headDelimiterNok(code3);
+      }
+      effects.exit("tableDelimiterRow");
+      effects.exit("tableHead");
+      return ok3(code3);
+    }
+    return headDelimiterNok(code3);
+  }
+  function headDelimiterNok(code3) {
+    return nok(code3);
+  }
+  function bodyRowStart(code3) {
+    effects.enter("tableRow");
+    return bodyRowBreak(code3);
+  }
+  function bodyRowBreak(code3) {
+    if (code3 === codes.verticalBar) {
+      effects.enter("tableCellDivider");
+      effects.consume(code3);
+      effects.exit("tableCellDivider");
+      return bodyRowBreak;
+    }
+    if (code3 === codes.eof || markdownLineEnding(code3)) {
+      effects.exit("tableRow");
+      return ok3(code3);
+    }
+    if (markdownSpace(code3)) {
+      return factorySpace(effects, bodyRowBreak, types.whitespace)(code3);
+    }
+    effects.enter(types.data);
+    return bodyRowData(code3);
+  }
+  function bodyRowData(code3) {
+    if (code3 === codes.eof || code3 === codes.verticalBar || markdownLineEndingOrSpace(code3)) {
+      effects.exit(types.data);
+      return bodyRowBreak(code3);
+    }
+    effects.consume(code3);
+    return code3 === codes.backslash ? bodyRowEscape : bodyRowData;
+  }
+  function bodyRowEscape(code3) {
+    if (code3 === codes.backslash || code3 === codes.verticalBar) {
+      effects.consume(code3);
+      return bodyRowData;
+    }
+    return bodyRowData(code3);
+  }
+}
+function resolveTable(events, context) {
+  let index2 = -1;
+  let inFirstCellAwaitingPipe = true;
+  let rowKind = 0;
+  let lastCell = [0, 0, 0, 0];
+  let cell = [0, 0, 0, 0];
+  let afterHeadAwaitingFirstBodyRow = false;
+  let lastTableEnd = 0;
+  let currentTable;
+  let currentBody;
+  let currentCell;
+  const map3 = new EditMap;
+  while (++index2 < events.length) {
+    const event = events[index2];
+    const token = event[1];
+    if (event[0] === "enter") {
+      if (token.type === "tableHead") {
+        afterHeadAwaitingFirstBodyRow = false;
+        if (lastTableEnd !== 0) {
+          ok(currentTable, "there should be a table opening");
+          flushTableEnd(map3, context, lastTableEnd, currentTable, currentBody);
+          currentBody = undefined;
+          lastTableEnd = 0;
+        }
+        currentTable = {
+          type: "table",
+          start: Object.assign({}, token.start),
+          end: Object.assign({}, token.end)
+        };
+        map3.add(index2, 0, [["enter", currentTable, context]]);
+      } else if (token.type === "tableRow" || token.type === "tableDelimiterRow") {
+        inFirstCellAwaitingPipe = true;
+        currentCell = undefined;
+        lastCell = [0, 0, 0, 0];
+        cell = [0, index2 + 1, 0, 0];
+        if (afterHeadAwaitingFirstBodyRow) {
+          afterHeadAwaitingFirstBodyRow = false;
+          currentBody = {
+            type: "tableBody",
+            start: Object.assign({}, token.start),
+            end: Object.assign({}, token.end)
+          };
+          map3.add(index2, 0, [["enter", currentBody, context]]);
+        }
+        rowKind = token.type === "tableDelimiterRow" ? 2 : currentBody ? 3 : 1;
+      } else if (rowKind && (token.type === types.data || token.type === "tableDelimiterMarker" || token.type === "tableDelimiterFiller")) {
+        inFirstCellAwaitingPipe = false;
+        if (cell[2] === 0) {
+          if (lastCell[1] !== 0) {
+            cell[0] = cell[1];
+            currentCell = flushCell(map3, context, lastCell, rowKind, undefined, currentCell);
+            lastCell = [0, 0, 0, 0];
+          }
+          cell[2] = index2;
+        }
+      } else if (token.type === "tableCellDivider") {
+        if (inFirstCellAwaitingPipe) {
+          inFirstCellAwaitingPipe = false;
+        } else {
+          if (lastCell[1] !== 0) {
+            cell[0] = cell[1];
+            currentCell = flushCell(map3, context, lastCell, rowKind, undefined, currentCell);
+          }
+          lastCell = cell;
+          cell = [lastCell[1], index2, 0, 0];
+        }
+      }
+    } else if (token.type === "tableHead") {
+      afterHeadAwaitingFirstBodyRow = true;
+      lastTableEnd = index2;
+    } else if (token.type === "tableRow" || token.type === "tableDelimiterRow") {
+      lastTableEnd = index2;
+      if (lastCell[1] !== 0) {
+        cell[0] = cell[1];
+        currentCell = flushCell(map3, context, lastCell, rowKind, index2, currentCell);
+      } else if (cell[1] !== 0) {
+        currentCell = flushCell(map3, context, cell, rowKind, index2, currentCell);
+      }
+      rowKind = 0;
+    } else if (rowKind && (token.type === types.data || token.type === "tableDelimiterMarker" || token.type === "tableDelimiterFiller")) {
+      cell[3] = index2;
+    }
+  }
+  if (lastTableEnd !== 0) {
+    ok(currentTable, "expected table opening");
+    flushTableEnd(map3, context, lastTableEnd, currentTable, currentBody);
+  }
+  map3.consume(context.events);
+  index2 = -1;
+  while (++index2 < context.events.length) {
+    const event = context.events[index2];
+    if (event[0] === "enter" && event[1].type === "table") {
+      event[1]._align = gfmTableAlign(context.events, index2);
+    }
+  }
+  return events;
+}
+function flushCell(map3, context, range, rowKind, rowEnd, previousCell) {
+  const groupName = rowKind === 1 ? "tableHeader" : rowKind === 2 ? "tableDelimiter" : "tableData";
+  const valueName = "tableContent";
+  if (range[0] !== 0) {
+    ok(previousCell, "expected previous cell enter");
+    previousCell.end = Object.assign({}, getPoint(context.events, range[0]));
+    map3.add(range[0], 0, [["exit", previousCell, context]]);
+  }
+  const now = getPoint(context.events, range[1]);
+  previousCell = {
+    type: groupName,
+    start: Object.assign({}, now),
+    end: Object.assign({}, now)
+  };
+  map3.add(range[1], 0, [["enter", previousCell, context]]);
+  if (range[2] !== 0) {
+    const relatedStart = getPoint(context.events, range[2]);
+    const relatedEnd = getPoint(context.events, range[3]);
+    const valueToken = {
+      type: valueName,
+      start: Object.assign({}, relatedStart),
+      end: Object.assign({}, relatedEnd)
+    };
+    map3.add(range[2], 0, [["enter", valueToken, context]]);
+    ok(range[3] !== 0);
+    if (rowKind !== 2) {
+      const start = context.events[range[2]];
+      const end = context.events[range[3]];
+      start[1].end = Object.assign({}, end[1].end);
+      start[1].type = types.chunkText;
+      start[1].contentType = constants.contentTypeText;
+      if (range[3] > range[2] + 1) {
+        const a = range[2] + 1;
+        const b = range[3] - range[2] - 1;
+        map3.add(a, b, []);
+      }
+    }
+    map3.add(range[3] + 1, 0, [["exit", valueToken, context]]);
+  }
+  if (rowEnd !== undefined) {
+    previousCell.end = Object.assign({}, getPoint(context.events, rowEnd));
+    map3.add(rowEnd, 0, [["exit", previousCell, context]]);
+    previousCell = undefined;
+  }
+  return previousCell;
+}
+function flushTableEnd(map3, context, index2, table, tableBody) {
+  const exits = [];
+  const related = getPoint(context.events, index2);
+  if (tableBody) {
+    tableBody.end = Object.assign({}, related);
+    exits.push(["exit", tableBody, context]);
+  }
+  table.end = Object.assign({}, related);
+  exits.push(["exit", table, context]);
+  map3.add(index2 + 1, 0, exits);
+}
+function getPoint(events, index2) {
+  const event = events[index2];
+  const side = event[0] === "enter" ? "start" : "end";
+  return event[1][side];
+}
+var init_syntax4 = __esm(() => {
+  init_development();
+  init_dev6();
+  init_dev4();
+  init_default();
+  init_infer();
+});
+
+// node_modules/micromark-extension-gfm-table/dev/index.js
+var init_dev20 = __esm(() => {
+  init_syntax4();
+});
+
+// node_modules/micromark-extension-gfm-task-list-item/dev/lib/syntax.js
+function gfmTaskListItem() {
+  return {
+    text: { [codes.leftSquareBracket]: tasklistCheck }
+  };
+}
+function tokenizeTasklistCheck(effects, ok3, nok) {
+  const self2 = this;
+  return open;
+  function open(code3) {
+    ok(code3 === codes.leftSquareBracket, "expected `[`");
+    if (self2.previous !== codes.eof || !self2._gfmTasklistFirstContentOfListItem) {
+      return nok(code3);
+    }
+    effects.enter("taskListCheck");
+    effects.enter("taskListCheckMarker");
+    effects.consume(code3);
+    effects.exit("taskListCheckMarker");
+    return inside;
+  }
+  function inside(code3) {
+    if (markdownLineEndingOrSpace(code3)) {
+      effects.enter("taskListCheckValueUnchecked");
+      effects.consume(code3);
+      effects.exit("taskListCheckValueUnchecked");
+      return close;
+    }
+    if (code3 === codes.uppercaseX || code3 === codes.lowercaseX) {
+      effects.enter("taskListCheckValueChecked");
+      effects.consume(code3);
+      effects.exit("taskListCheckValueChecked");
+      return close;
+    }
+    return nok(code3);
+  }
+  function close(code3) {
+    if (code3 === codes.rightSquareBracket) {
+      effects.enter("taskListCheckMarker");
+      effects.consume(code3);
+      effects.exit("taskListCheckMarker");
+      effects.exit("taskListCheck");
+      return after;
+    }
+    return nok(code3);
+  }
+  function after(code3) {
+    if (markdownLineEnding(code3)) {
+      return ok3(code3);
+    }
+    if (markdownSpace(code3)) {
+      return effects.check({ tokenize: spaceThenNonSpace }, ok3, nok)(code3);
+    }
+    return nok(code3);
+  }
+}
+function spaceThenNonSpace(effects, ok3, nok) {
+  return factorySpace(effects, after, types.whitespace);
+  function after(code3) {
+    return code3 === codes.eof ? nok(code3) : ok3(code3);
+  }
+}
+var tasklistCheck;
+var init_syntax5 = __esm(() => {
+  init_development();
+  init_dev6();
+  init_dev4();
+  init_default();
+  tasklistCheck = { name: "tasklistCheck", tokenize: tokenizeTasklistCheck };
+});
+
+// node_modules/micromark-extension-gfm-task-list-item/dev/index.js
+var init_dev21 = __esm(() => {
+  init_syntax5();
+});
+
+// node_modules/micromark-extension-gfm/index.js
+function gfm(options) {
+  return combineExtensions([
+    gfmAutolinkLiteral(),
+    gfmFootnote(),
+    gfmStrikethrough(options),
+    gfmTable(),
+    gfmTaskListItem()
+  ]);
+}
+var init_micromark_extension_gfm = __esm(() => {
+  init_micromark_util_combine_extensions();
+  init_dev17();
+  init_dev18();
+  init_dev19();
+  init_dev20();
+  init_dev21();
+});
+
+// node_modules/remark-gfm/lib/index.js
+function remarkGfm(options) {
+  const self2 = this;
+  const settings = options || emptyOptions2;
+  const data = self2.data();
+  const micromarkExtensions = data.micromarkExtensions || (data.micromarkExtensions = []);
+  const fromMarkdownExtensions = data.fromMarkdownExtensions || (data.fromMarkdownExtensions = []);
+  const toMarkdownExtensions = data.toMarkdownExtensions || (data.toMarkdownExtensions = []);
+  micromarkExtensions.push(gfm(settings));
+  fromMarkdownExtensions.push(gfmFromMarkdown());
+  toMarkdownExtensions.push(gfmToMarkdown(settings));
+}
+var emptyOptions2;
+var init_lib17 = __esm(() => {
+  init_mdast_util_gfm();
+  init_micromark_extension_gfm();
+  emptyOptions2 = {};
+});
+
+// node_modules/remark-gfm/index.js
+var init_remark_gfm = __esm(() => {
+  init_lib17();
+});
+
 // node_modules/mdast-util-to-hast/lib/handlers/blockquote.js
-function blockquote(state, node2) {
+function blockquote2(state, node2) {
   const result = {
     type: "element",
     tagName: "blockquote",
@@ -7067,18 +10282,18 @@ var init_blockquote = __esm(() => {
 });
 
 // node_modules/mdast-util-to-hast/lib/handlers/break.js
-function hardBreak(state, node2) {
+function hardBreak2(state, node2) {
   const result = { type: "element", tagName: "br", properties: {}, children: [] };
   state.patch(node2, result);
   return [state.applyData(node2, result), { type: "text", value: `
 ` }];
 }
-var init_break = __esm(() => {
+var init_break2 = __esm(() => {
   "";
 });
 
 // node_modules/mdast-util-to-hast/lib/handlers/code.js
-function code(state, node2) {
+function code3(state, node2) {
   const value = node2.value ? node2.value + `
 ` : "";
   const properties = {};
@@ -7100,7 +10315,7 @@ function code(state, node2) {
   state.patch(node2, result);
   return result;
 }
-var init_code = __esm(() => {
+var init_code2 = __esm(() => {
   "";
 });
 
@@ -7120,7 +10335,7 @@ var init_delete = __esm(() => {
 });
 
 // node_modules/mdast-util-to-hast/lib/handlers/emphasis.js
-function emphasis(state, node2) {
+function emphasis2(state, node2) {
   const result = {
     type: "element",
     tagName: "em",
@@ -7130,12 +10345,12 @@ function emphasis(state, node2) {
   state.patch(node2, result);
   return state.applyData(node2, result);
 }
-var init_emphasis = __esm(() => {
+var init_emphasis2 = __esm(() => {
   "";
 });
 
 // node_modules/mdast-util-to-hast/lib/handlers/footnote-reference.js
-function footnoteReference(state, node2) {
+function footnoteReference2(state, node2) {
   const clobberPrefix = typeof state.options.clobberPrefix === "string" ? state.options.clobberPrefix : "user-content-";
   const id = String(node2.identifier).toUpperCase();
   const safeId = normalizeUri(id.toLowerCase());
@@ -7151,7 +10366,7 @@ function footnoteReference(state, node2) {
   }
   reuseCounter += 1;
   state.footnoteCounts.set(id, reuseCounter);
-  const link = {
+  const link2 = {
     type: "element",
     tagName: "a",
     properties: {
@@ -7162,12 +10377,12 @@ function footnoteReference(state, node2) {
     },
     children: [{ type: "text", value: String(counter) }]
   };
-  state.patch(node2, link);
+  state.patch(node2, link2);
   const sup = {
     type: "element",
     tagName: "sup",
     properties: {},
-    children: [link]
+    children: [link2]
   };
   state.patch(node2, sup);
   return state.applyData(node2, sup);
@@ -7177,7 +10392,7 @@ var init_footnote_reference = __esm(() => {
 });
 
 // node_modules/mdast-util-to-hast/lib/handlers/heading.js
-function heading(state, node2) {
+function heading2(state, node2) {
   const result = {
     type: "element",
     tagName: "h" + node2.depth,
@@ -7187,12 +10402,12 @@ function heading(state, node2) {
   state.patch(node2, result);
   return state.applyData(node2, result);
 }
-var init_heading = __esm(() => {
+var init_heading2 = __esm(() => {
   "";
 });
 
 // node_modules/mdast-util-to-hast/lib/handlers/html.js
-function html(state, node2) {
+function html2(state, node2) {
   if (state.options.allowDangerousHtml) {
     const result = { type: "raw", value: node2.value };
     state.patch(node2, result);
@@ -7200,7 +10415,7 @@ function html(state, node2) {
   }
   return;
 }
-var init_html = __esm(() => {
+var init_html2 = __esm(() => {
   "";
 });
 
@@ -7236,27 +10451,27 @@ var init_revert = __esm(() => {
 });
 
 // node_modules/mdast-util-to-hast/lib/handlers/image-reference.js
-function imageReference(state, node2) {
+function imageReference2(state, node2) {
   const id = String(node2.identifier).toUpperCase();
-  const definition2 = state.definitionById.get(id);
-  if (!definition2) {
+  const definition3 = state.definitionById.get(id);
+  if (!definition3) {
     return revert(state, node2);
   }
-  const properties = { src: normalizeUri(definition2.url || ""), alt: node2.alt };
-  if (definition2.title !== null && definition2.title !== undefined) {
-    properties.title = definition2.title;
+  const properties = { src: normalizeUri(definition3.url || ""), alt: node2.alt };
+  if (definition3.title !== null && definition3.title !== undefined) {
+    properties.title = definition3.title;
   }
   const result = { type: "element", tagName: "img", properties, children: [] };
   state.patch(node2, result);
   return state.applyData(node2, result);
 }
-var init_image_reference = __esm(() => {
+var init_image_reference2 = __esm(() => {
   init_dev5();
   init_revert();
 });
 
 // node_modules/mdast-util-to-hast/lib/handlers/image.js
-function image(state, node2) {
+function image2(state, node2) {
   const properties = { src: normalizeUri(node2.url) };
   if (node2.alt !== null && node2.alt !== undefined) {
     properties.alt = node2.alt;
@@ -7268,37 +10483,37 @@ function image(state, node2) {
   state.patch(node2, result);
   return state.applyData(node2, result);
 }
-var init_image = __esm(() => {
+var init_image2 = __esm(() => {
   init_dev5();
 });
 
 // node_modules/mdast-util-to-hast/lib/handlers/inline-code.js
-function inlineCode(state, node2) {
-  const text3 = { type: "text", value: node2.value.replace(/\r?\n|\r/g, " ") };
-  state.patch(node2, text3);
+function inlineCode2(state, node2) {
+  const text5 = { type: "text", value: node2.value.replace(/\r?\n|\r/g, " ") };
+  state.patch(node2, text5);
   const result = {
     type: "element",
     tagName: "code",
     properties: {},
-    children: [text3]
+    children: [text5]
   };
   state.patch(node2, result);
   return state.applyData(node2, result);
 }
-var init_inline_code = __esm(() => {
+var init_inline_code2 = __esm(() => {
   "";
 });
 
 // node_modules/mdast-util-to-hast/lib/handlers/link-reference.js
-function linkReference(state, node2) {
+function linkReference2(state, node2) {
   const id = String(node2.identifier).toUpperCase();
-  const definition2 = state.definitionById.get(id);
-  if (!definition2) {
+  const definition3 = state.definitionById.get(id);
+  if (!definition3) {
     return revert(state, node2);
   }
-  const properties = { href: normalizeUri(definition2.url || "") };
-  if (definition2.title !== null && definition2.title !== undefined) {
-    properties.title = definition2.title;
+  const properties = { href: normalizeUri(definition3.url || "") };
+  if (definition3.title !== null && definition3.title !== undefined) {
+    properties.title = definition3.title;
   }
   const result = {
     type: "element",
@@ -7309,13 +10524,13 @@ function linkReference(state, node2) {
   state.patch(node2, result);
   return state.applyData(node2, result);
 }
-var init_link_reference = __esm(() => {
+var init_link_reference2 = __esm(() => {
   init_dev5();
   init_revert();
 });
 
 // node_modules/mdast-util-to-hast/lib/handlers/link.js
-function link(state, node2) {
+function link2(state, node2) {
   const properties = { href: normalizeUri(node2.url) };
   if (node2.title !== null && node2.title !== undefined) {
     properties.title = node2.title;
@@ -7329,29 +10544,29 @@ function link(state, node2) {
   state.patch(node2, result);
   return state.applyData(node2, result);
 }
-var init_link = __esm(() => {
+var init_link2 = __esm(() => {
   init_dev5();
 });
 
 // node_modules/mdast-util-to-hast/lib/handlers/list-item.js
-function listItem(state, node2, parent) {
+function listItem2(state, node2, parent) {
   const results = state.all(node2);
   const loose = parent ? listLoose(parent) : listItemLoose(node2);
   const properties = {};
   const children = [];
   if (typeof node2.checked === "boolean") {
     const head = results[0];
-    let paragraph;
+    let paragraph2;
     if (head && head.type === "element" && head.tagName === "p") {
-      paragraph = head;
+      paragraph2 = head;
     } else {
-      paragraph = { type: "element", tagName: "p", properties: {}, children: [] };
-      results.unshift(paragraph);
+      paragraph2 = { type: "element", tagName: "p", properties: {}, children: [] };
+      results.unshift(paragraph2);
     }
-    if (paragraph.children.length > 0) {
-      paragraph.children.unshift({ type: "text", value: " " });
+    if (paragraph2.children.length > 0) {
+      paragraph2.children.unshift({ type: "text", value: " " });
     }
-    paragraph.children.unshift({
+    paragraph2.children.unshift({
       type: "element",
       tagName: "input",
       properties: { type: "checkbox", checked: node2.checked, disabled: true },
@@ -7397,12 +10612,12 @@ function listItemLoose(node2) {
   const spread = node2.spread;
   return spread === null || spread === undefined ? node2.children.length > 1 : spread;
 }
-var init_list_item = __esm(() => {
+var init_list_item2 = __esm(() => {
   "";
 });
 
 // node_modules/mdast-util-to-hast/lib/handlers/list.js
-function list2(state, node2) {
+function list3(state, node2) {
   const properties = {};
   const results = state.all(node2);
   let index2 = -1;
@@ -7425,12 +10640,12 @@ function list2(state, node2) {
   state.patch(node2, result);
   return state.applyData(node2, result);
 }
-var init_list2 = __esm(() => {
+var init_list3 = __esm(() => {
   "";
 });
 
 // node_modules/mdast-util-to-hast/lib/handlers/paragraph.js
-function paragraph(state, node2) {
+function paragraph2(state, node2) {
   const result = {
     type: "element",
     tagName: "p",
@@ -7445,17 +10660,17 @@ var init_paragraph = __esm(() => {
 });
 
 // node_modules/mdast-util-to-hast/lib/handlers/root.js
-function root(state, node2) {
+function root2(state, node2) {
   const result = { type: "root", children: state.wrap(state.all(node2)) };
   state.patch(node2, result);
   return state.applyData(node2, result);
 }
-var init_root = __esm(() => {
+var init_root2 = __esm(() => {
   "";
 });
 
 // node_modules/mdast-util-to-hast/lib/handlers/strong.js
-function strong(state, node2) {
+function strong2(state, node2) {
   const result = {
     type: "element",
     tagName: "strong",
@@ -7465,7 +10680,7 @@ function strong(state, node2) {
   state.patch(node2, result);
   return state.applyData(node2, result);
 }
-var init_strong = __esm(() => {
+var init_strong2 = __esm(() => {
   "";
 });
 
@@ -7491,14 +10706,14 @@ function position2(node2) {
   }
 }
 var pointEnd, pointStart;
-var init_lib7 = __esm(() => {
+var init_lib18 = __esm(() => {
   pointEnd = point3("end");
   pointStart = point3("start");
 });
 
 // node_modules/unist-util-position/index.js
 var init_unist_util_position = __esm(() => {
-  init_lib7();
+  init_lib18();
 });
 
 // node_modules/mdast-util-to-hast/lib/handlers/table.js
@@ -7613,17 +10828,17 @@ function trimLine(value, start, end) {
   let startIndex = 0;
   let endIndex = value.length;
   if (start) {
-    let code2 = value.codePointAt(startIndex);
-    while (code2 === tab || code2 === space) {
+    let code4 = value.codePointAt(startIndex);
+    while (code4 === tab || code4 === space) {
       startIndex++;
-      code2 = value.codePointAt(startIndex);
+      code4 = value.codePointAt(startIndex);
     }
   }
   if (end) {
-    let code2 = value.codePointAt(endIndex - 1);
-    while (code2 === tab || code2 === space) {
+    let code4 = value.codePointAt(endIndex - 1);
+    while (code4 === tab || code4 === space) {
       endIndex--;
-      code2 = value.codePointAt(endIndex - 1);
+      code4 = value.codePointAt(endIndex - 1);
     }
   }
   return endIndex > startIndex ? value.slice(startIndex, endIndex) : "";
@@ -7631,7 +10846,7 @@ function trimLine(value, start, end) {
 var tab = 9, space = 32;
 
 // node_modules/mdast-util-to-hast/lib/handlers/text.js
-function text3(state, node2) {
+function text5(state, node2) {
   const result = { type: "text", value: trimLines(String(node2.value)) };
   state.patch(node2, result);
   return state.applyData(node2, result);
@@ -7639,7 +10854,7 @@ function text3(state, node2) {
 var init_text2 = () => {};
 
 // node_modules/mdast-util-to-hast/lib/handlers/thematic-break.js
-function thematicBreak2(state, node2) {
+function thematicBreak3(state, node2) {
   const result = {
     type: "element",
     tagName: "hr",
@@ -7649,7 +10864,7 @@ function thematicBreak2(state, node2) {
   state.patch(node2, result);
   return state.applyData(node2, result);
 }
-var init_thematic_break2 = __esm(() => {
+var init_thematic_break3 = __esm(() => {
   "";
 });
 
@@ -7660,52 +10875,52 @@ function ignore() {
 var handlers;
 var init_handlers = __esm(() => {
   init_blockquote();
-  init_break();
-  init_code();
+  init_break2();
+  init_code2();
   init_delete();
-  init_emphasis();
+  init_emphasis2();
   init_footnote_reference();
-  init_heading();
-  init_html();
-  init_image_reference();
-  init_image();
-  init_inline_code();
-  init_link_reference();
-  init_link();
-  init_list_item();
-  init_list2();
+  init_heading2();
+  init_html2();
+  init_image_reference2();
+  init_image2();
+  init_inline_code2();
+  init_link_reference2();
+  init_link2();
+  init_list_item2();
+  init_list3();
   init_paragraph();
-  init_root();
-  init_strong();
+  init_root2();
+  init_strong2();
   init_table();
   init_table_row();
   init_table_cell();
   init_text2();
-  init_thematic_break2();
+  init_thematic_break3();
   handlers = {
-    blockquote,
-    break: hardBreak,
-    code,
+    blockquote: blockquote2,
+    break: hardBreak2,
+    code: code3,
     delete: strikethrough,
-    emphasis,
-    footnoteReference,
-    heading,
-    html,
-    imageReference,
-    image,
-    inlineCode,
-    linkReference,
-    link,
-    listItem,
-    list: list2,
-    paragraph,
-    root,
-    strong,
+    emphasis: emphasis2,
+    footnoteReference: footnoteReference2,
+    heading: heading2,
+    html: html2,
+    imageReference: imageReference2,
+    image: image2,
+    inlineCode: inlineCode2,
+    linkReference: linkReference2,
+    link: link2,
+    listItem: listItem2,
+    list: list3,
+    paragraph: paragraph2,
+    root: root2,
+    strong: strong2,
     table,
     tableCell,
     tableRow,
-    text: text3,
-    thematicBreak: thematicBreak2,
+    text: text5,
+    thematicBreak: thematicBreak3,
     toml: ignore,
     yaml: ignore,
     definition: ignore,
@@ -7749,10 +10964,10 @@ var env, deserializer = ($, _) => {
         return as(new RegExp(source, flags), index2);
       }
       case MAP: {
-        const map = as(new Map, index2);
+        const map3 = as(new Map, index2);
         for (const [key, index3] of value)
-          map.set(unpair(key), unpair(index3));
-        return map;
+          map3.set(unpair(key), unpair(index3));
+        return map3;
       }
       case SET: {
         const set = as(new Set, index2);
@@ -7905,7 +11120,7 @@ var EMPTY = "", toString2, keys, typeOf = (value) => {
     return as([TYPE, { name: type, message }], value);
   };
   return pair;
-}, serialize = (value, { json, lossy } = {}) => {
+}, serialize2 = (value, { json, lossy } = {}) => {
   const _ = [];
   return serializer(!(json || lossy), !!json, new Map, _)(value), _;
 };
@@ -7919,7 +11134,7 @@ var esm_default;
 var init_esm = __esm(() => {
   init_deserialize();
   init_serialize();
-  esm_default = typeof structuredClone === "function" ? (any, options) => options && (("json" in options) || ("lossy" in options)) ? deserialize(serialize(any, options)) : structuredClone(any) : (any, options) => deserialize(serialize(any, options));
+  esm_default = typeof structuredClone === "function" ? (any, options) => options && (("json" in options) || ("lossy" in options)) ? deserialize(serialize2(any, options)) : structuredClone(any) : (any, options) => deserialize(serialize2(any, options));
 });
 
 // node_modules/mdast-util-to-hast/lib/footer.js
@@ -7950,12 +11165,12 @@ function footer(state) {
   const listItems = [];
   let referenceIndex = -1;
   while (++referenceIndex < state.footnoteOrder.length) {
-    const definition2 = state.footnoteById.get(state.footnoteOrder[referenceIndex]);
-    if (!definition2) {
+    const definition3 = state.footnoteById.get(state.footnoteOrder[referenceIndex]);
+    if (!definition3) {
       continue;
     }
-    const content3 = state.all(definition2);
-    const id = String(definition2.identifier).toUpperCase();
+    const content3 = state.all(definition3);
+    const id = String(definition3.identifier).toUpperCase();
     const safeId = normalizeUri(id.toLowerCase());
     let rereferenceIndex = 0;
     const backReferences = [];
@@ -7992,14 +11207,14 @@ function footer(state) {
     } else {
       content3.push(...backReferences);
     }
-    const listItem2 = {
+    const listItem3 = {
       type: "element",
       tagName: "li",
       properties: { id: clobberPrefix + "fn-" + safeId },
       children: state.wrap(content3, true)
     };
-    state.patch(definition2, listItem2);
-    listItems.push(listItem2);
+    state.patch(definition3, listItem3);
+    listItems.push(listItem3);
   }
   if (listItems.length === 0) {
     return;
@@ -8036,182 +11251,9 @@ var init_footer = __esm(() => {
   init_dev5();
 });
 
-// node_modules/unist-util-is/lib/index.js
-function anyFactory(tests) {
-  const checks = [];
-  let index2 = -1;
-  while (++index2 < tests.length) {
-    checks[index2] = convert(tests[index2]);
-  }
-  return castFactory(any);
-  function any(...parameters) {
-    let index3 = -1;
-    while (++index3 < checks.length) {
-      if (checks[index3].apply(this, parameters))
-        return true;
-    }
-    return false;
-  }
-}
-function propertiesFactory(check) {
-  const checkAsRecord = check;
-  return castFactory(all2);
-  function all2(node2) {
-    const nodeAsRecord = node2;
-    let key;
-    for (key in check) {
-      if (nodeAsRecord[key] !== checkAsRecord[key])
-        return false;
-    }
-    return true;
-  }
-}
-function typeFactory(check) {
-  return castFactory(type);
-  function type(node2) {
-    return node2 && node2.type === check;
-  }
-}
-function castFactory(testFunction) {
-  return check;
-  function check(value, index2, parent) {
-    return Boolean(looksLikeANode(value) && testFunction.call(this, value, typeof index2 === "number" ? index2 : undefined, parent || undefined));
-  }
-}
-function ok2() {
-  return true;
-}
-function looksLikeANode(value) {
-  return value !== null && typeof value === "object" && "type" in value;
-}
-var convert = function(test) {
-  if (test === null || test === undefined) {
-    return ok2;
-  }
-  if (typeof test === "function") {
-    return castFactory(test);
-  }
-  if (typeof test === "object") {
-    return Array.isArray(test) ? anyFactory(test) : propertiesFactory(test);
-  }
-  if (typeof test === "string") {
-    return typeFactory(test);
-  }
-  throw new Error("Expected function, string, or object as test");
-};
-
-// node_modules/unist-util-is/index.js
-var init_unist_util_is = () => {};
-
-// node_modules/unist-util-visit-parents/lib/color.js
-function color(d) {
-  return d;
-}
-
-// node_modules/unist-util-visit-parents/lib/index.js
-function visitParents(tree, test, visitor, reverse) {
-  let check;
-  if (typeof test === "function" && typeof visitor !== "function") {
-    reverse = visitor;
-    visitor = test;
-  } else {
-    check = test;
-  }
-  const is2 = convert(check);
-  const step = reverse ? -1 : 1;
-  factory(tree, undefined, [])();
-  function factory(node2, index2, parents) {
-    const value = node2 && typeof node2 === "object" ? node2 : {};
-    if (typeof value.type === "string") {
-      const name = typeof value.tagName === "string" ? value.tagName : typeof value.name === "string" ? value.name : undefined;
-      Object.defineProperty(visit, "name", {
-        value: "node (" + color(node2.type + (name ? "<" + name + ">" : "")) + ")"
-      });
-    }
-    return visit;
-    function visit() {
-      let result = empty;
-      let subresult;
-      let offset;
-      let grandparents;
-      if (!test || is2(node2, index2, parents[parents.length - 1] || undefined)) {
-        result = toResult(visitor(node2, parents));
-        if (result[0] === EXIT) {
-          return result;
-        }
-      }
-      if ("children" in node2 && node2.children) {
-        const nodeAsParent = node2;
-        if (nodeAsParent.children && result[0] !== SKIP) {
-          offset = (reverse ? nodeAsParent.children.length : -1) + step;
-          grandparents = parents.concat(nodeAsParent);
-          while (offset > -1 && offset < nodeAsParent.children.length) {
-            const child = nodeAsParent.children[offset];
-            subresult = factory(child, offset, grandparents)();
-            if (subresult[0] === EXIT) {
-              return subresult;
-            }
-            offset = typeof subresult[1] === "number" ? subresult[1] : offset + step;
-          }
-        }
-      }
-      return result;
-    }
-  }
-}
-function toResult(value) {
-  if (Array.isArray(value)) {
-    return value;
-  }
-  if (typeof value === "number") {
-    return [CONTINUE, value];
-  }
-  return value === null || value === undefined ? empty : [value];
-}
-var empty, CONTINUE = true, EXIT = false, SKIP = "skip";
-var init_lib8 = __esm(() => {
-  init_unist_util_is();
-  empty = [];
-});
-
-// node_modules/unist-util-visit-parents/index.js
-var init_unist_util_visit_parents = __esm(() => {
-  init_lib8();
-});
-
-// node_modules/unist-util-visit/lib/index.js
-function visit(tree, testOrVisitor, visitorOrReverse, maybeReverse) {
-  let reverse;
-  let test;
-  let visitor;
-  if (typeof testOrVisitor === "function" && typeof visitorOrReverse !== "function") {
-    test = undefined;
-    visitor = testOrVisitor;
-    reverse = visitorOrReverse;
-  } else {
-    test = testOrVisitor;
-    visitor = visitorOrReverse;
-    reverse = maybeReverse;
-  }
-  visitParents(tree, test, overload, reverse);
-  function overload(node2, parents) {
-    const parent = parents[parents.length - 1];
-    const index2 = parent ? parent.children.indexOf(node2) : undefined;
-    return visitor(node2, index2, parent);
-  }
-}
-var init_lib9 = __esm(() => {
-  init_unist_util_visit_parents();
-});
-
-// node_modules/unist-util-visit/index.js
-var init_unist_util_visit = __esm(() => {
-  init_lib9();
-});
-
 // node_modules/mdast-util-to-hast/lib/state.js
 function createState(tree, options) {
-  const settings = options || emptyOptions2;
+  const settings = options || emptyOptions3;
   const definitionById = new Map;
   const footnoteById = new Map;
   const footnoteCounts = new Map;
@@ -8231,19 +11273,19 @@ function createState(tree, options) {
   };
   visit(tree, function(node2) {
     if (node2.type === "definition" || node2.type === "footnoteDefinition") {
-      const map = node2.type === "definition" ? definitionById : footnoteById;
+      const map3 = node2.type === "definition" ? definitionById : footnoteById;
       const id = String(node2.identifier).toUpperCase();
-      if (!map.has(id)) {
-        map.set(id, node2);
+      if (!map3.has(id)) {
+        map3.set(id, node2);
       }
     }
   });
   return state;
   function one2(node2, parent) {
     const type = node2.type;
-    const handle = state.handlers[type];
-    if (own3.call(state.handlers, type) && handle) {
-      return handle(state, node2, parent);
+    const handle2 = state.handlers[type];
+    if (own4.call(state.handlers, type) && handle2) {
+      return handle2(state, node2, parent);
     }
     if (state.options.passThrough && state.options.passThrough.includes(type)) {
       if ("children" in node2) {
@@ -8316,7 +11358,7 @@ function applyData(from, to) {
 }
 function defaultUnknownHandler(state, node2) {
   const data = node2.data || {};
-  const result = "value" in node2 && !(own3.call(data, "hProperties") || own3.call(data, "hChildren")) ? { type: "text", value: node2.value } : {
+  const result = "value" in node2 && !(own4.call(data, "hProperties") || own4.call(data, "hChildren")) ? { type: "text", value: node2.value } : {
     type: "element",
     tagName: "div",
     properties: {},
@@ -8346,21 +11388,21 @@ function wrap2(nodes, loose) {
 }
 function trimMarkdownSpaceStart(value) {
   let index2 = 0;
-  let code2 = value.charCodeAt(index2);
-  while (code2 === 9 || code2 === 32) {
+  let code4 = value.charCodeAt(index2);
+  while (code4 === 9 || code4 === 32) {
     index2++;
-    code2 = value.charCodeAt(index2);
+    code4 = value.charCodeAt(index2);
   }
   return value.slice(index2);
 }
-var own3, emptyOptions2;
+var own4, emptyOptions3;
 var init_state = __esm(() => {
   init_esm();
   init_unist_util_visit();
   init_unist_util_position();
   init_handlers();
-  own3 = {}.hasOwnProperty;
-  emptyOptions2 = {};
+  own4 = {}.hasOwnProperty;
+  emptyOptions3 = {};
 });
 
 // node_modules/mdast-util-to-hast/lib/index.js
@@ -8376,7 +11418,7 @@ function toHast(tree, options) {
   }
   return result;
 }
-var init_lib10 = __esm(() => {
+var init_lib19 = __esm(() => {
   init_development();
   init_footer();
   init_state();
@@ -8384,7 +11426,7 @@ var init_lib10 = __esm(() => {
 
 // node_modules/mdast-util-to-hast/index.js
 var init_mdast_util_to_hast = __esm(() => {
-  init_lib10();
+  init_lib19();
 });
 
 // node_modules/remark-rehype/lib/index.js
@@ -8399,13 +11441,13 @@ function remarkRehype(destination, options) {
     return toHast(tree, { file, ...destination || options });
   };
 }
-var init_lib11 = __esm(() => {
+var init_lib20 = __esm(() => {
   init_mdast_util_to_hast();
 });
 
 // node_modules/remark-rehype/index.js
 var init_remark_rehype = __esm(() => {
-  init_lib11();
+  init_lib20();
 });
 
 // node_modules/html-void-elements/index.js
@@ -8455,9 +11497,9 @@ var init_schema = __esm(() => {
 function merge(definitions, space2) {
   const property = {};
   const normal = {};
-  for (const definition2 of definitions) {
-    Object.assign(property, definition2.property);
-    Object.assign(normal, definition2.normal);
+  for (const definition3 of definitions) {
+    Object.assign(property, definition3.property);
+    Object.assign(normal, definition3.normal);
   }
   return new Schema(property, normal, space2);
 }
@@ -8545,19 +11587,19 @@ var init_defined_info = __esm(() => {
 });
 
 // node_modules/property-information/lib/util/create.js
-function create(definition2) {
+function create(definition3) {
   const properties = {};
   const normals = {};
-  for (const [property, value] of Object.entries(definition2.properties)) {
-    const info = new DefinedInfo(property, definition2.transform(definition2.attributes || {}, property), value, definition2.space);
-    if (definition2.mustUseProperty && definition2.mustUseProperty.includes(property)) {
+  for (const [property, value] of Object.entries(definition3.properties)) {
+    const info = new DefinedInfo(property, definition3.transform(definition3.attributes || {}, property), value, definition3.space);
+    if (definition3.mustUseProperty && definition3.mustUseProperty.includes(property)) {
       info.mustUseProperty = true;
     }
     properties[property] = info;
     normals[normalize2(property)] = property;
     normals[normalize2(info.attribute)] = property;
   }
-  return new Schema(properties, normals, definition2.space);
+  return new Schema(properties, normals, definition3.space);
 }
 var init_create = __esm(() => {
   init_defined_info();
@@ -8639,12 +11681,12 @@ function caseInsensitiveTransform(attributes, property) {
 var init_case_insensitive_transform = () => {};
 
 // node_modules/property-information/lib/html.js
-var html2;
-var init_html2 = __esm(() => {
+var html3;
+var init_html3 = __esm(() => {
   init_case_insensitive_transform();
   init_create();
   init_types2();
-  html2 = create({
+  html3 = create({
     attributes: {
       acceptcharset: "accept-charset",
       classname: "class",
@@ -9603,42 +12645,18 @@ var init_find = __esm(() => {
 });
 
 // node_modules/property-information/index.js
-var html3, svg2;
+var html4, svg2;
 var init_property_information = __esm(() => {
   init_merge();
   init_aria();
-  init_html2();
+  init_html3();
   init_svg();
   init_xlink();
   init_xmlns();
   init_xml();
   init_find();
-  html3 = merge([aria, html2, xlink, xmlns, xml], "html");
+  html4 = merge([aria, html3, xlink, xmlns, xml], "html");
   svg2 = merge([aria, svg, xlink, xmlns, xml], "svg");
-});
-
-// node_modules/zwitch/index.js
-function zwitch(key, options) {
-  const settings = options || {};
-  function one2(value, ...parameters) {
-    let fn = one2.invalid;
-    const handlers2 = one2.handlers;
-    if (value && own4.call(value, key)) {
-      const id = String(value[key]);
-      fn = own4.call(handlers2, id) ? handlers2[id] : one2.unknown;
-    }
-    if (fn) {
-      return fn.call(this, value, ...parameters);
-    }
-  }
-  one2.handlers = settings.handlers || {};
-  one2.invalid = settings.invalid;
-  one2.unknown = settings.unknown;
-  return one2;
-}
-var own4;
-var init_zwitch = __esm(() => {
-  own4 = {}.hasOwnProperty;
 });
 
 // node_modules/stringify-entities/lib/core.js
@@ -9681,8 +12699,8 @@ var init_core = __esm(() => {
 });
 
 // node_modules/stringify-entities/lib/util/to-hexadecimal.js
-function toHexadecimal(code2, next, omit) {
-  const value = "&#x" + code2.toString(16).toUpperCase();
+function toHexadecimal(code4, next, omit) {
+  const value = "&#x" + code4.toString(16).toUpperCase();
   return omit && next && !hexadecimalRegex.test(String.fromCharCode(next)) ? value : value + ";";
 }
 var hexadecimalRegex;
@@ -9691,8 +12709,8 @@ var init_to_hexadecimal = __esm(() => {
 });
 
 // node_modules/stringify-entities/lib/util/to-decimal.js
-function toDecimal(code2, next, omit) {
-  const value = "&#" + String(code2);
+function toDecimal(code4, next, omit) {
+  const value = "&#" + String(code4);
   return omit && next && !decimalRegex.test(String.fromCharCode(next)) ? value : value + ";";
 }
 var decimalRegex;
@@ -10088,8 +13106,8 @@ var init_dangerous = __esm(() => {
 });
 
 // node_modules/stringify-entities/lib/util/to-named.js
-function toNamed(code2, next, omit, attribute) {
-  const character = String.fromCharCode(code2);
+function toNamed(code4, next, omit, attribute) {
+  const character = String.fromCharCode(code4);
   if (own5.call(characters, character)) {
     const name = characters[character];
     const value = "&" + name;
@@ -10116,14 +13134,14 @@ var init_to_named = __esm(() => {
 });
 
 // node_modules/stringify-entities/lib/util/format-smart.js
-function formatSmart(code2, next, options) {
-  let numeric = toHexadecimal(code2, next, options.omitOptionalSemicolons);
+function formatSmart(code4, next, options) {
+  let numeric = toHexadecimal(code4, next, options.omitOptionalSemicolons);
   let named;
   if (options.useNamedReferences || options.useShortestReferences) {
-    named = toNamed(code2, next, options.omitOptionalSemicolons, options.attribute);
+    named = toNamed(code4, next, options.omitOptionalSemicolons, options.attribute);
   }
   if ((options.useShortestReferences || !named) && options.useShortestReferences) {
-    const decimal = toDecimal(code2, next, options.omitOptionalSemicolons);
+    const decimal = toDecimal(code4, next, options.omitOptionalSemicolons);
     if (decimal.length < numeric.length) {
       numeric = decimal;
     }
@@ -10140,14 +13158,14 @@ var init_format_smart = __esm(() => {
 function stringifyEntities(value, options) {
   return core(value, Object.assign({ format: formatSmart }, options));
 }
-var init_lib12 = __esm(() => {
+var init_lib21 = __esm(() => {
   init_core();
   init_format_smart();
 });
 
 // node_modules/stringify-entities/index.js
 var init_stringify_entities = __esm(() => {
-  init_lib12();
+  init_lib21();
 });
 
 // node_modules/hast-util-to-html/lib/handle/comment.js
@@ -10174,21 +13192,6 @@ function doctype(_1, _2, _3, state) {
   return "<!" + (state.settings.upperDoctype ? "DOCTYPE" : "doctype") + (state.settings.tightDoctype ? "" : " ") + "html>";
 }
 
-// node_modules/ccount/index.js
-function ccount(value, character) {
-  const source = String(value);
-  if (typeof character !== "string") {
-    throw new TypeError("Expected character");
-  }
-  let count = 0;
-  let index2 = source.indexOf(character);
-  while (index2 !== -1) {
-    count++;
-    index2 = source.indexOf(character, index2 + character.length);
-  }
-  return count;
-}
-
 // node_modules/comma-separated-tokens/index.js
 function stringify(values2, options) {
   const settings = options || {};
@@ -10209,13 +13212,13 @@ function empty2(value) {
   return value.replace(re, "") === "";
 }
 var re;
-var init_lib13 = __esm(() => {
+var init_lib22 = __esm(() => {
   re = /[ \t\n\f\r]/g;
 });
 
 // node_modules/hast-util-whitespace/index.js
 var init_hast_util_whitespace = __esm(() => {
-  init_lib13();
+  init_lib22();
 });
 
 // node_modules/hast-util-to-html/lib/omission/util/siblings.js
@@ -10259,7 +13262,7 @@ function headOrColgroupOrCaption(_, index2, parent) {
   const next = siblingAfter(parent, index2, true);
   return !next || next.type !== "comment" && !(next.type === "text" && whitespace(next.value.charAt(0)));
 }
-function html4(_, index2, parent) {
+function html5(_, index2, parent) {
   const next = siblingAfter(parent, index2);
   return !next || next.type !== "comment";
 }
@@ -10326,7 +13329,7 @@ var init_closing = __esm(() => {
     dd,
     dt,
     head: headOrColgroupOrCaption,
-    html: html4,
+    html: html5,
     li,
     optgroup,
     option,
@@ -10343,7 +13346,7 @@ var init_closing = __esm(() => {
 });
 
 // node_modules/hast-util-to-html/lib/omission/opening.js
-function html5(node2) {
+function html6(node2) {
   const head = siblingAfter(node2, -1);
   return !head || head.type !== "comment";
 }
@@ -10364,17 +13367,17 @@ function body2(node2) {
   return !head2 || head2.type !== "comment" && !(head2.type === "text" && whitespace(head2.value.charAt(0))) && !(head2.type === "element" && (head2.tagName === "meta" || head2.tagName === "link" || head2.tagName === "script" || head2.tagName === "style" || head2.tagName === "template"));
 }
 function colgroup(node2, index2, parent) {
-  const previous2 = siblingBefore(parent, index2);
+  const previous3 = siblingBefore(parent, index2);
   const head2 = siblingAfter(node2, -1, true);
-  if (parent && previous2 && previous2.type === "element" && previous2.tagName === "colgroup" && closing(previous2, parent.children.indexOf(previous2), parent)) {
+  if (parent && previous3 && previous3.type === "element" && previous3.tagName === "colgroup" && closing(previous3, parent.children.indexOf(previous3), parent)) {
     return false;
   }
   return Boolean(head2 && head2.type === "element" && head2.tagName === "col");
 }
 function tbody2(node2, index2, parent) {
-  const previous2 = siblingBefore(parent, index2);
+  const previous3 = siblingBefore(parent, index2);
   const head2 = siblingAfter(node2, -1);
-  if (parent && previous2 && previous2.type === "element" && (previous2.tagName === "thead" || previous2.tagName === "tbody") && closing(previous2, parent.children.indexOf(previous2), parent)) {
+  if (parent && previous3 && previous3.type === "element" && (previous3.tagName === "thead" || previous3.tagName === "tbody") && closing(previous3, parent.children.indexOf(previous3), parent)) {
     return false;
   }
   return Boolean(head2 && head2.type === "element" && head2.tagName === "tr");
@@ -10389,7 +13392,7 @@ var init_opening = __esm(() => {
     body: body2,
     colgroup,
     head,
-    html: html5,
+    html: html6,
     tbody: tbody2
   });
 });
@@ -10523,7 +13526,7 @@ var init_element = __esm(() => {
 });
 
 // node_modules/hast-util-to-html/lib/handle/text.js
-function text4(node2, _, parent, state) {
+function text6(node2, _, parent, state) {
   return parent && parent.type === "element" && (parent.tagName === "script" || parent.tagName === "style") ? node2.value : stringifyEntities(node2.value, Object.assign({}, state.settings.characterReferences, {
     subset: textEntitySubset
   }));
@@ -10536,14 +13539,14 @@ var init_text3 = __esm(() => {
 
 // node_modules/hast-util-to-html/lib/handle/raw.js
 function raw(node2, index2, parent, state) {
-  return state.settings.allowDangerousHtml ? node2.value : text4(node2, index2, parent, state);
+  return state.settings.allowDangerousHtml ? node2.value : text6(node2, index2, parent, state);
 }
 var init_raw = __esm(() => {
   init_text3();
 });
 
 // node_modules/hast-util-to-html/lib/handle/root.js
-function root2(node2, _1, _2, state) {
+function root3(node2, _1, _2, state) {
   return state.all(node2);
 }
 
@@ -10555,23 +13558,23 @@ function unknown(node_) {
   const node2 = node_;
   throw new Error("Cannot compile unknown node `" + node2.type + "`");
 }
-var handle;
-var init_handle = __esm(() => {
+var handle2;
+var init_handle2 = __esm(() => {
   init_zwitch();
   init_comment();
   init_element();
   init_raw();
   init_text3();
-  handle = zwitch("type", {
+  handle2 = zwitch("type", {
     invalid,
     unknown,
-    handlers: { comment, doctype, element: element2, raw, root: root2, text: text4 }
+    handlers: { comment, doctype, element: element2, raw, root: root3, text: text6 }
   });
 });
 
 // node_modules/hast-util-to-html/lib/index.js
 function toHtml(tree, options) {
-  const options_ = options || emptyOptions3;
+  const options_ = options || emptyOptions4;
   const quote = options_.quote || '"';
   const alternative = quote === '"' ? "'" : '"';
   if (quote !== '"' && quote !== "'") {
@@ -10599,14 +13602,14 @@ function toHtml(tree, options) {
       closeSelfClosing: options_.closeSelfClosing || false,
       closeEmptyElements: options_.closeEmptyElements || false
     },
-    schema: options_.space === "svg" ? svg2 : html3,
+    schema: options_.space === "svg" ? svg2 : html4,
     quote,
     alternative
   };
   return state.one(Array.isArray(tree) ? { type: "root", children: tree } : tree, undefined, undefined);
 }
 function one2(node2, index2, parent) {
-  return handle(node2, index2, parent, this);
+  return handle2(node2, index2, parent, this);
 }
 function all2(parent) {
   const results = [];
@@ -10617,19 +13620,19 @@ function all2(parent) {
   }
   return results.join("");
 }
-var emptyOptions3, emptyCharacterReferences, emptyChildren2;
-var init_lib14 = __esm(() => {
+var emptyOptions4, emptyCharacterReferences, emptyChildren2;
+var init_lib23 = __esm(() => {
   init_html_void_elements();
   init_property_information();
-  init_handle();
-  emptyOptions3 = {};
+  init_handle2();
+  emptyOptions4 = {};
   emptyCharacterReferences = {};
   emptyChildren2 = [];
 });
 
 // node_modules/hast-util-to-html/index.js
 var init_hast_util_to_html = __esm(() => {
-  init_lib14();
+  init_lib23();
 });
 
 // node_modules/rehype-stringify/lib/index.js
@@ -10641,30 +13644,30 @@ function rehypeStringify(options) {
     return toHtml(tree, settings);
   }
 }
-var init_lib15 = __esm(() => {
+var init_lib24 = __esm(() => {
   init_hast_util_to_html();
 });
 
 // node_modules/rehype-stringify/index.js
 var init_rehype_stringify = __esm(() => {
-  init_lib15();
+  init_lib24();
 });
 
 // node:path
-function assertPath3(path) {
-  if (typeof path !== "string")
-    throw new TypeError("Path must be a string. Received " + JSON.stringify(path));
+function assertPath3(path2) {
+  if (typeof path2 !== "string")
+    throw new TypeError("Path must be a string. Received " + JSON.stringify(path2));
 }
-function normalizeStringPosix(path, allowAboveRoot) {
-  var res = "", lastSegmentLength = 0, lastSlash = -1, dots = 0, code2;
-  for (var i = 0;i <= path.length; ++i) {
-    if (i < path.length)
-      code2 = path.charCodeAt(i);
-    else if (code2 === 47)
+function normalizeStringPosix(path2, allowAboveRoot) {
+  var res = "", lastSegmentLength = 0, lastSlash = -1, dots = 0, code4;
+  for (var i = 0;i <= path2.length; ++i) {
+    if (i < path2.length)
+      code4 = path2.charCodeAt(i);
+    else if (code4 === 47)
       break;
     else
-      code2 = 47;
-    if (code2 === 47) {
+      code4 = 47;
+    if (code4 === 47) {
       if (lastSlash === i - 1 || dots === 1)
         ;
       else if (lastSlash !== i - 1 && dots === 2) {
@@ -10693,13 +13696,13 @@ function normalizeStringPosix(path, allowAboveRoot) {
         }
       } else {
         if (res.length > 0)
-          res += "/" + path.slice(lastSlash + 1, i);
+          res += "/" + path2.slice(lastSlash + 1, i);
         else
-          res = path.slice(lastSlash + 1, i);
+          res = path2.slice(lastSlash + 1, i);
         lastSegmentLength = i - lastSlash - 1;
       }
       lastSlash = i, dots = 0;
-    } else if (code2 === 46 && dots !== -1)
+    } else if (code4 === 46 && dots !== -1)
       ++dots;
     else
       dots = -1;
@@ -10717,17 +13720,17 @@ function _format(sep, pathObject) {
 function resolve() {
   var resolvedPath = "", resolvedAbsolute = false, cwd2;
   for (var i = arguments.length - 1;i >= -1 && !resolvedAbsolute; i--) {
-    var path;
+    var path2;
     if (i >= 0)
-      path = arguments[i];
+      path2 = arguments[i];
     else {
       if (cwd2 === undefined)
         cwd2 = process.cwd();
-      path = cwd2;
+      path2 = cwd2;
     }
-    if (assertPath3(path), path.length === 0)
+    if (assertPath3(path2), path2.length === 0)
       continue;
-    resolvedPath = path + "/" + resolvedPath, resolvedAbsolute = path.charCodeAt(0) === 47;
+    resolvedPath = path2 + "/" + resolvedPath, resolvedAbsolute = path2.charCodeAt(0) === 47;
   }
   if (resolvedPath = normalizeStringPosix(resolvedPath, !resolvedAbsolute), resolvedAbsolute)
     if (resolvedPath.length > 0)
@@ -10739,20 +13742,20 @@ function resolve() {
   else
     return ".";
 }
-function normalize3(path) {
-  if (assertPath3(path), path.length === 0)
+function normalize3(path2) {
+  if (assertPath3(path2), path2.length === 0)
     return ".";
-  var isAbsolute = path.charCodeAt(0) === 47, trailingSeparator = path.charCodeAt(path.length - 1) === 47;
-  if (path = normalizeStringPosix(path, !isAbsolute), path.length === 0 && !isAbsolute)
-    path = ".";
-  if (path.length > 0 && trailingSeparator)
-    path += "/";
+  var isAbsolute = path2.charCodeAt(0) === 47, trailingSeparator = path2.charCodeAt(path2.length - 1) === 47;
+  if (path2 = normalizeStringPosix(path2, !isAbsolute), path2.length === 0 && !isAbsolute)
+    path2 = ".";
+  if (path2.length > 0 && trailingSeparator)
+    path2 += "/";
   if (isAbsolute)
-    return "/" + path;
-  return path;
+    return "/" + path2;
+  return path2;
 }
-function isAbsolute(path) {
-  return assertPath3(path), path.length > 0 && path.charCodeAt(0) === 47;
+function isAbsolute(path2) {
+  return assertPath3(path2), path2.length > 0 && path2.charCodeAt(0) === 47;
 }
 function join2() {
   if (arguments.length === 0)
@@ -10820,15 +13823,15 @@ function relative(from, to) {
     return to.slice(toStart);
   }
 }
-function _makeLong(path) {
-  return path;
+function _makeLong(path2) {
+  return path2;
 }
-function dirname2(path) {
-  if (assertPath3(path), path.length === 0)
+function dirname2(path2) {
+  if (assertPath3(path2), path2.length === 0)
     return ".";
-  var code2 = path.charCodeAt(0), hasRoot = code2 === 47, end = -1, matchedSlash = true;
-  for (var i = path.length - 1;i >= 1; --i)
-    if (code2 = path.charCodeAt(i), code2 === 47) {
+  var code4 = path2.charCodeAt(0), hasRoot = code4 === 47, end = -1, matchedSlash = true;
+  for (var i = path2.length - 1;i >= 1; --i)
+    if (code4 = path2.charCodeAt(i), code4 === 47) {
       if (!matchedSlash) {
         end = i;
         break;
@@ -10839,20 +13842,20 @@ function dirname2(path) {
     return hasRoot ? "/" : ".";
   if (hasRoot && end === 1)
     return "//";
-  return path.slice(0, end);
+  return path2.slice(0, end);
 }
-function basename2(path, ext) {
+function basename2(path2, ext) {
   if (ext !== undefined && typeof ext !== "string")
     throw new TypeError('"ext" argument must be a string');
-  assertPath3(path);
+  assertPath3(path2);
   var start = 0, end = -1, matchedSlash = true, i;
-  if (ext !== undefined && ext.length > 0 && ext.length <= path.length) {
-    if (ext.length === path.length && ext === path)
+  if (ext !== undefined && ext.length > 0 && ext.length <= path2.length) {
+    if (ext.length === path2.length && ext === path2)
       return "";
     var extIdx = ext.length - 1, firstNonSlashEnd = -1;
-    for (i = path.length - 1;i >= 0; --i) {
-      var code2 = path.charCodeAt(i);
-      if (code2 === 47) {
+    for (i = path2.length - 1;i >= 0; --i) {
+      var code4 = path2.charCodeAt(i);
+      if (code4 === 47) {
         if (!matchedSlash) {
           start = i + 1;
           break;
@@ -10861,7 +13864,7 @@ function basename2(path, ext) {
         if (firstNonSlashEnd === -1)
           matchedSlash = false, firstNonSlashEnd = i + 1;
         if (extIdx >= 0)
-          if (code2 === ext.charCodeAt(extIdx)) {
+          if (code4 === ext.charCodeAt(extIdx)) {
             if (--extIdx === -1)
               end = i;
           } else
@@ -10871,11 +13874,11 @@ function basename2(path, ext) {
     if (start === end)
       end = firstNonSlashEnd;
     else if (end === -1)
-      end = path.length;
-    return path.slice(start, end);
+      end = path2.length;
+    return path2.slice(start, end);
   } else {
-    for (i = path.length - 1;i >= 0; --i)
-      if (path.charCodeAt(i) === 47) {
+    for (i = path2.length - 1;i >= 0; --i)
+      if (path2.charCodeAt(i) === 47) {
         if (!matchedSlash) {
           start = i + 1;
           break;
@@ -10884,15 +13887,15 @@ function basename2(path, ext) {
         matchedSlash = false, end = i + 1;
     if (end === -1)
       return "";
-    return path.slice(start, end);
+    return path2.slice(start, end);
   }
 }
-function extname2(path) {
-  assertPath3(path);
+function extname2(path2) {
+  assertPath3(path2);
   var startDot = -1, startPart = 0, end = -1, matchedSlash = true, preDotState = 0;
-  for (var i = path.length - 1;i >= 0; --i) {
-    var code2 = path.charCodeAt(i);
-    if (code2 === 47) {
+  for (var i = path2.length - 1;i >= 0; --i) {
+    var code4 = path2.charCodeAt(i);
+    if (code4 === 47) {
       if (!matchedSlash) {
         startPart = i + 1;
         break;
@@ -10901,7 +13904,7 @@ function extname2(path) {
     }
     if (end === -1)
       matchedSlash = false, end = i + 1;
-    if (code2 === 46) {
+    if (code4 === 46) {
       if (startDot === -1)
         startDot = i;
       else if (preDotState !== 1)
@@ -10911,26 +13914,26 @@ function extname2(path) {
   }
   if (startDot === -1 || end === -1 || preDotState === 0 || preDotState === 1 && startDot === end - 1 && startDot === startPart + 1)
     return "";
-  return path.slice(startDot, end);
+  return path2.slice(startDot, end);
 }
 function format(pathObject) {
   if (pathObject === null || typeof pathObject !== "object")
     throw new TypeError('The "pathObject" argument must be of type Object. Received type ' + typeof pathObject);
   return _format("/", pathObject);
 }
-function parse2(path) {
-  assertPath3(path);
+function parse2(path2) {
+  assertPath3(path2);
   var ret = { root: "", dir: "", base: "", ext: "", name: "" };
-  if (path.length === 0)
+  if (path2.length === 0)
     return ret;
-  var code2 = path.charCodeAt(0), isAbsolute2 = code2 === 47, start;
+  var code4 = path2.charCodeAt(0), isAbsolute2 = code4 === 47, start;
   if (isAbsolute2)
     ret.root = "/", start = 1;
   else
     start = 0;
-  var startDot = -1, startPart = 0, end = -1, matchedSlash = true, i = path.length - 1, preDotState = 0;
+  var startDot = -1, startPart = 0, end = -1, matchedSlash = true, i = path2.length - 1, preDotState = 0;
   for (;i >= start; --i) {
-    if (code2 = path.charCodeAt(i), code2 === 47) {
+    if (code4 = path2.charCodeAt(i), code4 === 47) {
       if (!matchedSlash) {
         startPart = i + 1;
         break;
@@ -10939,7 +13942,7 @@ function parse2(path) {
     }
     if (end === -1)
       matchedSlash = false, end = i + 1;
-    if (code2 === 46) {
+    if (code4 === 46) {
       if (startDot === -1)
         startDot = i;
       else if (preDotState !== 1)
@@ -10950,18 +13953,18 @@ function parse2(path) {
   if (startDot === -1 || end === -1 || preDotState === 0 || preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
     if (end !== -1)
       if (startPart === 0 && isAbsolute2)
-        ret.base = ret.name = path.slice(1, end);
+        ret.base = ret.name = path2.slice(1, end);
       else
-        ret.base = ret.name = path.slice(startPart, end);
+        ret.base = ret.name = path2.slice(startPart, end);
   } else {
     if (startPart === 0 && isAbsolute2)
-      ret.name = path.slice(1, startDot), ret.base = path.slice(1, end);
+      ret.name = path2.slice(1, startDot), ret.base = path2.slice(1, end);
     else
-      ret.name = path.slice(startPart, startDot), ret.base = path.slice(startPart, end);
-    ret.ext = path.slice(startDot, end);
+      ret.name = path2.slice(startPart, startDot), ret.base = path2.slice(startPart, end);
+    ret.ext = path2.slice(startDot, end);
   }
   if (startPart > 0)
-    ret.dir = path.slice(0, startPart - 1);
+    ret.dir = path2.slice(0, startPart - 1);
   else if (isAbsolute2)
     ret.dir = "/";
   return ret;
@@ -11104,11 +14107,11 @@ function makeSnippet(mark2, options) {
   }
   return result.replace(/\n$/, "");
 }
-function compileStyleAliases(map) {
+function compileStyleAliases(map3) {
   var result = {};
-  if (map !== null) {
-    Object.keys(map).forEach(function(style) {
-      map[style].forEach(function(alias) {
+  if (map3 !== null) {
+    Object.keys(map3).forEach(function(style) {
+      map3[style].forEach(function(alias) {
         result[String(alias)] = style;
       });
     });
@@ -11181,8 +14184,8 @@ function compileMap() {
   }
   return result;
 }
-function Schema$1(definition2) {
-  return this.extend(definition2);
+function Schema$1(definition3) {
+  return this.extend(definition3);
 }
 function resolveYamlNull(data) {
   if (data === null)
@@ -11423,26 +14426,26 @@ function resolveYamlMerge(data) {
 function resolveYamlBinary(data) {
   if (data === null)
     return false;
-  var code2, idx, bitlen = 0, max = data.length, map2 = BASE64_MAP;
+  var code4, idx, bitlen = 0, max = data.length, map4 = BASE64_MAP;
   for (idx = 0;idx < max; idx++) {
-    code2 = map2.indexOf(data.charAt(idx));
-    if (code2 > 64)
+    code4 = map4.indexOf(data.charAt(idx));
+    if (code4 > 64)
       continue;
-    if (code2 < 0)
+    if (code4 < 0)
       return false;
     bitlen += 6;
   }
   return bitlen % 8 === 0;
 }
 function constructYamlBinary(data) {
-  var idx, tailbits, input = data.replace(/[\r\n=]/g, ""), max = input.length, map2 = BASE64_MAP, bits = 0, result = [];
+  var idx, tailbits, input = data.replace(/[\r\n=]/g, ""), max = input.length, map4 = BASE64_MAP, bits = 0, result = [];
   for (idx = 0;idx < max; idx++) {
     if (idx % 4 === 0 && idx) {
       result.push(bits >> 16 & 255);
       result.push(bits >> 8 & 255);
       result.push(bits & 255);
     }
-    bits = bits << 6 | map2.indexOf(input.charAt(idx));
+    bits = bits << 6 | map4.indexOf(input.charAt(idx));
   }
   tailbits = max % 4 * 6;
   if (tailbits === 0) {
@@ -11458,32 +14461,32 @@ function constructYamlBinary(data) {
   return new Uint8Array(result);
 }
 function representYamlBinary(object) {
-  var result = "", bits = 0, idx, tail, max = object.length, map2 = BASE64_MAP;
+  var result = "", bits = 0, idx, tail, max = object.length, map4 = BASE64_MAP;
   for (idx = 0;idx < max; idx++) {
     if (idx % 3 === 0 && idx) {
-      result += map2[bits >> 18 & 63];
-      result += map2[bits >> 12 & 63];
-      result += map2[bits >> 6 & 63];
-      result += map2[bits & 63];
+      result += map4[bits >> 18 & 63];
+      result += map4[bits >> 12 & 63];
+      result += map4[bits >> 6 & 63];
+      result += map4[bits & 63];
     }
     bits = (bits << 8) + object[idx];
   }
   tail = max % 3;
   if (tail === 0) {
-    result += map2[bits >> 18 & 63];
-    result += map2[bits >> 12 & 63];
-    result += map2[bits >> 6 & 63];
-    result += map2[bits & 63];
+    result += map4[bits >> 18 & 63];
+    result += map4[bits >> 12 & 63];
+    result += map4[bits >> 6 & 63];
+    result += map4[bits & 63];
   } else if (tail === 2) {
-    result += map2[bits >> 10 & 63];
-    result += map2[bits >> 4 & 63];
-    result += map2[bits << 2 & 63];
-    result += map2[64];
+    result += map4[bits >> 10 & 63];
+    result += map4[bits >> 4 & 63];
+    result += map4[bits << 2 & 63];
+    result += map4[64];
   } else if (tail === 1) {
-    result += map2[bits >> 2 & 63];
-    result += map2[bits << 4 & 63];
-    result += map2[64];
-    result += map2[64];
+    result += map4[bits >> 2 & 63];
+    result += map4[bits << 4 & 63];
+    result += map4[64];
+    result += map4[64];
   }
   return result;
 }
@@ -12654,15 +15657,15 @@ function load$1(input, options) {
   }
   throw new exception("expected a single document in the stream, but found more");
 }
-function compileStyleMap(schema2, map2) {
+function compileStyleMap(schema2, map4) {
   var result, keys2, index2, length, tag, style, type2;
-  if (map2 === null)
+  if (map4 === null)
     return {};
   result = {};
-  keys2 = Object.keys(map2);
+  keys2 = Object.keys(map4);
   for (index2 = 0, length = keys2.length;index2 < length; index2 += 1) {
     tag = keys2[index2];
-    style = String(map2[tag]);
+    style = String(map4[tag]);
     if (tag.slice(0, 2) === "!!") {
       tag = "tag:yaml.org,2002:" + tag.slice(2);
     }
@@ -12675,21 +15678,21 @@ function compileStyleMap(schema2, map2) {
   return result;
 }
 function encodeHex(character) {
-  var string3, handle2, length;
+  var string3, handle3, length;
   string3 = character.toString(16).toUpperCase();
   if (character <= 255) {
-    handle2 = "x";
+    handle3 = "x";
     length = 2;
   } else if (character <= 65535) {
-    handle2 = "u";
+    handle3 = "u";
     length = 4;
   } else if (character <= 4294967295) {
-    handle2 = "U";
+    handle3 = "U";
     length = 8;
   } else {
     throw new exception("code point within a string may not be greater than 0xFFFFFFFF");
   }
-  return "\\" + handle2 + common.repeat("0", length - string3.length) + string3;
+  return "\\" + handle3 + common.repeat("0", length - string3.length) + string3;
 }
 function State(options) {
   this.schema = options["schema"] || _default;
@@ -12839,8 +15842,8 @@ function writeScalar(state, string3, level, iskey, inblock) {
         return state.quotingType === QUOTING_TYPE_DOUBLE ? '"' + string3 + '"' : "'" + string3 + "'";
       }
     }
-    var indent = state.indent * Math.max(1, level);
-    var lineWidth = state.lineWidth === -1 ? -1 : Math.max(Math.min(state.lineWidth, 40), state.lineWidth - indent);
+    var indent2 = state.indent * Math.max(1, level);
+    var lineWidth = state.lineWidth === -1 ? -1 : Math.max(Math.min(state.lineWidth, 40), state.lineWidth - indent2);
     var singleLineOnly = iskey || state.flowLevel > -1 && level >= state.flowLevel;
     function testAmbiguity(string4) {
       return testImplicitResolving(state, string4);
@@ -12851,9 +15854,9 @@ function writeScalar(state, string3, level, iskey, inblock) {
       case STYLE_SINGLE:
         return "'" + string3.replace(/'/g, "''") + "'";
       case STYLE_LITERAL:
-        return "|" + blockHeader(string3, state.indent) + dropEndingNewline(indentString(string3, indent));
+        return "|" + blockHeader(string3, state.indent) + dropEndingNewline(indentString(string3, indent2));
       case STYLE_FOLDED:
-        return ">" + blockHeader(string3, state.indent) + dropEndingNewline(indentString(foldString(string3, lineWidth), indent));
+        return ">" + blockHeader(string3, state.indent) + dropEndingNewline(indentString(foldString(string3, lineWidth), indent2));
       case STYLE_DOUBLE:
         return '"' + escapeString(string3) + '"';
       default:
@@ -13216,7 +16219,7 @@ function renamed(from, to) {
     throw new Error("Function yaml." + from + " is removed in js-yaml 4. " + "Use yaml." + to + " instead, which is now safe by default.");
   };
 }
-var isNothing_1, isObject_1, toArray_1, repeat_1, isNegativeZero_1, extend_1, common, exception, snippet, TYPE_CONSTRUCTOR_OPTIONS, YAML_NODE_KINDS, type, schema, str, seq, map, failsafe, _null, bool, int, YAML_FLOAT_PATTERN, SCIENTIFIC_WITHOUT_DOT, float, json, core2, YAML_DATE_REGEXP, YAML_TIMESTAMP_REGEXP, timestamp, merge2, BASE64_MAP = `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=
+var isNothing_1, isObject_1, toArray_1, repeat_1, isNegativeZero_1, extend_1, common, exception, snippet, TYPE_CONSTRUCTOR_OPTIONS, YAML_NODE_KINDS, type, schema, str, seq, map3, failsafe, _null, bool, int, YAML_FLOAT_PATTERN, SCIENTIFIC_WITHOUT_DOT, float, json, core2, YAML_DATE_REGEXP, YAML_TIMESTAMP_REGEXP, timestamp, merge2, BASE64_MAP = `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=
 \r`, binary, _hasOwnProperty$3, _toString$2, omap, _toString$1, pairs, _hasOwnProperty$2, set, _default, _hasOwnProperty$1, CONTEXT_FLOW_IN = 1, CONTEXT_FLOW_OUT = 2, CONTEXT_BLOCK_IN = 3, CONTEXT_BLOCK_OUT = 4, CHOMPING_CLIP = 1, CHOMPING_STRIP = 2, CHOMPING_KEEP = 3, PATTERN_NON_PRINTABLE, PATTERN_NON_ASCII_LINE_BREAKS, PATTERN_FLOW_INDICATORS, PATTERN_TAG_HANDLE, PATTERN_TAG_URI, simpleEscapeCheck, simpleEscapeMap, i, directiveHandlers, loadAll_1, load_1, loader, _toString, _hasOwnProperty, CHAR_BOM = 65279, CHAR_TAB = 9, CHAR_LINE_FEED = 10, CHAR_CARRIAGE_RETURN = 13, CHAR_SPACE = 32, CHAR_EXCLAMATION = 33, CHAR_DOUBLE_QUOTE = 34, CHAR_SHARP = 35, CHAR_PERCENT = 37, CHAR_AMPERSAND = 38, CHAR_SINGLE_QUOTE = 39, CHAR_ASTERISK = 42, CHAR_COMMA = 44, CHAR_MINUS = 45, CHAR_COLON = 58, CHAR_EQUALS = 61, CHAR_GREATER_THAN = 62, CHAR_QUESTION = 63, CHAR_COMMERCIAL_AT = 64, CHAR_LEFT_SQUARE_BRACKET = 91, CHAR_RIGHT_SQUARE_BRACKET = 93, CHAR_GRAVE_ACCENT = 96, CHAR_LEFT_CURLY_BRACKET = 123, CHAR_VERTICAL_LINE = 124, CHAR_RIGHT_CURLY_BRACKET = 125, ESCAPE_SEQUENCES, DEPRECATED_BOOLEANS_SYNTAX, DEPRECATED_BASE60_SYNTAX, QUOTING_TYPE_SINGLE = 1, QUOTING_TYPE_DOUBLE = 2, STYLE_PLAIN = 1, STYLE_SINGLE = 2, STYLE_LITERAL = 3, STYLE_FOLDED = 4, STYLE_DOUBLE = 5, dump_1, dumper, Type, Schema2, FAILSAFE_SCHEMA, JSON_SCHEMA, CORE_SCHEMA, DEFAULT_SCHEMA, load, loadAll, dump, YAMLException, types2, safeLoad, safeLoadAll, safeDump, jsYaml, js_yaml_default;
 var init_js_yaml = __esm(() => {
   /*! js-yaml 4.1.0 https://github.com/nodeca/js-yaml @license MIT */
@@ -13259,18 +16262,18 @@ var init_js_yaml = __esm(() => {
     "mapping"
   ];
   type = Type$1;
-  Schema$1.prototype.extend = function extend3(definition2) {
+  Schema$1.prototype.extend = function extend3(definition3) {
     var implicit = [];
     var explicit = [];
-    if (definition2 instanceof type) {
-      explicit.push(definition2);
-    } else if (Array.isArray(definition2)) {
-      explicit = explicit.concat(definition2);
-    } else if (definition2 && (Array.isArray(definition2.implicit) || Array.isArray(definition2.explicit))) {
-      if (definition2.implicit)
-        implicit = implicit.concat(definition2.implicit);
-      if (definition2.explicit)
-        explicit = explicit.concat(definition2.explicit);
+    if (definition3 instanceof type) {
+      explicit.push(definition3);
+    } else if (Array.isArray(definition3)) {
+      explicit = explicit.concat(definition3);
+    } else if (definition3 && (Array.isArray(definition3.implicit) || Array.isArray(definition3.explicit))) {
+      if (definition3.implicit)
+        implicit = implicit.concat(definition3.implicit);
+      if (definition3.explicit)
+        explicit = explicit.concat(definition3.explicit);
     } else {
       throw new exception("Schema.extend argument should be a Type, [ Type ], " + "or a schema definition ({ implicit: [...], explicit: [...] })");
     }
@@ -13311,7 +16314,7 @@ var init_js_yaml = __esm(() => {
       return data !== null ? data : [];
     }
   });
-  map = new type("tag:yaml.org,2002:map", {
+  map3 = new type("tag:yaml.org,2002:map", {
     kind: "mapping",
     construct: function(data) {
       return data !== null ? data : {};
@@ -13321,7 +16324,7 @@ var init_js_yaml = __esm(() => {
     explicit: [
       str,
       seq,
-      map
+      map3
     ]
   });
   _null = new type("tag:yaml.org,2002:null", {
@@ -13500,17 +16503,17 @@ var init_js_yaml = __esm(() => {
       }
     },
     TAG: function handleTagDirective(state, name, args) {
-      var handle2, prefix;
+      var handle3, prefix;
       if (args.length !== 2) {
         throwError(state, "TAG directive accepts exactly two arguments");
       }
-      handle2 = args[0];
+      handle3 = args[0];
       prefix = args[1];
-      if (!PATTERN_TAG_HANDLE.test(handle2)) {
+      if (!PATTERN_TAG_HANDLE.test(handle3)) {
         throwError(state, "ill-formed tag handle (first argument) of the TAG directive");
       }
-      if (_hasOwnProperty$1.call(state.tagMap, handle2)) {
-        throwError(state, 'there is a previously declared suffix for "' + handle2 + '" tag handle');
+      if (_hasOwnProperty$1.call(state.tagMap, handle3)) {
+        throwError(state, 'there is a previously declared suffix for "' + handle3 + '" tag handle');
       }
       if (!PATTERN_TAG_URI.test(prefix)) {
         throwError(state, "ill-formed tag prefix (second argument) of the TAG directive");
@@ -13520,7 +16523,7 @@ var init_js_yaml = __esm(() => {
       } catch (err) {
         throwError(state, "tag prefix is malformed: " + prefix);
       }
-      state.tagMap[handle2] = prefix;
+      state.tagMap[handle3] = prefix;
     }
   };
   loadAll_1 = loadAll$1;
@@ -13583,7 +16586,7 @@ var init_js_yaml = __esm(() => {
   types2 = {
     binary,
     float,
-    map,
+    map: map3,
     null: _null,
     pairs,
     set,
@@ -13758,9 +16761,9 @@ function listenBtn(id, method, container = document.body) {
 }
 function markdown(md) {
   md = md.replace(/^(\#+?)/mg, "$1##");
-  const result = unified().use(remarkParse).use(remarkRehype).use(rehypeStringify).processSync(md);
-  const html6 = String(result);
-  return html6;
+  const result = unified().use(remarkParse).use(remarkGfm).use(remarkRehype).use(rehypeStringify).processSync(md);
+  const html7 = String(result);
+  return html7;
 }
 function red(msg) {
   return colorize(msg, "31");
@@ -13782,6 +16785,7 @@ var init_utils = __esm(() => {
   init_constants();
   init_unified();
   init_remark_parse();
+  init_remark_gfm();
   init_remark_rehype();
   init_rehype_stringify();
   init_Locale();
@@ -14581,6 +17585,8 @@ class Work {
           case "cycleTime":
           case "leftTime":
             return clock.time2horloge(v2);
+          case "content":
+            return markdown(v2);
           case "report":
             if (v2) {
               return markdown(`---

@@ -4,10 +4,15 @@ import { DGet } from "../../public/js/dom.js";
 // Pour remark (Markdonw => HTML)
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
+import remarkGfm from 'remark-gfm';
 import remarkRehype from 'remark-rehype';
 import rehypeStringify from 'rehype-stringify';
 import { t } from "./Locale.js";
 import { Flash } from "../../public/js/flash.js";
+// import { marked } from 'marked';
+// import { gfmHeadingId } from 'marked-gfm-heading-id';
+// import { markedHighlight } from 'marked-highlight';
+// marked.use({ gfm: true });
 
 export async function postToServer(route: string, data: RecType){
   const controller = new AbortController();
@@ -70,11 +75,13 @@ export function markdown(md: string): string {
   md = md.replace(/^(\#+?)/mg, '$1##');
   const result = unified()
     .use(remarkParse)
+    .use(remarkGfm)          // Support GFM (task lists, tables, etc.)
     .use(remarkRehype)
     .use(rehypeStringify)
-    .processSync(md);
-  
+    .processSync(md);  
   const html = String(result);
+
+  // const html = marked.parse(md);
 
   // console.log("Report corrigé", html);
   return html; 
