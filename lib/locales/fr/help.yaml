@@ -40,19 +40,38 @@ help:
       Imaginons, pour faire simple, que vous avez ces différents projets
       en cours :
 
-      * un livre sur le développement personnel,
-      * un programme de gestion de tâche,
-      * une extension de votre maison pour faire une nouvelle chambre,
-      * la lecture d'un ouvrage historique
-      * la traduction d'un ouvrage technique sur un appareil.
+      *(peu importe que vous ne connaissiez pas le temps total de 
+      développement, il est indiqué ici uniquement pour l'exemple)
 
-      Cinq projets que vous menez de front, qui représente d'après
-      vos estimations, chacun, une centaine d'heures de trvail,
-      mais auxquels vous n'êtes 
-      pas sûr(e), dans votre organisation actuelle,
-      de consacrer le temps qu'il faudrait.
+      | Travail | Durée total<br />de réalisation | Temps travaillé |
+      | --- | --- | --- |
+      | Livre sur le développement personnel | 100 h | 0 h |
+      | Programme de gestion de tâche | 150 h | 0 h |
+      | Extension de la maison (chambre de bébé) | 200 h | 0 h |
+      | Lecture d'un ouvrage historique | 40 h | 0 h |
+      | Traduction de l'ouvre technique Xtt | 300 h | 0 |
+
+      Mais sans organisation, vous n'êtes pas sûr de consacrer le 
+      temps qu'il faudrait à chaque projet dans votre journée, votre
+      semaine ou votre mois.
       
-      Grâce à ETC, vous allez pouvoir le faire.
+      Grâce à ETC, vous allez pouvoir organiser tout ça.
+
+      Comment ? En travaillant par *CYCLE*. Un cycle correspond à
+      travailler un certain temps (2 heures par défaut) sur chaque
+      projet, dans l'ordre ou au hasard, jusqu'à les avoir tous abordé.
+
+      Par exemple, si vous laiser la durée par défaut d'une session
+      à 2 heures, voilà comment les choses vont se passer : 
+      
+      * ETC va vous proposer de travailler 2 heures sur la maison,
+      * puis 2 heures sur l'ouvrage historique,
+      * puis 2 heures sur le gestionnaire de tâches,
+      * puis 2 heures sur le livre de développement personnel,
+      * puis 2 heures sur la traduction.
+
+      Vous venez d'accomplir un *CYCLE* et votre état de travail 
+      est le suivant : 
 
       D'abord, vous ouvrez l'application après l'avoir chargée. Vous 
       rejoignez en premier lieu les préférences (⚙️) afin de choisir

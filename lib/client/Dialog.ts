@@ -70,6 +70,10 @@ export class Dialog {
   }
 
   private close(){
+    if (this.timer) {
+      clearTimeout(this.timer);
+      delete (this as any).timer;
+    }
     this.decourcircuiteKeyboard();
     this.box.classList.add('hidden');
   }
@@ -101,8 +105,7 @@ export class Dialog {
 
 
   onTimeout(ev: Event){
-    clearTimeout(this.timer);
-    delete (this as any).timer;
+    this.close();
     (this.data.onTimeout || this.fallbackOnTimeout)();
   }
 

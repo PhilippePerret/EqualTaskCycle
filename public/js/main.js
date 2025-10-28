@@ -14644,6 +14644,10 @@ class Dialog {
     import_renderer.default.info("<- Dialog.show");
   }
   close() {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      delete this.timer;
+    }
     this.decourcircuiteKeyboard();
     this.box.classList.add("hidden");
   }
@@ -14674,8 +14678,7 @@ class Dialog {
   }
   _oldKeyDownFunction;
   onTimeout(ev) {
-    clearTimeout(this.timer);
-    delete this.timer;
+    this.close();
     (this.data.onTimeout || this.fallbackOnTimeout)();
   }
   detemplatize(values2) {

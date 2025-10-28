@@ -26,7 +26,7 @@ div#flash-group div#flash-info  {
   cursor: pointer;
 }
 div#flash-group div.flash-message:not(.error) {
-  background-color: deepskyblue;
+  background-color: rgb(19, 154, 184);
 }
 div#flash-group div#flash-error,
 div#flash-group div.flash-message.error,
