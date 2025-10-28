@@ -6,16 +6,13 @@
  */
 import fs from 'fs';
 import path from 'path';
-import { Dialog } from './Dialog';
-import { t } from '../shared/Locale';
 import log from 'electron-log/main';
 
 const fileWatcher = new Worker(path.join(__dirname, 'ActivityTracker_watcher.ts'));
 
-export class ActivityTracker /* SERVER */ {
-  public static singleton(){
-    return this._inst || (this._inst = new ActivityTracker());
-  }; private static _inst: ActivityTracker;
+export class ActivityTracker /* SERVER */ { /* singleton */
+  public static singleton(){return this._inst || (this._inst = new ActivityTracker())}
+  private static _inst: ActivityTracker;
   private constructor(){}
 
 
@@ -53,39 +50,8 @@ export class ActivityTracker /* SERVER */ {
     });
   }
 
-  private on?: boolean; // true if user work
+  public init(){}
 
-  public async askUserIfWorking(){
-    log.info('-> ActivityTracker.askUserIfWorking')
-    await this.askIfActifDialog.show();
-    return {ok: true, userIsWorking: this.on === true}
-  }
-
-  public init(){
-    log.info("-> ActivityTracker.init")
-    this.askIfActifDialog; // pour forcer sa construction
-    log.info(`[ActivityTracker.init] Typeof this._dialog: ${typeof this._dialog}`);
-  }
-
-  private get askIfActifDialog(){
-    return this._dialog || (this._dialog = this.getDialog())
-  }; private _dialog?: Dialog;
-
-  private onChooseActivityState(state: boolean, ev: Event) { this.on = state }
-
-  private getDialog(){
-    return new Dialog({
-      title: t('ui.title.confirmation_required'),
-      message: t('ui.text.are_you_still_working'),
-      buttons: [
-        {text: t('ui.button.not_anymore'), onclick: this.onChooseActivityState.bind(this, false)},
-        {text: t('ui.button.yes_still'), onclick: this.onChooseActivityState.bind(this, true)}
-      ],
-      timeout: 120,
-      onTimeout: this.onChooseActivityState.bind(this, false),
-      icon: process.env.APP_ICON_PATH
-    })
-  }
 }
 
 export const activTracker = ActivityTracker.singleton();

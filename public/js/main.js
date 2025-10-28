@@ -14366,7 +14366,7 @@ var init_Locale = __esm(() => {
 });
 
 // lib/client/main.ts
-var import_renderer2 = __toESM(require_renderer2(), 1);
+var import_renderer3 = __toESM(require_renderer2(), 1);
 init_Locale();
 // lib/client/work.ts
 init_flash();
@@ -14616,6 +14616,139 @@ class Work {
 // lib/client/activityTracker.ts
 init_utils();
 
+// lib/client/Dialog.ts
+var import_renderer = __toESM(require_renderer2(), 1);
+
+class Dialog {
+  data;
+  _built = false;
+  fallbackOnTimeout = () => {};
+  timer;
+  cancelFunction;
+  defaultFunction;
+  box;
+  title;
+  message;
+  constructor(data) {
+    this.data = data;
+  }
+  show(values2 = undefined) {
+    import_renderer.default.info("-> Dialog.show");
+    this._built || this.build();
+    const detempCode = this.detemplatize(values2);
+    this.box.classList.remove("hidden");
+    this.courtcircuiteKeyboard();
+    if (this.data.timeout) {
+      this.timer = setTimeout(this.onTimeout.bind(this), this.data.timeout * 1000);
+    }
+    import_renderer.default.info("<- Dialog.show");
+  }
+  close() {
+    this.decourcircuiteKeyboard();
+    this.box.classList.add("hidden");
+  }
+  onClickButton(callback, ev) {
+    ev && stopEvent(ev);
+    this.close();
+    return callback && callback();
+  }
+  onCancel() {
+    return this.onClickButton(this.cancelFunction);
+  }
+  onDefault() {
+    return this.onClickButton(this.defaultFunction);
+  }
+  courtcircuiteKeyboard() {
+    this._oldKeyDownFunction = window.onkeydown;
+    window.onkeydown = (ev) => {
+      if (ev.code === "Escape") {
+        this.onCancel();
+      } else if (ev.code === "Enter") {
+        this.onDefault();
+      }
+      return false;
+    };
+  }
+  decourcircuiteKeyboard() {
+    window.onkeydown = this._oldKeyDownFunction;
+  }
+  _oldKeyDownFunction;
+  onTimeout(ev) {
+    clearTimeout(this.timer);
+    delete this.timer;
+    (this.data.onTimeout || this.fallbackOnTimeout)();
+  }
+  detemplatize(values2) {
+    if (values2 === undefined) {
+      return;
+    } else {
+      values2.forEach((value, i2) => {
+        const reg = new RegExp(`_${i2}_`, "g");
+        if (this.title) {
+          this.title.innerHTML = this.title.innerHTML.replace(reg, value);
+        }
+        this.message.innerHTML = this.message.innerHTML.replace(reg, value);
+      });
+    }
+  }
+  build() {
+    import_renderer.default.info("-> Dialog.build()");
+    const o = document.createElement("DIV");
+    o.className = "dialog hidden";
+    if (this.data.title) {
+      const t2 = document.createElement("DIV");
+      t2.className = "dialog-title";
+      t2.innerHTML = this.formatted_title;
+      o.appendChild(t2);
+      this.title = t2;
+    }
+    const m = document.createElement("DIV");
+    m.className = "dialog-message";
+    m.innerHTML = this.formatted_message;
+    o.appendChild(m);
+    this.message = m;
+    const i2 = document.createElement("IMG");
+    i2.className = "dialog-icon";
+    o.appendChild(i2);
+    i2.setAttribute("src", this.data.icon);
+    const bts = document.createElement("DIV");
+    bts.className = "buttons";
+    o.appendChild(bts);
+    this.data.buttons.forEach((bouton) => {
+      const b = document.createElement("BUTTON");
+      b.innerHTML = bouton.text;
+      b.addEventListener("click", this.onClickButton.bind(this, bouton.onclick));
+      if (bouton.role === "default") {
+        this.defaultFunction = bouton.onclick;
+        b.classList.add("default");
+      } else if (bouton.role === "cancel") {
+        this.cancelFunction = bouton.onclick;
+        b.classList.add("cancel");
+      }
+      bts.appendChild(b);
+    });
+    import_renderer.default.info("<- Dialog.build()");
+    this.box = o;
+    document.body.appendChild(this.box);
+    this._built = true;
+  }
+  get formatted_message() {
+    return this.commonReplacements(this.data.message);
+  }
+  get formatted_title() {
+    return this.commonReplacements(this.data.title);
+  }
+  commonReplacements(str2) {
+    return str2.replace(/'/g, "’").split(`
+
+`).map((s) => `<p>${s}</p>`).join("");
+  }
+}
+
+// lib/client/activityTracker.ts
+init_Locale();
+var import_renderer2 = __toESM(require_renderer2(), 1);
+
 class ActivityTracker {
   static CHECK_INTERVAL = 3 * 60 * 1000;
   static timer;
@@ -14639,16 +14772,38 @@ class ActivityTracker {
     }
   }
   static async control() {
+    import_renderer2.default.info("-> ActivityTracker.control");
     const result = await postToServer("/work/check-activity", {
       projectFolder: Work.currentWork.folder,
       lastCheck: Date.now() - this.CHECK_INTERVAL
     });
+    import_renderer2.default.info(`Retour de control: ${JSON.stringify(result)}`);
     if (result.ok) {
-      this.inactiveUser = result.userIsWorking === false;
-      if (this.inactiveUser) {
-        ui.onForceStop();
+      if (result.isActive === false) {
+        import_renderer2.default.info("--- Activer la fenêtre de demande d’activité ---");
+        window.electronAPI.bringToFront();
+        this.dialogActivity.show();
       }
     }
+  }
+  static onChooseActivityState(isActive) {
+    if (isActive === false) {
+      ui.onForceStop();
+    }
+  }
+  static _dialactiv;
+  static get dialogActivity() {
+    return this._dialactiv || (this._dialactiv = new Dialog({
+      title: t("ui.title.confirmation_required"),
+      message: t("ui.text.are_you_still_working"),
+      buttons: [
+        { text: t("ui.button.not_anymore"), role: "cancel", onclick: this.onChooseActivityState.bind(this, false) },
+        { text: t("ui.button.yes_still"), role: "default", onclick: this.onChooseActivityState.bind(this, true) }
+      ],
+      timeout: 120,
+      onTimeout: this.onChooseActivityState.bind(this, false),
+      icon: "images/icon.png"
+    }));
   }
 }
 
@@ -16819,143 +16974,10 @@ class Editing {
 }
 var editor = Editing.getIntance();
 
-// lib/client/Dialog.ts
-var import_renderer = __toESM(require_renderer2(), 1);
-
-class Dialog {
-  data;
-  _built = false;
-  code;
-  tableButtons;
-  defaultButton;
-  cancelButton;
-  buttonList;
-  fallbackButtons = [
-    { text: "Cancel", onclick: () => {} },
-    { text: "OK", onclick: () => {} }
-  ];
-  fallbackIcon = "note";
-  fallbackOnTimeout = () => {};
-  timer;
-  cancelFunction;
-  defaultFunction;
-  box;
-  constructor(data) {
-    this.data = data;
-  }
-  show(values2 = undefined) {
-    import_renderer.default.info("-> Dialog.show");
-    this._built || this.build();
-    const detempCode = this.detemplatize(String(this.code), values2);
-    this.box.classList.remove("hidden");
-    this.courtcircuiteKeyboard();
-    if (this.data.timeout) {
-      this.timer = setTimeout(this.onTimeout.bind(this), this.data.timeout * 1000);
-    }
-    import_renderer.default.info("<- Dialog.show");
-  }
-  close() {
-    this.decourcircuiteKeyboard();
-    this.box.classList.add("hidden");
-  }
-  onClickButton(callback, ev) {
-    ev && stopEvent(ev);
-    this.close();
-    return callback && callback();
-  }
-  onCancel() {
-    return this.onClickButton(this.cancelFunction);
-  }
-  onDefault() {
-    return this.onClickButton(this.defaultFunction);
-  }
-  courtcircuiteKeyboard() {
-    this._oldKeyDownFunction = window.onkeydown;
-    window.onkeydown = (ev) => {
-      if (ev.code === "Escape") {
-        this.onCancel();
-      } else if (ev.code === "Enter") {
-        this.onDefault();
-      }
-      return false;
-    };
-  }
-  decourcircuiteKeyboard() {
-    window.onkeydown = this._oldKeyDownFunction;
-  }
-  _oldKeyDownFunction;
-  onTimeout(ev) {
-    clearTimeout(this.timer);
-    delete this.timer;
-    (this.data.onTimeout || this.fallbackOnTimeout)();
-  }
-  detemplatize(code2, values2) {
-    if (values2 === undefined) {
-      return code2;
-    } else {
-      values2.forEach((value, i2) => {
-        const reg = new RegExp(`_${i2}_`, "g");
-        code2 = code2.replace(reg, value);
-      });
-      return code2;
-    }
-  }
-  build() {
-    import_renderer.default.info("-> Dialog.build()");
-    const o = document.createElement("DIV");
-    o.className = "dialog hidden";
-    if (this.data.title) {
-      const t2 = document.createElement("DIV");
-      t2.className = "dialog-title";
-      t2.innerHTML = this.formatted_title;
-      o.appendChild(t2);
-    }
-    const m2 = document.createElement("DIV");
-    m2.className = "dialog-message";
-    m2.innerHTML = this.formatted_message;
-    o.appendChild(m2);
-    const i2 = document.createElement("IMG");
-    i2.className = "dialog-icon";
-    o.appendChild(i2);
-    i2.setAttribute("src", this.data.icon);
-    const bts = document.createElement("DIV");
-    bts.className = "buttons";
-    o.appendChild(bts);
-    this.data.buttons.forEach((bouton) => {
-      const b2 = document.createElement("BUTTON");
-      b2.innerHTML = bouton.text;
-      b2.addEventListener("click", this.onClickButton.bind(this, bouton.onclick));
-      if (bouton.default === true) {
-        this.defaultFunction = bouton.onclick;
-        b2.classList.add("default");
-      } else if (bouton.cancel === true) {
-        this.cancelFunction = bouton.onclick;
-        b2.classList.add("cancel");
-      }
-      bts.appendChild(b2);
-    });
-    import_renderer.default.info("<- Dialog.build()");
-    this.box = o;
-    document.body.appendChild(this.box);
-    this._built = true;
-  }
-  get formatted_message() {
-    return this.commonReplacements(this.data.message);
-  }
-  get formatted_title() {
-    return this.commonReplacements(this.data.title);
-  }
-  commonReplacements(str2) {
-    return str2.replace(/'/g, "’").split(`
-
-`).map((s) => `<p>${s}</p>`).join("");
-  }
-}
-
 // lib/client/main.ts
 class Client {
   async init() {
-    import_renderer2.default.info("=== INITIALISATION CLIENT ===");
+    import_renderer3.default.info("=== INITIALISATION CLIENT ===");
     await this.initObjet(prefs, "Prefs");
     await this.initObjet(loc, "Locale", prefs.getLang());
     this.initObjetSync(ui, "UI", prefs.getSavedData());
@@ -16964,18 +16986,6 @@ class Client {
     this.initObjetSync(help, "Help");
     Flash.notice(`${t("app.is_ready")} <span id="mes123">(${t("help.show")})</span>`);
     DGet("span#mes123").addEventListener("click", help.show.bind(help, ["resume_home_page"]), { once: true, capture: true });
-    const dialog = new Dialog({
-      title: "Pour essai et réglage",
-      message: `Ceci est le message pour essayer la boite de dialogue.
-
-En multiligne en plus pour faire un test sérieux`,
-      icon: "images/icon.png",
-      buttons: [
-        { text: "NON", onclick: this.onRespondNo.bind(this), cancel: true },
-        { text: "OUI", onclick: this.onRespondYes.bind(this), default: true }
-      ]
-    });
-    dialog.show();
   }
   onRespondYes() {
     console.log("Il a répondu oui");
@@ -16984,7 +16994,7 @@ En multiligne en plus pour faire un test sérieux`,
     console.log("Il a répondu non");
   }
   initObjetSync(objet, name, args) {
-    import_renderer2.default.info(`${name} init…`);
+    import_renderer3.default.info(`${name} init…`);
     let res;
     if (args) {
       res = objet.init(args);
@@ -16992,13 +17002,13 @@ En multiligne en plus pour faire un test sérieux`,
       res = objet.init();
     }
     if (res) {
-      import_renderer2.default.info("  -- ok");
+      import_renderer3.default.info("  -- ok");
     } else {
-      import_renderer2.default.warn(`Problem with ${name} initialisation`);
+      import_renderer3.default.warn(`Problem with ${name} initialisation`);
     }
   }
   async initObjet(objet, name, args) {
-    import_renderer2.default.info(`${name} init…`);
+    import_renderer3.default.info(`${name} init…`);
     let res;
     if (args) {
       res = await objet.init(args);
@@ -17006,9 +17016,9 @@ En multiligne en plus pour faire un test sérieux`,
       res = await objet.init();
     }
     if (res) {
-      import_renderer2.default.info("  -- ok");
+      import_renderer3.default.info("  -- ok");
     } else {
-      import_renderer2.default.warn(`Problem with ${name} initialisation`);
+      import_renderer3.default.warn(`Problem with ${name} initialisation`);
     }
   }
   static inst;

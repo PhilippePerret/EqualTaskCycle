@@ -30,29 +30,19 @@ import { stopEvent } from '../../public/js/dom';
 type ButtonType = {
   text: string;
   onclick: Function;
-  default?: boolean;
-  cancel?: boolean;
+  role?: 'default' | 'cancel';
 }
 
 export class Dialog {
 
   private _built: boolean = false;
-  private code!: string;
-  private tableButtons!: {[x: string]: ButtonType};
-  private defaultButton!: string;
-  private cancelButton?: string;
-  private buttonList!: string[];
-  // Valeurs de remplacement (aka par défaut)
-  private fallbackButtons: ButtonType[] = [
-    {text: "Cancel", onclick:()=>{}}, 
-    {text: "OK", onclick: ()=>{}}
-  ]
-  private fallbackIcon: string = 'note';
   private fallbackOnTimeout: Function = ()=>{}
   private timer?: number;
   private cancelFunction?: Function; 
   private defaultFunction?: Function;
   private box!: HTMLDivElement; // La boite principale
+  private title?: HTMLDivElement;
+  private message!: HTMLDivElement;
 
   constructor(
     private data:{
@@ -69,7 +59,7 @@ export class Dialog {
   show(values: string[] | undefined = undefined){
     log.info('-> Dialog.show');
     this._built || this.build();
-    const detempCode = this.detemplatize(String(this.code), values);
+    const detempCode = this.detemplatize(values);
     this.box.classList.remove('hidden');
     this.courtcircuiteKeyboard();
     // On met en route un timeout s'il le faut
@@ -116,15 +106,17 @@ export class Dialog {
     (this.data.onTimeout || this.fallbackOnTimeout)();
   }
 
-  detemplatize(code: string, values: string[] | undefined): string{
+  detemplatize(values: string[] | undefined): void {
     if (values === undefined) {
-      return code;
+      return;
     } else {
       values.forEach((value: string, i: number) => {
         const reg = new RegExp(`_${i}_`, 'g');
-        code = code.replace(reg, value)
+        if (this.title) {
+          this.title.innerHTML = this.title.innerHTML.replace(reg, value);
+        }
+        this.message.innerHTML = this.message.innerHTML.replace(reg, value);
       });
-      return code;
     }
   }
 
@@ -138,11 +130,13 @@ export class Dialog {
       t.className = 'dialog-title';
       t.innerHTML = this.formatted_title;
       o.appendChild(t);
+      this.title = t as HTMLDivElement;
     }
     const m = document.createElement('DIV');
     m.className = 'dialog-message';
     m.innerHTML = this.formatted_message;
     o.appendChild(m);
+    this.message = m as HTMLDivElement;
     const i = document.createElement('IMG');
     i.className = 'dialog-icon';
     o.appendChild(i);
@@ -154,10 +148,10 @@ export class Dialog {
       const b = document.createElement('BUTTON');
       b.innerHTML = bouton.text;
       b.addEventListener('click', this.onClickButton.bind(this, bouton.onclick));
-      if (bouton.default === true) {
+      if (bouton.role === 'default') {
         this.defaultFunction = bouton.onclick;
         b.classList.add('default');
-      } else if (bouton.cancel === true) {
+      } else if (bouton.role === 'cancel') {
         this.cancelFunction = bouton.onclick;
         b.classList.add('cancel');
       }

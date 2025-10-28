@@ -20,7 +20,7 @@ if (existsSync(ICON_PATH)) {
   throw new Error("Unfound icon");
 }
 
-app.name = "Equal Task Cycle";
+app.name = "ETC";
 
 const bunPath = app.isPackaged 
 ? path.join(process.resourcesPath, 'bun')

@@ -1,10 +1,10 @@
 ---
 lang: fr
-appName: "Equal Task Cycle"
+appName: "ETC"
 
 ui:
   app:
-    name: "(ETC) Cycle Égal de Tâches"
+    name: "ETC"
     mode: '' # renseigné au chargement
   button:
     change: UNE AUTRE

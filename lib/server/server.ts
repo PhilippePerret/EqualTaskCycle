@@ -55,20 +55,12 @@ app.post('/work/check-activity', async (req, res) => {
     const lastCheck = dreq.lastCheck;
     const isActive = await activTracker.watchActivity(folder, lastCheck);
     log.info('Data watcher activity:', {isActive, folder, lastCheck, date: new Date(lastCheck)});
-    if (!isActive) {
-      log.info("-> Alerte pour demander de confirmer le travail.");
-      try {
-        response = await activTracker.askUserIfWorking();
-      } catch(err) {
-        log.error(`Impossible de demander à l'user : ${(err as any).message}.`)
-      }
-      // response = {ok: true, userIsWorking: true}; // pour essayer sans l'appel
-      log.info("Réponse de l'utilisateur : ", response);
-    } else {
-      response = {ok: true, userIsWorking: true, raison: 'activity in folder'};
+    if (isActive === false) {
+      // TODO Activer l'application pour voir le dialogue
     }
+    response = {ok: true, isActive: isActive}
   } catch (err) {
-    console.error("ERREURS IN /work/check-activity", err);
+    log.error("ERREURS IN /work/check-activity", err);
     response = {ok: false, error: (err as any).message }
   }
   res.json(response);
