@@ -71,13 +71,11 @@ export function listenBtn(id: string, method: Function, container = document.bod
 }
 
 export function markdown(md: string): string {
-  // Ajouter deux '#' à chaque titre
-  md = md.replace(/^(\#+?)/mg, '$1##');
   const result = unified()
     .use(remarkParse)
     .use(remarkGfm)          // Support GFM (task lists, tables, etc.)
-    .use(remarkRehype)
-    .use(rehypeStringify)
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeStringify, { allowDangerousHtml: true })
     .processSync(md);  
   const html = String(result);
 

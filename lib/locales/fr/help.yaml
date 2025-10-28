@@ -414,7 +414,7 @@ help:
       - Le travailleur peut passer au travail suivant.
       - Et ainsi de suite jusqu’au lendemain.
 
-      Bien entendu, les exemples présentés ici n'utilisait qu’un seul travail
+      Bien entendu, les exemples présentés ici n'utilisaient qu’un seul travail
       avec des durées différentes mais dans la réalité, chaque travail peut
       avoir sa propre *durée cycle* et sa propre *durée session* pour s'adapter
       à toutes les situations.

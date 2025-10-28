@@ -16644,7 +16644,7 @@ class Locale {
     return this.locales;
   }
   translateText(texte) {
-    return texte.replaceAll(/\bt\((.+?)\)/g, this.replacementMethod.bind(this));
+    return texte.replace(/\bt\((.+?)\)/g, this.replacementMethod.bind(this));
   }
   translate(route) {
     const translated = route.split(".").reduce((obj, key2) => obj?.[key2], this.locales);
@@ -16763,8 +16763,7 @@ function listenBtn(id, method, container = document.body) {
   DGet(`button.btn-${id}`, container).addEventListener("click", method);
 }
 function markdown(md) {
-  md = md.replace(/^(\#+?)/mg, "$1##");
-  const result = unified().use(remarkParse).use(remarkGfm).use(remarkRehype).use(rehypeStringify).processSync(md);
+  const result = unified().use(remarkParse).use(remarkGfm).use(remarkRehype, { allowDangerousHtml: true }).use(rehypeStringify, { allowDangerousHtml: true }).processSync(md);
   const html7 = String(result);
   return html7;
 }
@@ -18321,29 +18320,42 @@ class Help {
   async show(helpIds) {
     this.isOpened() || ui.toggleHelp();
     this.content.innerHTML = "";
-    this.texts = helpIds.map((helpId) => {
-      let texte = tt(HELP_TEXTS[helpId]);
+    const LocIds = [];
+    helpIds.forEach((helpId) => {
+      LocIds.push({ type: "text", locId: helpId });
+    });
+    this.texts = [];
+    let locDef;
+    while (locDef = LocIds.shift()) {
+      const locId = locDef.locId;
+      const locIdpur = locId.replace(/\./g, "");
+      let texte = HELP_TEXTS[locId] || t(locId);
       while (texte.match(/\bt\(/)) {
         texte = tt(texte);
       }
-      console.log("TEXTE INI", texte);
       if (texte.match(/help\((.+?)\)/)) {
-        console.info("contient help(");
-        texte = texte.replaceAll(/help\((.+?)\)/g, (_tout, hid) => {
+        texte = texte.replace(/help\((.+?)\)/g, (_tout, hid) => {
           hid = hid.trim();
           console.log("HID = ", hid);
           const fullIdTitle = `help.${hid}.title`;
-          return `<a href="#help-${hid}">${t("ui.thing.guil_open")}${t(fullIdTitle)}${t("ui.thing.guil_close")}</a>`;
+          const fullIdPrefix = t(`help.${hid}.level`);
+          const fullIdText = `help.${hid}.text`;
+          LocIds.push({ type: "title", locId: fullIdTitle, prefix: fullIdPrefix });
+          LocIds.push({ type: "text", locId: fullIdText });
+          return `[*${t(fullIdTitle)}*](#help-${fullIdTitle.replace(/\./g, "")})`;
         });
-      } else {
-        console.warn("Ne contient pas help(...)");
       }
-      return `<a id="help-${helpId}" name="${helpId}"></a>
+      if (locDef.type === "title") {
+        texte = `${locDef.prefix} ${texte}`;
+      } else {
+        texte = `${texte}
 
-` + this.finalizeText(texte).trim().concat(`
-
----`);
-    });
+---`;
+      }
+      const formated_text = `<a id="help-${locIdpur}" name="${locIdpur}"></a>
+` + this.finalizeText(texte).trim();
+      this.texts.push(formated_text);
+    }
     this.writeText.bind(this)();
   }
   timer;
@@ -18352,18 +18364,12 @@ class Help {
       const [tit, hid] = args.split(",").map((s) => s.trim());
       return `<span onclick="help.show(['${hid}'])">${tit}</span>`;
     });
-    while (text7.match(/\bt\(/)) {
-      text7 = tt(text7);
-    }
     return text7;
   }
   writeText() {
     var text7;
-    if (text7 = this.texts.shift()) {
+    while (text7 = this.texts.shift()) {
       this.write(markdown(text7));
-    } else {
-      clearInterval(this.timer);
-      delete this.timer;
     }
   }
   close() {

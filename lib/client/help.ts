@@ -1,7 +1,7 @@
 import type { RecType } from "../shared/types";
 import { DGet } from "../../public/js/dom";
 import { ui } from "./ui";
-import { loc, tt, t } from "../shared/Locale";
+import { tt, t } from "../shared/Locale";
 import { listenBtn, markdown } from "../shared/utils";
 
 /**
@@ -92,31 +92,53 @@ class Help { /* singleton */
   public async show(helpIds: string[]){
     this.isOpened() || ui.toggleHelp();
     this.content.innerHTML = '';
-    this.texts = helpIds.map((helpId: string) => {
-      let texte = tt(HELP_TEXTS[helpId]);
+    // La liste helpIds va pouvoir être augmentée de
+    // certaines aides nécessaires, appelées par exemple
+    // par des liens. Il faut donc fonctionner tant 
+    // qu'elle n'est pas vide.
+    const LocIds: {type: string, locId: string, prefix?: string}[] = [];
+    helpIds.forEach((helpId: string) => {
+      LocIds.push({type: 'text', locId: helpId})
+    })
+    this.texts = [];
+    let locDef: {type: string, locId: string, prefix?: string} | undefined; 
+    while((locDef = LocIds.shift())) {
+      // console.log("locDef = ", locDef);
+      const locId = locDef.locId;
+      const locIdpur = locId.replace(/\./g, '');
+      let texte = HELP_TEXTS[locId] || t(locId);
+      // console.log("TEXTE INI", texte);
       while(texte.match(/\bt\(/)) { texte = tt(texte) }
-      console.log("TEXTE INI", texte);
       // Est-ce un lien vers une autre partie de
       // l'aide ?
       if (texte.match(/help\((.+?)\)/)) {
-        console.info("contient help(");
-        texte = texte.replaceAll(/help\((.+?)\)/g, (_tout: string, hid: string) => {
+        texte = texte.replace(/help\((.+?)\)/g, (_tout: string, hid: string) => {
           hid = hid.trim();
           console.log("HID = ", hid);
           const fullIdTitle = `help.${hid}.title`;
-          // const fullIdText  =  `help.${hid}.text`;
-          return `<a href="#help-${hid}">${t('ui.thing.guil_open')}${t(fullIdTitle)}${t('ui.thing.guil_close')}</a>`
+          const fullIdPrefix = t(`help.${hid}.level`);
+          const fullIdText  = `help.${hid}.text`;
+          LocIds.push({type: 'title', locId: fullIdTitle, prefix: fullIdPrefix});
+          LocIds.push({type: 'text', locId: fullIdText});
+          return `[*${t(fullIdTitle)}*](#help-${fullIdTitle.replace(/\./g, '')})`
         })
+      }
+
+      if (locDef.type === 'title') {
+        texte = `${locDef.prefix} ${texte}`;
       } else {
-        console.warn("Ne contient pas help(...)")
+        texte = `${texte}\n\n---`
       }
 
       // console.log("texte = ", texte);
-      return `<a id="help-${helpId}" name="${helpId}"></a>\n\n` 
-      + this.finalizeText(texte)
-      .trim()
-      .concat("\n\n---")
-    });
+      const formated_text = `<a id="help-${locIdpur}" name="${locIdpur}"></a>\n` 
+      + this.finalizeText(texte).trim();
+
+      // console.log("\n\n\nTEXTE AJOUTÉ : ", formated_text);
+      this.texts.push(formated_text);
+    };
+
+
     this.writeText.bind(this)();
 
     // this.timer = setInterval(() => {
@@ -132,17 +154,13 @@ class Help { /* singleton */
       const [tit, hid] = args.split(',').map((s: string) => s.trim());
       return `<span onclick="help.show(['${hid}'])">${tit}</span>`;
     });
-    while(text.match(/\bt\(/)) { text = tt(text) }
     return text;
   }
 
   private writeText(){
     var text: string | undefined;
-    if ( (text = this.texts.shift()) ) {
+    while ( (text = this.texts.shift()) ) {
       this.write(markdown(text) as string);
-    } else {
-      clearInterval(this.timer);
-      delete this.timer;
     }
   }
 

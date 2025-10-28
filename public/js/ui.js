@@ -16641,7 +16641,7 @@ class Locale {
     return this.locales;
   }
   translateText(texte) {
-    return texte.replaceAll(/\bt\((.+?)\)/g, this.replacementMethod.bind(this));
+    return texte.replace(/\bt\((.+?)\)/g, this.replacementMethod.bind(this));
   }
   translate(route) {
     const translated = route.split(".").reduce((obj, key2) => obj?.[key2], this.locales);
@@ -16760,8 +16760,7 @@ function listenBtn(id, method, container = document.body) {
   DGet(`button.btn-${id}`, container).addEventListener("click", method);
 }
 function markdown(md) {
-  md = md.replace(/^(\#+?)/mg, "$1##");
-  const result = unified().use(remarkParse).use(remarkGfm).use(remarkRehype).use(rehypeStringify).processSync(md);
+  const result = unified().use(remarkParse).use(remarkGfm).use(remarkRehype, { allowDangerousHtml: true }).use(rehypeStringify, { allowDangerousHtml: true }).processSync(md);
   const html7 = String(result);
   return html7;
 }
