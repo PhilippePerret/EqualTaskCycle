@@ -8,7 +8,95 @@ help:
       task_data
       stop_report
       durcycvsdursess
-  term:
+
+  deroulement_travail:
+    title: How Task Progress Works
+    level: '##'
+    text: |
+      Everything starts when ETC selects the first task from your list, 
+      or a random one if you’ve chosen that option.
+      
+      The task appears in the window, along with several buttons:
+
+      | Button | Name | Action |
+      | --- | --- | --- |
+      | t(ui.button.start) | Start | Begins work on the task. A timer shows either the elapsed time or the remaining time (for the cycle), depending on your settings. |
+      | t(ui.button.change) | Another Task | If you don’t like the suggested task, you can request another one. Note: this option can only be used once per session. |
+      | t(ui.button.open_project) | Open Project | Opens the project folder on your desktop. |
+      | t(ui.button.run) | Run Script | If a script is defined for the task, this button lets you run it. |
+
+      To start tracking time, click the t(ui.button.start) button.  
+      If you’ve selected the **Stopwatch** mode, time starts counting up from 0:00:00.  
+      If you’ve selected the **Countdown** mode, the timer starts from the duration set for the task in the cycle (usually two hours), or from the custom session time you’ve defined for that specific task, and counts down to zero.
+
+      You can pause your work at any time using the t(ui.button.pause) button.  
+      The timer will stop until you resume the task by clicking t(ui.button.restart).
+
+      After working for at least one minute, you can decide to stop by clicking t(ui.button.stop).
+
+      You can also let the timer run until the end. When the time is almost up, 
+      the application will notify you that the session is nearly over and that 
+      it’s time to move on to the next task.
+
+      A panel titled t(ui.title.stop_report) will then appear.  
+      This panel allows you to record a short report. The report isn’t meant only 
+      to describe what you’ve done (although you can use it for that), but more 
+      importantly to note what should be done next — so you can quickly resume 
+      work later on.  
+      (For more details, see help(help.stop_report.title)).
+
+      In this panel, the t(ui.button.dont_save_time_and_report) button lets you 
+      discard the recorded time if, for example, you feel the session wasn’t 
+      productive.
+
+      Once you save your report, ETC updates the task’s time and immediately 
+      presents the next task in your workflow.
+
+  set_preferences:
+    title: Setting Your Preferences
+    level: '##'
+    text: |
+      First, open the application after it has finished loading.  
+      To access your preferences, click the (⚙️) button.  
+      There, you can set the following options:
+
+      * the **language** of the interface and messages,  
+      * the **default task duration** within a cycle (not the total completion time),  
+      * the **UI mode**, dark or light,  
+      * the appearance of the **clock** (or stopwatch),  
+      * the **time tracking mode**, either continuous or countdown,  
+      * the **path to the task file** (which will be created with the tasks you define — see help(help.define_tasks.title)),  
+      * the **task selection mode**, either random or sequential, depending on the order in your list.
+
+      *(You’ll also find some useful tools in this panel to reset the current cycle or open the external manual.)*
+
+      Once you’ve made your changes, close the preferences window after saving them,  
+      so that all updates are applied correctly.
+
+  define_tasks:
+    title: Defining Your Task List
+    level: "##"
+    text: |
+      To define your list of tasks, open the task panel using the ✍🏽 button.  
+      This is where you can create and manage your **tasks**, **projects**, or **jobs** —  
+      whatever term you prefer.
+
+      Use the “➕” button to create a new task, which will be added to the bottom of the list.  
+      When you first launch the application, this list should contain only one sample task.
+
+      Fill in the fields with the information you want.  
+      (Even if most properties are self-explanatory, you can find detailed explanations  
+      in help(help.task_data.title).)
+
+      Once you’ve set up your list and arranged the tasks in order using the arrow buttons,  
+      save it by clicking t(ui.button.save).  
+      You’ll then return to the main panel, ready to start your first task.
+
+      > Note: If you prefer, you can also manage your tasks through a YAML file  
+      or even generate them programmatically from another application.  
+      Simply edit the YAML file whose path is defined in the application’s preferences.
+
+  terminologie:
     title: Terminology
     level: '##'
     text: |
@@ -47,7 +135,7 @@ help:
       | Script | | The strength of this app lies in allowing you to define a script to be executed at any time during the work (often beforehand). This script, which can be in any language, opens up unlimited possibilities. |
       | Duration | | Sets a duration specific to the task. If this value is not defined, the default duration is used. |
       | Session duration | | Optionally, you can define a session duration different from the cycle duration. Subtle, yet clear in practice. For full understanding, consult hlink(Cycle duration versus session duration, duree_cycle_vs_duree_sess). |
-  intro:
+  introduction:
     title: INTRODUCTION
     level: '##'
     text: |
@@ -72,7 +160,9 @@ help:
       The process is intuitive, but let’s detail the various
       properties you can define:
 
-      help(terminologie)
+      t(help.terminologie.title)
+
+      t(help.terminologie.text)
 
       | Property | | Description |
       | --- | --- | --- |

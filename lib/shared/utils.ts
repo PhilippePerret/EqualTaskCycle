@@ -46,7 +46,7 @@ export async function postToServer(route: string, data: RecType){
   }
   if (response.ok === false) {
     let error = response.error;
-    if (null === error.match(' ')) {error = t(error)}
+    if (null === error.match(' ')) {error = t.call(null, error)}
     let msg = `${t('error.occurred', [error])}`;
     if (response.process) { msg = `[${response.process}] ${msg}` }
     Flash.error(msg);

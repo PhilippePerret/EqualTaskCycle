@@ -3,7 +3,7 @@ import yaml from 'js-yaml';
 import fs from 'fs';
 import type { RecType } from '../lib/shared/types';
 import { blue, green, red, subTitleize } from '../lib/shared/utils';
-import { loc, t } from '../lib/Locale';
+import { loc, t } from '../lib/shared/Locale';
 
 loc.init('en');
 
@@ -15,7 +15,7 @@ const FOLDERS = [
 ];
 
 const EXTENSIONS: RecType = {};
-['.ts', '.js', 'md', '.html', '.htm'].forEach((ext: string) => {
+['.ts', '.js', '.yaml', '.yml', '.md', '.html', '.htm'].forEach((ext: string) => {
   Object.assign(EXTENSIONS, {[ext]: true});
 })
 
@@ -34,7 +34,7 @@ FOLDERS.forEach((folder: string) => {
     // console.log("-> Doit être traité");
     const code = fs.readFileSync(fpath, 'utf8');
     if ( code.match(/t\(/) === null ) { return }
-    code.matchAll(/\bt\((["'])?([a-zA-Z0-9_\.]+?)\1?(\)|\,.+?\))/g).forEach((found: RegExpExecArray) => {
+    code.matchAll(/\b(?:t|help)\((["'])?([a-zA-Z0-9_\.]+?)\1?(\)|\,.+?\))/g).forEach((found: RegExpExecArray) => {
       let route: string | undefined, params: string | undefined;
       [route, params] = (found[2] as string).split(',');
       if (route && route !== 'route' /* la fonction elle-même */) {

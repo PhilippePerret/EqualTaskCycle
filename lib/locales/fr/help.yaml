@@ -7,8 +7,9 @@ help:
       intro_manual
       presentation
       exemple_utilisation
-      term
+      terminologie
       task_data
+      deroulement_travail
       stop_report
       durcycvsdursess
   intro_manual: 
@@ -34,7 +35,7 @@ help:
 
       Mais pour bien comprendre, voyons comment tout cela se passe.
   exemple_utilisation:
-    title: Exemple complet d'utilisation
+    title: Exemple complet d'utilisation quotidienne
     level: '##'
     text: |
       Imaginons, pour faire simple, que vous avez ces différents projets
@@ -43,25 +44,31 @@ help:
       *(peu importe que vous ne connaissiez pas le temps total de 
       développement, il est indiqué ici uniquement pour l'exemple)
 
-      | Travail | Durée total<br />de réalisation | Temps travaillé |
+      | Travail | Durée totale<br />de réalisation | Temps travaillé |
       | --- | --- | --- |
       | Livre sur le développement personnel | 100 h | 0 h |
       | Programme de gestion de tâche | 150 h | 0 h |
       | Extension de la maison (chambre de bébé) | 200 h | 0 h |
       | Lecture d'un ouvrage historique | 40 h | 0 h |
-      | Traduction de l'ouvre technique Xtt | 300 h | 0 |
+      | Traduction de l'ouvre technique Xtt | 300 h | 0 h |
 
-      Mais sans organisation, vous n'êtes pas sûr de consacrer le 
+      Mais sans organisation, vous n'êtes pas certain ou certaine de 
+      consacrer le 
       temps qu'il faudrait à chaque projet dans votre journée, votre
       semaine ou votre mois.
       
-      Grâce à ETC, vous allez pouvoir organiser tout ça.
+      Grâce à ETC, vous allez pouvoir organiser tout ça. D'abord vous
+      avez commencé par définir votre liste de tâches 
+      (help(help.define_tasks.title)) et vous avez réglé vos préférences 
+      (help(help.set_preferences.title)).
 
-      Comment ? En travaillant par *CYCLE*. Un cycle correspond à
+      Comment ? En travaillant par *CYCLE*. 
+      
+      Un cycle correspond à
       travailler un certain temps (2 heures par défaut) sur chaque
       projet, dans l'ordre ou au hasard, jusqu'à les avoir tous abordé.
 
-      Par exemple, si vous laiser la durée par défaut d'une session
+      Par exemple, si vous laisser la durée par défaut d'une session
       à 2 heures, voilà comment les choses vont se passer : 
       
       * ETC va vous proposer de travailler 2 heures sur la maison,
@@ -71,48 +78,32 @@ help:
       * puis 2 heures sur la traduction.
 
       Vous venez d'accomplir un *CYCLE* et votre état de travail 
-      est le suivant : 
+      est maintenant le suivant : 
 
-      D'abord, vous ouvrez l'application après l'avoir chargée. Vous 
-      rejoignez en premier lieu les préférences (⚙️) afin de choisir
-      votre langue et les éléments d'interface que vous souhaitez (le
-      mode sombre ou clair, la taille de l'horloge — nous y reviendrons —,
-      etc.).
+      | Travail | Durée totale | Temps travaillé |
+      | --- | --- | --- |
+      | Livre sur le développement personnel | 100 h | 2 h |
+      | Programme de gestion de tâche | 150 h | 2 h |
+      | Extension de la maison (chambre de bébé) | 200 h | 2 h |
+      | Lecture d'un ouvrage historique | 40 h | 2 h |
+      | Traduction de l'ouvre technique Xtt | 300 h | 2 h |
 
-      Vous refermez la fenêtre après avoir enregistré les nouvelles
-      informations puis vous ouvrez le panneau des données (✍🏽). C'est
-      dans ce panneau que vous pouvez définir vos travaux, vos projets,
-      vos tâches (ou quel que soit le nom que vous leur donnez.
+      Mais nous sommes allés un peu vite… Détaillons un peu le processus
+      de mise en route, de comptage du temps et d'arrêt de chaque 
+      travail.
 
-      Grâce au bouton « ➕ » vous pouvez créer un nouveau travail. Vous
-      pouvez trouver dans la section help(task_data) toutes les informations
-      sur les propriétés.
-
-      Enregistrer lorsque vous en avez terminé. Vous rejoignez alors le
-      panneau principal avant votre première tâche. Vous pouvez en changer
-      une fois (et une seule fois par session de travail, c'est le principe
-      de cette façon de travailler) en cliquant le bouton t(ui.button.change).
-
-      Et vous démarrez votre travail en cliquant sur le bouton t(ui.button.start). 
-      Une horloge se met en route (ou un
-      compte à rebours selon vos préférences) qui déroulera le temps 
-      jusqu'à la durée par défaut (120 minutes) ou celle que vous avez 
-      définie dans vos préférences.
-
-      Une fois l'échéance arrivée, l'application vous prévient et vous
-      pouvez arrêter en cliquant le bouton t(ui.button.stop). Une page 
-      de rapport s'ouvre alors, que vous pouvez remplir. Cette help(stop_report)
-      est très important car c'est lui que vous trouverez en bas de votre 
-      tâche la prochaine fois que vous l'aborderez (au prochain *cycle*).
-      Remplissez-le donc avec soin.
-
-      Le prochain travail apparait (choisi au hasard ou en prenant le suivant
-      en fonction de vos préférences) et vous poursuivez votre travail.
+      t(help.deroulement_travail.text)
 
       Les travaux s'enchainent ainsi, peut-être le lendemain et les jours
       suivants, jusqu'à ce qu'ils soient TOUS passés en revue. Une fois que
       TOUS les travaux ont été effectués une première fois, un nouveau 
       cycle reprend.
+
+      > À nouveau, ici, attention de ne pas confondre le temps total 
+      qu'il faudrait consacrer à un travail pour l'achever, et le temps
+      de travail dans un *cycle*, qui permet d'enchainer plusieurs 
+      travaux au cours de la même journée, ou au cours de deux journées
+      plus vraisemblablement, sans en oublier.
 
       Bien entendu, si vous avez achevé un de ces travaux, vous pouvez
       le désactiver (ou le détruire) depuis le panneau des éditions des
@@ -145,9 +136,112 @@ help:
       | Traduction | 1 heure |
       | --- | --- |
 
+  deroulement_travail:
+    title: Déroulement du travail sur une tâche
+    level: '##'
+    text: |
+      Tout commence avec ETC qui choisit le premier travail de votre
+      liste ou un travail au hasard si tel est votre choix. 
+      
+      Il l'affiche dans la fenêtre en faisant apparaitre plusieurs 
+      boutons :
 
+      | Bouton | Nom | Effet |
+      | --- | --- | --- |
+      | t(ui.button.start) | Mise en route | Amorce le travail sur la tâche. Un compteur affiche le temps écoulé ou le temps restant (pour le cycle) en fonction de vos choix. |
+      | t(ui.button.change) | Autre tâche | Si ce premier travail ne vous plait pas. Ce bouton vous permet de demander un autre travail. Mais attention, il n'est utilisable qu'une seule fois par session, c'est le principe. |
+      | t(ui.button.open_project) | Ouverture du projet | Permet d'ouvrir sur le bureau du dossier du projet. |
+      | t(ui.button.run) | Jouer le script | Si un script est défini pour le travail, ce bouton permet de le lancer. |
 
-  intro:
+      Vous mettez donc le chronomètre en route à l'aide du bouton 
+      t(ui.button.start). Si vous avez choisi le mode « chronomètre »,
+      alors le temps se met à défiler depuis 0:00:00. Si, au contraire,
+      vous avez choisi le mode « compte à rebours », l'horloge part du
+      temps imparti à un tâche dans le cycle (en général 2 heures) ou 
+      la durée de travail par session que vous avez définie pour ce
+      travail en particulier, et il remonte jusqu'à zéro.
+
+      À n'importe quel moment vous pouvez mettre ce travail en pause 
+      à l'aide du
+      bouton t(ui.button.pause). Le chronomètre s'arrête, attendant que
+      vous relanciez la tâche avec le bouton t(ui.button.restart).
+
+      Puis, après au moins une première minute de travail, vous pouvez
+      décider de vous arrêter et vous cliquez sur le bouton t(ui.button.stop).
+
+      Vous pouvez aussi aller au bout du temps et l'application vous 
+      préviens alors que le temps est bientôt écoulé et que vous allez
+      pouvoir passer à la tâche suivante.
+
+      Un panneau vous est alors proposé, intitulé t(ui.title.stop_report), 
+      qui vous permet d'enregistrer un rapport. Ce rapport n'est pas tant
+      là pour parler de ce que vous avez fait (même si vous pouvez bien 
+      entendu vous en servir pour ça), mais plutôt pour dire ce qu'il 
+      faudra faire à la reprise du travail, pour qu'elle soit rapide et
+      efficace (pour en savoir plus, consultez help(help.stop_report.title)).
+
+      Dans ce panneau, un bouton t(ui.button.dont_save_time_and_report) 
+      vous permet de renoncer à l'enregistrement de ce temps de travail,
+      si vous estimez qu'il n'a pas été fait correctement par exemple.
+
+      Vous l'enregistrez, ETC vous présente les nouveaux temps sur la
+      tâche et, surtout, vous présente la tâche suivante.
+
+  set_preferences:
+    title: Définir ses préférences
+    level: '##'
+    text: |
+      D'abord, vous ouvrez l'application après l'avoir chargée. Vous 
+      rejoignez les préférences en cliquant sur le bouton (⚙️). Là, 
+      vous pouvez choisir : 
+
+      * la **langue** de l'interface et ses messages,
+      * la **durée par défaut d'une tâche** au cours d'un cycle (pas 
+      son temps total de réalisation),
+      * le **mode de l'UI**, sombre ou clair, 
+      * l'apparence de l'**horloge** (ou du chronomètre),
+      * le **mode de décompte du temps**, soit continu, soit en compte à rebours,
+      * le **chemin d'accès au fichier des tâches** (qui se créera avec les
+      tâches que vous définirez — help(help.define_tasks.title)),
+      * le mode de **choix des tâches**, aléatoire ou continu suivant 
+      l'ordre dans la liste que vous avez établie,
+
+      *(Remarquez que dans ce panneau se trouvent aussi des outils
+      pratiques pour réinitialiser le cycle courant ou ouvrir le
+      manuel externe)*
+
+      Vous refermez la fenêtre après avoir enregistré les nouvelles
+      informations pour que tout soit pris en compte.
+
+  define_tasks:
+    title: Définir la liste des tâches
+    level: "##"
+    text: |
+      Pour définir la liste de vos travaux, vous ouvrez le panneau des 
+      tâches à l'aide du bouton ✍🏽. C'est dans ce panneau que vous pouvez
+      définir vos « travaux », vos « projets », vos « tâches », peu 
+      importe le nom que vous leur donnez.
+
+      Grâce au bouton « ➕ » vous pouvez créer une nouvelle tâche qui
+      est ajouée en bas de la liste. Cette liste, au premier lancement
+      de l'application, ne devrait comporter qu'une seule tâche.
+
+      Remplissez les champs avec les informations que vous souhaitez
+      (même si les propriétés sont assez explicites, vous trouverez dans 
+      la section help(help.task_data.title) toutes les informations précises).
+
+      Lorsque vous avez établi votre liste, que vous avez organisé les
+      tâches dans l'ordre grâce aux flèches, pouvez enregistrer la liste
+      grâce au bouton t(ui.button.save). Vous rejoignez alors le
+      panneau principal avant votre première tâche.
+
+      > Notez que si vous préférez passer par un fichier YAML ou même
+      définir de façon informatisée la liste des tâches à partir d'un
+      autre programme, vous pouvez tout à faire le faire en modifiant
+      directement le fichier YAML dont le chemin est défini dans les
+      préférences de l'application.
+
+  introduction:
     title: INTRODUCTION
     level: "##"
     text: |
@@ -159,7 +253,7 @@ help:
       de ceux que vous pouvez connaitre et s'adapte particulièrement aux
       situations où vous avez des projets à mener de front, sans en oublier,
       en leur consacrant un temps chaque jour ou chaque semaine.
-  term:
+  terminologie:
     title: Terminologie
     level: '##'
     text: |
@@ -191,20 +285,34 @@ help:
     title: "Rapport d’arrêt (de tâche)"
     level: '##'
     text: |
-      Le *rapport de fin* apparait lorsque l’on arrête (STOP) le travail
-      sur une tâche particulière.
+      Le *rapport d'arrêt de tâche* apparait lorsque l’on arrête 
+      (bouton t(ui.button.stop)) le travail sur une tâche particulière, que
+      ce soit en fin de temps normal ou au cours du travail.
 
-      Le *rapport de fin* permet de préparer le prochain cycle de travail,
-      lorsqu'il faudra reprendre la tâche le plus rapidement possible Et
-      le plus efficacement.
+      Ce rapport ne sert pas tant à faire le point sur le travail effectué
+      au cours de la session, même si c'est toujours possible, que d'aider
+      à commencer rapidement et efficacement la prochain session.
 
-      Pour rédiger ce rapport, il faut donc ce projeter à la prochaine
-      session de travail et imaginer les indications dont on aura besoin 
-      pour poursuivre aussitôt le travail sur la tâche. Indiquer par 
+      Car une des plus grosses difficultés lorsque l'on travaille sur plusieurs
+      (gros) chantier en même temps, et qu'ils sont très différents de forme et
+      de nature, c'est de passer souplement de l'un à l'autre sans avoir à perdre
+      trop de temps à se remettre la situation en tête.
+
+      Ce *rapport d'arrêt de tâche* est vraiment là pour ça.
+
+      Pour rédiger ce rapport, il convient donc de se projeter à la prochaine
+      session de travail et d'imaginer les indications dont on aurait besoin 
+      pour poursuivre aussitôt le travail sur la tâche. Indiquez par 
       exemple les fichiers sur lesquels on travaille ainsi que les lignes
       précises qui sont concernées.
 
-      Le format utilisable est le format [Markdown](https://fr.wikipedia.org/wiki/Markdown).
+      Astuce : Rédigez ce rapport comme si vous deviez confier la suite du
+      travail à quelqu'un qui ne connait rien du projet, ou pas grand-chose.
+
+      Le format de redaction est exclusivement pour le moment le format 
+      [Markdown](https://fr.wikipedia.org/wiki/Markdown), pratique pour sa
+      simplicité et sa mise en œuvre.
+
   task_list:
     title: Liste des travaux
     level: '##'
@@ -218,7 +326,7 @@ help:
       La suite est aussi intuitive. Détaillons tout de même les différentes
       propriétés que vous pouvez définir :
 
-      t(help.terminologie)
+      t(help.terminologie.text)
 
       t(help.task_data.text)
 

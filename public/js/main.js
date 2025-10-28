@@ -14240,7 +14240,7 @@ async function postToServer(route, data) {
   if (response.ok === false) {
     let error = response.error;
     if (error.match(" ") === null) {
-      error = t(error);
+      error = t.call(null, error);
     }
     let msg = `${t("error.occurred", [error])}`;
     if (response.process) {
@@ -16699,19 +16699,33 @@ init_Locale();
 init_utils();
 var HELP_TEXTS = {
   resume_home_page: `
-help(introduction, terminologie, task_list)
+# t(help.introduction.title)
+
+t(help.introduction.text)
+
+# t(help.terminologie.title)
+
+t(help.terminologie.text)
+
+# t(help.deroulement_travail.title)
+
+t(help.deroulement_travail.text)
+
+# t(help.task_list.title)
+
+t(help.task_list.text)
   `,
   introduction: `
-### t(help.intro.title)
+### t(help.introduction.title)
 
-t(help.intro.text)
+t(help.introduction.text)
 `,
   terminologie: `
-### t(help.term.title)
+### t(help.terminologie.title)
 
 *(D'abord un peu de terminologie pour bien comprendre l'aide)*
 
-t(help.term.text)
+t(help.terminologie.text)
   `,
   task_list: `
 ### t(help.task_list.title)

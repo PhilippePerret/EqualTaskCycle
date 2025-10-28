@@ -13743,7 +13743,7 @@ async function postToServer(route, data) {
   if (response.ok === false) {
     let error = response.error;
     if (error.match(" ") === null) {
-      error = t(error);
+      error = t.call(null, error);
     }
     let msg = `${t("error.occurred", [error])}`;
     if (response.process) {
