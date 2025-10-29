@@ -107,9 +107,14 @@ help:
     text: |
       | Term | | Description |
       | --- | --- | --- |
-      | Cycle | | A *c.* is a complete loop over all tasks to be performed. |
-      | Remaining time | | A *rem. t.* corresponds to the time left to complete the work within the current cycle. |
-      | Time spent | | The *spent t.* corresponds to the time dedicated to the work/project during the current cycle. |
+      | Job | | A *job* here does not correspond to a task. It is closer to a “project.” It evolves over *cycles* and may require dozens or even hundreds of hours to complete. |
+      | Cycle duration | | Each job has a *cycle duration* which roughly corresponds to the execution time during a single work session (although, in reality, this duration may cover several sessions). |
+      | Finalization duration | | The *cycle duration* above should not be confused with the total time required to fully complete the job. These two durations are unrelated. |
+      | Cycle | | A *cycle* corresponds to a full execution of all current jobs. NOTE: when we say *full execution* here, it does NOT mean the full completion of the job, but **only its <em>cycle duration</em>**. A job may require 400 hours to complete; if its *cycle duration* is 2 hours, it is considered completed in a cycle once it has been worked on for 2 hours. |
+      | Remaining time | | *Rem. t.* corresponds to the time left to complete the job’s current cycle. |
+      | Time worked | | *Time w.* corresponds to the time spent on the job/project in the current cycle. |
+      | Total time | | *Total time* is the actual time spent on the job across all cycles. |
+
   stop_report:
     title: Stop Report
     level: '##'

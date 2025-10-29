@@ -18281,7 +18281,7 @@ class Panel {
     this.data = data;
   }
   setContent(contenu) {
-    this.fldContent.innerText = contenu;
+    this.fldContent.innerHTML = contenu;
   }
   onOk(ev) {
     stopEvent(ev);

@@ -268,10 +268,13 @@ help:
 
       | Terme | | Description |
       | --- | --- | --- |
-      | Cycle | | Un *c.* est une boucle complète sur tous les travaux à effectuer. |
-      | Temps restant | | Un *tps. r.* correspond au temps qui reste à accomplir sur le travail dans le cycle courant. |
-      | Temps effectué | | Le *tps. r.* correspond au temps consacré au travail/projet dans le cycle courant. |
-      | --- | ---| --- |
+      | Travail | | Un *travail*, ici, ne correspond pas à une tâche. Il serait plus proche de « projet ». Il se modifie au cours des *cycles* et nécessite plusieurs dizaines d'heures, voire centaines d'heures pour être achevé.|
+      | Durée cycle | | Chaque travail possède une *durée de cycle* qui correspond, grosso modo, à la durée d'exécution au cours d'une seule session de travail (même si, en réalité, on verra que cette durée peut concerner plusieurs sessions). |
+      | Durée finalisation | | La *durée cycle* ci-dessus n'est pas à confondre avec la durée totale qu'il faut pour finaliser entièrement le travail. Ces deux durées n'ont rien à voir. |
+      | Cycle | | Un *cycle* correspond à une exécution complète de tous les travaux courants. ATTENTION : lorsque l'on parle d'*exécution complète* ici, ça N'EST PAS l'exécution complète du travail, mais **seulement de sa <em>durée cycle</em>**. Un travail peut nécessiter 400 heures de travail pour être achevé, si ça *durée cycle* est de 2 heures, il est complété quand, dans un cycle, on l'a travaillé 2 heures.|
+      | Temps restant | | Un *tps. r.* correspond au temps qui reste à accomplir sur le travail pour qu'il ait achevé son cycle. |
+      | Temps effectué | | Le *tps. e.* correspond au temps consacré au travail/projet dans le cycle courant. |
+      | Temps total | | Le *temps total* est le temps véritablement effectué sur le travail au cours de tous les cycles. |
   task_data:
     title: Données d’un travail
     level: '##'
