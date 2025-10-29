@@ -4,16 +4,14 @@ import yaml from 'js-yaml';
 import { HOST, PORT } from '../../public/js/constants';
 import { Work } from "./work";
 import { prefs } from './prefs';
-import { runtime } from './runtime';
 import { existsSync, readFileSync } from 'fs';
 import { execFileSync, execSync } from 'child_process';
 import type { RecType, WorkType } from '../shared/types';
 import { activTracker } from './activityTracker';
-import { loc, tf } from '../shared/Locale';
+import { loc, t, tf } from '../shared/Locale';
 import log from 'electron-log/main';
 import { manual } from './Manual';
-import { userDataPath } from './constants_server';
-import { runInNewContext } from 'vm';
+import db from './db';
 
 const app = express();
 const APP_PATH = path.resolve('.');
@@ -27,7 +25,7 @@ app.get('/', (_req, res) => {
   log.info("->route /");
   prefs.load();
   loc.init(prefs.data.lang);
-  activTracker.init(); // pour préparer le dialog localisé
+  db.init();
   res.send(tf(MAIN_HTML_FILE));
 });
 
@@ -72,28 +70,22 @@ app.post('/work/save-session', (req, res) => {
   log.info("-> /work/save-session");
   const dwork = req.body;
   log.info("Sauvegarde de la session : ", dwork);
-  runtime.updateWork(dwork);
+  db.updateWorkTimes(dwork);
   res.json({
     ok: true,
     next: Work.getCurrentWork(),
-    options: {canChange: true /* TODO: À régler */}
+    options: {canChange: db.lastChangeIsFarEnough()}
   });
 });
 
-app.post('/task/current', (req, res) => {
-  log.info("-> /task/current");
+app.post('/task/get-current', (req, res) => {
+  log.info("-> /task/get-current");
   let result = {ok: true, error: ''};
   const options = req.body
   try {
-    const dprefs = prefs.load();
-    existsSync(dprefs.file) || Work.buildPrimoFile();
-    if (false === existsSync(dprefs.file)) {
-      throw new Error('Tasks File doesn’t exist, again...');
-    }
-    Work.inited || Work.init();
     Object.assign(result, {
       task: Work.getCurrentWork(options),
-      options: { canChange: runtime.lastChangeIsFarEnough()}
+      options: { canChange: db.lastChangeIsFarEnough()}
     });
   } catch(err) {
     result = {ok: false, error: (err as any).message}
@@ -143,22 +135,22 @@ app.post('/task/change', (req, res) => {
   } = {ok: true, error: '', task: undefined};
 
   // Est-ce qu'on peut changer la tâche ?
-  if (runtime.lastChangeIsFarEnough()) {
+  if (db.lastChangeIsFarEnough()) {
     const retour = Work.getCurrentWork({but: dreq.taskId});
     // choisir une autre
-    if (retour.ok === false) {
+    if ((retour as any).ok === false) {
       result = {
-        ok: false, 
-        error: 'No other tasks found. You must complete that one.',
-        task: Work.get(dreq.taskId).dataForClient
+        ok: false,
+        error: t('error.no_other_task_complete_that_one'),
+        task: Work.get(dreq.taskId)
       }
     } else {
-      Object.assign(result, {task: retour as RecType & WorkType})
+      Object.assign(result, {task: retour as WorkType})
     }
     // Enregistrer la transaction
-    runtime.setLastChange();
+    db.setLastChange();
   } else {
-    result = {ok: false, error: 'Task has been already changed today.'}
+    result = {ok: false, error: t('error.task_already_changed_today')}
   }
   res.json(result);
 });
@@ -180,18 +172,10 @@ app.post('/tasks/all', (req, res) => {
 
 app.post('/tasks/get-all-data', (req, res) => {
   const data: RecType = req.body;
-  // Pour obtenir les noms
-  const table = {};
-  // @ts-ignore
-  yaml.load(readFileSync(data.dataPath, 'utf8'))
-  .forEach((w: WorkType) => Object.assign(table, {[w.id]: {name: w.project, active: w.active}}));
-  // On récupère les données temporelles
-  const ids = Object.keys(table);
-  const dataTimes = runtime.getAllDataOf(ids);
+  const works = db.getAllActiveWorks();
   res.json(Object.assign(data, {
     ok: true,
-    data: table,
-    times: dataTimes
+    works: works,
   }));
 });
 
@@ -234,7 +218,7 @@ app.post('/localization/get-all', (req, res) => {
 app.post('/tool/reset-cycle', async (req, res) => {
   log.info("->route /tool/reset-cycle")
   const data = req.body;
-  const {ok, error} = runtime.resetCycle();
+  const {ok, error} = db.resetCycle();
   res.json(Object.assign(data, {ok, error}));
 });
 

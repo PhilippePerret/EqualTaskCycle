@@ -3,7 +3,9 @@ space: ' '
 app:
   is_ready: L'application est prête.
 error:
+  no_other_task_complete_that_one: "Aucun autre travail trouvé, vous devez finir celui-ci."
   occurred: "Une erreur est survenue : _0_"
+  task_already_changed_today: "La tâche a déjà été changée aujourd'hui (une seule dérogation par jour…)."
   unfound_field: "Champ introuvable : _0_"
 files:
   unfound_at_path: "Fichier _0_ introuvable à '_1_'"

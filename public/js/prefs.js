@@ -16701,6 +16701,7 @@ var init_Locale = __esm(() => {
 var exports_utils = {};
 __export(exports_utils, {
   subTitleize: () => subTitleize,
+  startOfToday: () => startOfToday,
   red: () => red,
   postToServer: () => postToServer,
   markdown: () => markdown,
@@ -16755,6 +16756,11 @@ async function postToServer(route, data) {
     Flash.error(msg);
   }
   return response;
+}
+function startOfToday() {
+  const today = new Date;
+  today.setHours(0, 0, 0, 0);
+  return today.getTime();
 }
 function listenBtn(id, method, container = document.body) {
   DGet(`button.btn-${id}`, container).addEventListener("click", method);
@@ -17526,7 +17532,7 @@ class Work {
   static _obj;
   static async getCurrent(options = {}) {
     Object.assign(options, { process: "Work::getCurrent" });
-    const retour = await postToServer("/task/current", options);
+    const retour = await postToServer("/task/get-current", options);
     if (retour.ok === false) {
       return false;
     }

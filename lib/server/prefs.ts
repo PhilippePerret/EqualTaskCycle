@@ -15,7 +15,6 @@ class Prefs { /* singleton */
   private DEFAULT_DATA:PrefsDataType = {
     lang:   'en',
     duree:  120,
-    file:   path.join(os.homedir(), 'Documents', 'ETC_Tasks.yaml'),
     clock:  'big',
     theme:  'dark',
     random: true,
@@ -25,9 +24,7 @@ class Prefs { /* singleton */
 
   private static inst: Prefs;
   private constructor(){}
-  public static singleton(){
-    return this.inst || (this.inst = new Prefs());
-  }
+  public static singleton(){return this.inst || (this.inst = new Prefs())}
 
   public get data(): PrefsDataType {
     return this._data || (this._data = this.load())

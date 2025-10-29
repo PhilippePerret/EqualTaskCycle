@@ -10,27 +10,33 @@ export type ButtonType = {
 
 export interface WorkType {
     id: string;
+    active?: number;
     project: string;
     content: string;
     folder: string; // Required (to watch activity)
-    duration?: number;
+    defaultLeftTime?: number;
     script?: string; // path du script de démarrage
-    active?: boolean;
+    totalTime: number;  // Le nombre total de minutes de travail
+    cycleTime: number;  // Le nombre de minutes travaillées dans le cycle courant
+    leftTime: number;   // Nombre de minutes restant pour finir le cycle
+    cycleCount: number; // Nombre de cycles
+    startedAt: number;  // Date de démarrage du travail
+    lastWorkedAt: number | undefined; // Date de dernier travail
+    report: string; // Le Stop Report (rapport de fin, bâton de relais)
 }
 export const WorkProps = ['active', 'id','project', 'content', 'duration','folder', 'script'];
 
-export interface RunTimeInfosType {
-  totalTime: number;  // Le nombre total de minutes de travail
-  cycleTime: number;  // Le nombre de minutes travaillées dans le cycle courant
-  leftTime: number;   // Nombre de minutes restant pour finir le cycle
-  cycleCount: number; // Nombre de cycles
-  startedAt: number;  // Date de démarrage du travail
-  lastWorkedAt: number; // Date de dernier travail
-  report: string; // Le Stop Report (rapport de fin, bâton de relais)
-}
+// export interface RunTimeInfosType {
+//   totalTime: number;  // Le nombre total de minutes de travail
+//   cycleTime: number;  // Le nombre de minutes travaillées dans le cycle courant
+//   leftTime: number;   // Nombre de minutes restant pour finir le cycle
+//   cycleCount: number; // Nombre de cycles
+//   startedAt: number;  // Date de démarrage du travail
+//   lastWorkedAt: number; // Date de dernier travail
+//   report: string; // Le Stop Report (rapport de fin, bâton de relais)
+// }
 
 export interface PrefsDataType {
-  file?: string;
   duree: number;
   clock: 'mini' | 'medium' | 'big';
   theme: 'dark' | 'light';

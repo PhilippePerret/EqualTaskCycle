@@ -59,6 +59,12 @@ export async function postToServer(route: string, data: RecType){
   return response;
 }
 
+export function startOfToday(): number {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today.getTime();
+}
+
 /**
  * Pour faciliter l'observation des clicks sur les boutons.
  * 

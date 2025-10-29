@@ -1,5 +1,5 @@
 import { clock } from "./Clock.js";
-import type { RecType, RunTimeInfosType, WorkType } from "../shared/types.js";
+import type { RecType, WorkType } from "../shared/types.js";
 import { DGet } from "../../public/js/dom.js";
 import { Flash } from "../../public/js/flash.js";
 import { ui } from "./ui.js";
@@ -84,10 +84,9 @@ export class Work {
    */
   public static async getCurrent(options: RecType = {}): Promise<boolean> {
     Object.assign(options, {process: 'Work::getCurrent'})
-    const retour: RecType = await postToServer('/task/current', options);
+    const retour: RecType = await postToServer('/task/get-current', options);
     if (retour.ok === false) { return false}
-    if (retour.task.ok === false) {
-      // <= il n'y aucune tâche active
+    if (retour.task.ok === false) { // <= il n'y aucune tâche active
       Flash.error(t('task.any_active'));
       return false;
     } else {
@@ -98,7 +97,7 @@ export class Work {
   }
 
   private static displayWork(
-    wdata: WorkType & RunTimeInfosType,
+    wdata: WorkType,
     options: RecType
   ) {
     // console.log("Current Task", dataCurrentWork);
@@ -107,7 +106,7 @@ export class Work {
   }
 
   constructor(
-    private data: WorkType & RunTimeInfosType
+    private data: WorkType
   ){}
 
   public updateData(newData: WorkType){
