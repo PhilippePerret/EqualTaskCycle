@@ -1,6 +1,6 @@
 import log from 'electron-log/renderer';
 import { loc, t } from '../shared/Locale';
-import { prefs } from './prefs';
+import prefs from './prefs';
 import { Work } from './work';
 import { ui } from './ui';
 import { Flash } from '../../public/js/flash';

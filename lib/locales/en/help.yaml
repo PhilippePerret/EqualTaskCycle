@@ -70,7 +70,6 @@ help:
       * the **UI mode**, dark or light,  
       * the appearance of the **clock** (or stopwatch),  
       * the **time tracking mode**, either continuous or countdown,  
-      * the **path to the task file** (which will be created with the tasks you define — see help(define_tasks)),  
       * the **task selection mode**, either random or sequential, depending on the order in your list.
 
       *(You’ll also find some useful tools in this panel to reset the current cycle or open the external manual.)*
@@ -96,10 +95,6 @@ help:
       Once you’ve set up your list and arranged the tasks in order using the arrow buttons,  
       save it by clicking t(ui.button.save).  
       You’ll then return to the main panel, ready to start your first task.
-
-      > Note: If you prefer, you can also manage your tasks through a YAML file  
-      or even generate them programmatically from another application.  
-      Simply edit the YAML file whose path is defined in the application’s preferences.
 
   terminologie:
     title: Terminology

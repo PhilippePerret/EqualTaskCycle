@@ -52,7 +52,6 @@ ui:
     Folder: Folder
     Theme: Theme
     Work: Work
-    works_file: Works File
   adj:
     active_m: active
     Active_m: Active
@@ -96,7 +95,6 @@ ui:
     total_duration: Total duration
     ui_theme: UI Theme
     your_project: "Your project/Task"
-    works_file: Works File
     description_stop_report_modele: |
       Description of what will need to be done in the next session.
 

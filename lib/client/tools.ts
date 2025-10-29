@@ -4,8 +4,8 @@ import { Flash } from "../../public/js/flash.js";
 import { ui } from "./ui";
 import { markdown, postToServer } from "../shared/utils.js";
 import { Work } from "./work.js";
-import { prefs } from "./prefs.js";
-import type { RecType } from "../shared/types.js";
+import prefs from "./prefs.js";
+import type { RecType, WorkType } from "../shared/types.js";
 import { Panel } from "./Panel.js";
 import { clock } from "./Clock.js";
 
@@ -74,22 +74,21 @@ class Tools { /* singleton */
    */
   private async tasksReportDisplay(ev: Event){
     stopEvent(ev);
-    const retour = await postToServer('/tasks/get-all-data', {process: 'times_report tool', dataPath: prefs.getFile()});
+    const retour = await postToServer('/tasks/get-all-data', {process: 'times_report tool'});
     if (retour.ok) {
       console.log("RETOUR: ", retour);
       let tableau: string | string[] = []
       tableau.push([t('ui.thing.Work'), `${t('ui.thing.Cycle')}<sup>1</sup>`, `${t('ui.title.worked')}<sup>2</sup>`, `${t('ui.title.left')}<sup>3</sup>`, `${t('ui.title.total')}<sup>4</sup>`].join(' | '))
       tableau.push(['---', ':---:', ':---:', ':---:', ':---:'].join(' | '));
-      retour.times.forEach((dtimes: RecType) => {
-        const idw = dtimes.id;
-        const wdata = retour.data[idw];
-        if (Number(wdata.active) === 0) { return }
+      retour.works.forEach((work: WorkType) => {
+        const idw = work.id;
+        if (work.active === 0) { return }
         const line = [
-          wdata.name, 
-          clock.mn2h(dtimes.defaultLeftTime),
-          clock.mn2h(dtimes.defaultLeftTime - dtimes.leftTime),
-          clock.mn2h(dtimes.leftTime),
-          clock.mn2h(dtimes.totalTime)
+          work.project, 
+          clock.mn2h(work.defaultLeftTime as number),
+          clock.mn2h(work.defaultLeftTime as number - work.leftTime),
+          clock.mn2h(work.leftTime),
+          clock.mn2h(work.totalTime)
         ].join (' | ');
         (tableau as string[]).push(line)
       });

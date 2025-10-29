@@ -1,13 +1,13 @@
 import { WorkProps, type RecType, type WorkType } from "../shared/types";
 import { DGet } from "../../public/js/dom";
 import { Flash } from "../../public/js/flash";
-import { prefs } from "./prefs";
+import prefs from "./prefs";
 import { ui } from "./ui";
 import { listenBtn, postToServer } from "../shared/utils";
 import { nanoid } from 'nanoid';
 import { t } from '../shared/Locale';
 import { Work } from "./work";
-
+import log from 'electron-log/renderer';
 
 class Editing {
 
@@ -51,10 +51,11 @@ class Editing {
     ui.toggleSection('editing');
     const container = this.taskContainer;
     container.innerHTML = '';
-    const retour: RecType = await postToServer('/tasks/all', {dataPath: prefs.getValue('file')});
+    const retour: RecType = await postToServer('/tasks/all', {process: 'Editing.startEditing'});
     if (retour.ok === false ) { return }
     // --- TACHES/WORKS ---
     const works = retour.works;
+    log.info("Works retreaved", works);
     // Indiquer le nombre de tâches
     DGet('span#tasks-count', this.section).innerHTML = works.length;
     // Créer tous les formulaires pour les tâches
@@ -130,7 +131,7 @@ class Editing {
       project: t('ui.text.your_project'),
       content: t('ui.text.temp_description'),
       folder: t('ui.text.path_example'),
-      active: false
+      active: 0
     } as WorkType);
     owork.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }

@@ -1,5 +1,4 @@
 import path from "path";
-import os from 'os';
 import type { PrefsDataType, RecType } from "../shared/types";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { userDataPath } from "./constants_server";
@@ -42,7 +41,7 @@ class Prefs { /* singleton */
   }
   public loaded: boolean = false; 
 
-  save(data: RecType){
+  save(data: PrefsDataType){
     const report: ReportType = {ok: true, errors: []};
     writeFileSync(this.fpath, JSON.stringify(data));
     // Rapport de retour

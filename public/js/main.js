@@ -17375,7 +17375,7 @@ var init_Locale = __esm(() => {
 });
 
 // lib/client/main.ts
-var import_renderer4 = __toESM(require_renderer2(), 1);
+var import_renderer5 = __toESM(require_renderer2(), 1);
 init_Locale();
 // lib/client/work.ts
 init_flash();
@@ -18371,35 +18371,34 @@ class Tools {
   }
   async openManual(ev) {
     stopEvent(ev);
-    await postToServer("/manual/open", { lang: prefs.getLang() });
+    await postToServer("/manual/open", { lang: prefs_default.getLang() });
   }
   async produceManual(ev) {
     stopEvent(ev);
-    const retour = await postToServer("/manual/produce", { lang: prefs.getLang() });
+    const retour = await postToServer("/manual/produce", { lang: prefs_default.getLang() });
     if (retour.ok) {
       Flash.success(t("manual.produced"));
     }
   }
   async tasksReportDisplay(ev) {
     stopEvent(ev);
-    const retour = await postToServer("/tasks/get-all-data", { process: "times_report tool", dataPath: prefs.getFile() });
+    const retour = await postToServer("/tasks/get-all-data", { process: "times_report tool" });
     if (retour.ok) {
       console.log("RETOUR: ", retour);
       let tableau = [];
       tableau.push([t("ui.thing.Work"), `${t("ui.thing.Cycle")}<sup>1</sup>`, `${t("ui.title.worked")}<sup>2</sup>`, `${t("ui.title.left")}<sup>3</sup>`, `${t("ui.title.total")}<sup>4</sup>`].join(" | "));
       tableau.push(["---", ":---:", ":---:", ":---:", ":---:"].join(" | "));
-      retour.times.forEach((dtimes) => {
-        const idw = dtimes.id;
-        const wdata = retour.data[idw];
-        if (Number(wdata.active) === 0) {
+      retour.works.forEach((work) => {
+        const idw = work.id;
+        if (work.active === 0) {
           return;
         }
         const line = [
-          wdata.name,
-          clock.mn2h(dtimes.defaultLeftTime),
-          clock.mn2h(dtimes.defaultLeftTime - dtimes.leftTime),
-          clock.mn2h(dtimes.leftTime),
-          clock.mn2h(dtimes.totalTime)
+          work.project,
+          clock.mn2h(work.defaultLeftTime),
+          clock.mn2h(work.defaultLeftTime - work.leftTime),
+          clock.mn2h(work.leftTime),
+          clock.mn2h(work.totalTime)
         ].join(" | ");
         tableau.push(line);
       });
@@ -18468,13 +18467,13 @@ class Prefs {
   fieldsReady = false;
   static inst;
   constructor() {}
-  static getInstance() {
+  static singleton() {
     return this.inst || (this.inst = new Prefs);
   }
   async init() {
     const retour = await postToServer("/prefs/load", { process: "Prefs.init" });
     if (retour.ok) {
-      import_renderer3.default.info("Prefs remontées", retour.prefs);
+      import_renderer3.default.info("Prefs loaded", retour.prefs);
       this.setData(retour.prefs);
       this.observeButtons();
     }
@@ -18485,18 +18484,6 @@ class Prefs {
   }
   getSavedData() {
     return this.data;
-  }
-  getFile() {
-    return this.data.file;
-  }
-  async onOpenDataFile(ev) {
-    stopEvent(ev);
-    const result = await postToServer("/prefs/open-data-file", {
-      filePath: this.getValue("file")
-    });
-    if (result.ok) {
-      Flash.success(t("data_file.open_with_sucess"));
-    }
   }
   async onSave(ev) {
     stopEvent(ev);
@@ -18576,7 +18563,6 @@ class Prefs {
     listenBtn("prefs", this.onOpen.bind(this));
     listenBtn("close-prefs", this.onClose.bind(this));
     listenBtn("save-prefs", this.onSave.bind(this));
-    listenBtn("open-datafile", this.onOpenDataFile.bind(this));
   }
   observeFields() {
     Object.keys(this.data).forEach((prop) => {
@@ -18585,7 +18571,8 @@ class Prefs {
     this.fieldsReady = true;
   }
 }
-var prefs = Prefs.getInstance();
+var prefs = Prefs.singleton();
+var prefs_default = prefs;
 
 // lib/client/main.ts
 init_flash();
@@ -18755,6 +18742,8 @@ var nanoid = (size = 21) => {
 
 // lib/client/editing.ts
 init_Locale();
+var import_renderer4 = __toESM(require_renderer2(), 1);
+
 class Editing {
   get section() {
     return DGet("section#editing");
@@ -18789,11 +18778,12 @@ class Editing {
     ui.toggleSection("editing");
     const container = this.taskContainer;
     container.innerHTML = "";
-    const retour = await postToServer("/tasks/all", { dataPath: prefs.getValue("file") });
+    const retour = await postToServer("/tasks/all", { process: "Editing.startEditing" });
     if (retour.ok === false) {
       return;
     }
     const works = retour.works;
+    import_renderer4.default.info("Works retreaved", works);
     DGet("span#tasks-count", this.section).innerHTML = works.length;
     works.forEach((work) => {
       this.createNewTask(work);
@@ -18862,7 +18852,7 @@ class Editing {
       project: t("ui.text.your_project"),
       content: t("ui.text.temp_description"),
       folder: t("ui.text.path_example"),
-      active: false
+      active: 0
     });
     owork.scrollIntoView({ behavior: "smooth", block: "start" });
   }
@@ -18903,10 +18893,10 @@ var editor = Editing.getIntance();
 // lib/client/main.ts
 class Client {
   async init() {
-    import_renderer4.default.info("=== INITIALISATION CLIENT ===");
-    await this.initObjet(prefs, "Prefs");
-    await this.initObjet(loc, "Locale", prefs.getLang());
-    this.initObjetSync(ui, "UI", prefs.getSavedData());
+    import_renderer5.default.info("=== INITIALISATION CLIENT ===");
+    await this.initObjet(prefs_default, "Prefs");
+    await this.initObjet(loc, "Locale", prefs_default.getLang());
+    this.initObjetSync(ui, "UI", prefs_default.getSavedData());
     await this.initObjet(Work, "Work");
     this.initObjetSync(editor, "Editor");
     this.initObjetSync(help, "Help");
@@ -18920,7 +18910,7 @@ class Client {
     console.log("Il a répondu non");
   }
   initObjetSync(objet, name, args) {
-    import_renderer4.default.info(`${name} init…`);
+    import_renderer5.default.info(`${name} init…`);
     let res;
     if (args) {
       res = objet.init(args);
@@ -18928,13 +18918,13 @@ class Client {
       res = objet.init();
     }
     if (res) {
-      import_renderer4.default.info("  -- ok");
+      import_renderer5.default.info("  -- ok");
     } else {
-      import_renderer4.default.warn(`Problem with ${name} initialisation`);
+      import_renderer5.default.warn(`Problem with ${name} initialisation`);
     }
   }
   async initObjet(objet, name, args) {
-    import_renderer4.default.info(`${name} init…`);
+    import_renderer5.default.info(`${name} init…`);
     let res;
     if (args) {
       res = await objet.init(args);
@@ -18942,9 +18932,9 @@ class Client {
       res = await objet.init();
     }
     if (res) {
-      import_renderer4.default.info("  -- ok");
+      import_renderer5.default.info("  -- ok");
     } else {
-      import_renderer4.default.warn(`Problem with ${name} initialisation`);
+      import_renderer5.default.warn(`Problem with ${name} initialisation`);
     }
   }
   static inst;

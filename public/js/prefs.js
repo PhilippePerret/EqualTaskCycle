@@ -18364,35 +18364,34 @@ class Tools {
   }
   async openManual(ev) {
     stopEvent(ev);
-    await postToServer("/manual/open", { lang: prefs.getLang() });
+    await postToServer("/manual/open", { lang: prefs_default.getLang() });
   }
   async produceManual(ev) {
     stopEvent(ev);
-    const retour = await postToServer("/manual/produce", { lang: prefs.getLang() });
+    const retour = await postToServer("/manual/produce", { lang: prefs_default.getLang() });
     if (retour.ok) {
       Flash.success(t("manual.produced"));
     }
   }
   async tasksReportDisplay(ev) {
     stopEvent(ev);
-    const retour = await postToServer("/tasks/get-all-data", { process: "times_report tool", dataPath: prefs.getFile() });
+    const retour = await postToServer("/tasks/get-all-data", { process: "times_report tool" });
     if (retour.ok) {
       console.log("RETOUR: ", retour);
       let tableau = [];
       tableau.push([t("ui.thing.Work"), `${t("ui.thing.Cycle")}<sup>1</sup>`, `${t("ui.title.worked")}<sup>2</sup>`, `${t("ui.title.left")}<sup>3</sup>`, `${t("ui.title.total")}<sup>4</sup>`].join(" | "));
       tableau.push(["---", ":---:", ":---:", ":---:", ":---:"].join(" | "));
-      retour.times.forEach((dtimes) => {
-        const idw = dtimes.id;
-        const wdata = retour.data[idw];
-        if (Number(wdata.active) === 0) {
+      retour.works.forEach((work) => {
+        const idw = work.id;
+        if (work.active === 0) {
           return;
         }
         const line = [
-          wdata.name,
-          clock.mn2h(dtimes.defaultLeftTime),
-          clock.mn2h(dtimes.defaultLeftTime - dtimes.leftTime),
-          clock.mn2h(dtimes.leftTime),
-          clock.mn2h(dtimes.totalTime)
+          work.project,
+          clock.mn2h(work.defaultLeftTime),
+          clock.mn2h(work.defaultLeftTime - work.leftTime),
+          clock.mn2h(work.leftTime),
+          clock.mn2h(work.totalTime)
         ].join(" | ");
         tableau.push(line);
       });
@@ -18461,13 +18460,13 @@ class Prefs {
   fieldsReady = false;
   static inst;
   constructor() {}
-  static getInstance() {
+  static singleton() {
     return this.inst || (this.inst = new Prefs);
   }
   async init() {
     const retour = await postToServer("/prefs/load", { process: "Prefs.init" });
     if (retour.ok) {
-      import_renderer3.default.info("Prefs remontées", retour.prefs);
+      import_renderer3.default.info("Prefs loaded", retour.prefs);
       this.setData(retour.prefs);
       this.observeButtons();
     }
@@ -18478,18 +18477,6 @@ class Prefs {
   }
   getSavedData() {
     return this.data;
-  }
-  getFile() {
-    return this.data.file;
-  }
-  async onOpenDataFile(ev) {
-    stopEvent(ev);
-    const result = await postToServer("/prefs/open-data-file", {
-      filePath: this.getValue("file")
-    });
-    if (result.ok) {
-      Flash.success(t("data_file.open_with_sucess"));
-    }
   }
   async onSave(ev) {
     stopEvent(ev);
@@ -18569,7 +18556,6 @@ class Prefs {
     listenBtn("prefs", this.onOpen.bind(this));
     listenBtn("close-prefs", this.onClose.bind(this));
     listenBtn("save-prefs", this.onSave.bind(this));
-    listenBtn("open-datafile", this.onOpenDataFile.bind(this));
   }
   observeFields() {
     Object.keys(this.data).forEach((prop) => {
@@ -18578,8 +18564,9 @@ class Prefs {
     this.fieldsReady = true;
   }
 }
-var prefs = Prefs.getInstance();
+var prefs = Prefs.singleton();
+var prefs_default = prefs;
 export {
-  prefs,
+  prefs_default as default,
   Prefs
 };

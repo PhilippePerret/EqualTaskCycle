@@ -52,7 +52,6 @@ ui:
     Folder: Dossier
     Theme: Thème
     Work: Travail
-    works_file: Fichier des travaux
   adj:
     active_m: actif
     Active_m: Actif
@@ -96,7 +95,6 @@ ui:
     total_duration: Durée totale
     ui_theme: Thème interface
     your_project: "Votre projet/Tâche"
-    works_file: Fichier tâches
     description_stop_report_modele: |
       Description de ce qu'il faudra faire à la prochaine session.
 

@@ -22,6 +22,10 @@ class DBWorks {
     return this.run(`SELECT * FROM works WHERE ${condition}`) as WorkType[]
   }
 
+  public getAllWorks(): WorkType[] {
+    return this.run('SELECT * FROM works') as WorkType[];
+  }
+  
   public getAllActiveWorks(): WorkType[] {
     return this.findAll('active = 1');
   }

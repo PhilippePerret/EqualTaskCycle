@@ -160,14 +160,8 @@ app.post('/task/change', (req, res) => {
 // temps.
 app.post('/tasks/all', (req, res) => {
   const dreq = req.body;
-  let retour: RecType = {ok: true, error: ''}
-  const dataPath = dreq.dataPath;
-  if (existsSync(dataPath)) {
-    retour = {ok: true, works: yaml.load(readFileSync(dataPath,'utf8'))};
-  } else {
-    retour = {ok: false, error: 'Data File Unfound : ' + dataPath};
-  }
-  res.json(retour);
+  Object.assign(dreq, {ok: true, works: db.getAllWorks()})
+  res.json(dreq);
 });
 
 app.post('/tasks/get-all-data', (req, res) => {
@@ -184,24 +178,8 @@ app.post('/tasks/save', (req, res) => {
   let retour = {ok: true, error: ''};
   Work.saveAllData(allData);
   res.json(retour);
-})
+});
 
-app.post('/prefs/open-data-file', (req, res) => {
-  const dreq = req.body;
-  const fpath = dreq.filePath
-  let report = {ok: true, error: ''};
-  if (existsSync(fpath)) {
-    try {
-      execSync(`open "${fpath}"`);
-    } catch(err) {
-      log.info('ERR: ' + err);
-      report = {ok: false, error: 'ERROR DURING OPEN DATA FILE (see console)'}
-    }
-  } else {
-    report = {ok: false, error: 'File "'+fpath+'" unfound…'}
-  }
-  res.json(report);
-})
 app.post('/prefs/save', (req, res) => {
   const report = prefs.save(req.body);
   res.json(report);

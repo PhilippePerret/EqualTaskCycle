@@ -25,7 +25,7 @@ export class Work {
   public static getCurrentWork(options: RecType | undefined = {}): WorkType | {ok: boolean, error: string} {
     log.info("-> getCurrentWork")
     const filtre: string | string[] = []
-    filtre.push('active = 1 AND restTime > 0');
+    filtre.push('active = 1 AND leftTime > 0');
     if (options.no_lasttime_constraint !== true) {
       filtre.push(`(lastWorkedAt IS NULL OR lastWorkedAt <= ${startOfToday()})`);
     }
@@ -55,12 +55,12 @@ export class Work {
         // => C'est une erreur handicapante
         return {ok: false, error: t('task.any_active')}
       } else if (this.noWorkWithRestTime()) {
-        // <= Plus aucune tâche active n'a de restTime
+        // <= Plus aucune tâche active n'a de leftTime
         // => On initie un nouveau cycle
         db.resetCycle();
         return this.getCurrentWork(options)
       } else {
-        // <= Il y a des tâches avec du restTime, mais elles ont
+        // <= Il y a des tâches avec du leftTime, mais elles ont
         //    été déjà jouées aujourd'hui.
         // => On baisse la contrainte
         return this.getCurrentWork(Object.assign(options, {no_lasttime_constraint: true}))
@@ -81,7 +81,7 @@ export class Work {
     return db.findAll('active = 1').length === 0;
   }
   private static noWorkWithRestTime(): boolean {
-    return db.findAll('active = 1 AND restTime > 0').length === 0;
+    return db.findAll('active = 1 AND leftTime > 0').length === 0;
   }
 
   constructor(

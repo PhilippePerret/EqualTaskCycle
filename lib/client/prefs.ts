@@ -15,12 +15,12 @@ export class Prefs { /* singleton */
 
   private static inst: Prefs;
   private constructor(){}
-  public static getInstance(){return this.inst || (this.inst = new Prefs())}
+  public static singleton(){return this.inst || (this.inst = new Prefs())}
 
   public async init(): Promise<boolean> {
     const retour = await postToServer('/prefs/load', {process: 'Prefs.init'});
     if (retour.ok) {
-      log.info('Prefs remontées', retour.prefs);
+      log.info('Prefs loaded', retour.prefs);
       this.setData(retour.prefs);
       this.observeButtons();
     }
@@ -29,19 +29,7 @@ export class Prefs { /* singleton */
 
   public getLang(){ return this.data.lang || 'en' } /* <=========== TODO */
   public getSavedData(){ return this.data; }
-  public getFile(){ return this.data.file; }
   
-  /**
-   * Pour ouvrir le fichier des données
-   */
-  async onOpenDataFile(ev: MouseEvent){
-    stopEvent(ev);
-    const result = await postToServer('/prefs/open-data-file', {
-      filePath: this.getValue('file')
-    })
-    if (result.ok) { Flash.success(t('data_file.open_with_sucess')) } 
-  }
-
   /**
    * Fonction appelée pour sauver les données de préférence
    */
@@ -129,7 +117,6 @@ export class Prefs { /* singleton */
     listenBtn('prefs', this.onOpen.bind(this));
     listenBtn('close-prefs', this.onClose.bind(this));
     listenBtn('save-prefs', this.onSave.bind(this));
-    listenBtn('open-datafile', this.onOpenDataFile.bind(this));
   }
   private observeFields(){
     Object.keys(this.data).forEach((prop: string) => {
@@ -140,4 +127,5 @@ export class Prefs { /* singleton */
   }
 
 }
-export const prefs = Prefs.getInstance();
+const prefs = Prefs.singleton();
+export default prefs;
