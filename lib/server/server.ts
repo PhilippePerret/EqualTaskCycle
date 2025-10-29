@@ -12,6 +12,8 @@ import { activTracker } from './activityTracker';
 import { loc, tf } from '../shared/Locale';
 import log from 'electron-log/main';
 import { manual } from './Manual';
+import { userDataPath } from './constants_server';
+import { runInNewContext } from 'vm';
 
 const app = express();
 const APP_PATH = path.resolve('.');
@@ -161,6 +163,9 @@ app.post('/task/change', (req, res) => {
   res.json(result);
 });
 
+// Retourne toutes les tâches, mais seulement les
+// information dans le fichier des données, pas les
+// temps.
 app.post('/tasks/all', (req, res) => {
   const dreq = req.body;
   let retour: RecType = {ok: true, error: ''}
@@ -171,7 +176,24 @@ app.post('/tasks/all', (req, res) => {
     retour = {ok: false, error: 'Data File Unfound : ' + dataPath};
   }
   res.json(retour);
-})
+});
+
+app.post('/tasks/get-all-data', (req, res) => {
+  const data: RecType = req.body;
+  // Pour obtenir les noms
+  const table = {};
+  // @ts-ignore
+  yaml.load(readFileSync(data.dataPath, 'utf8'))
+  .forEach((w: WorkType) => Object.assign(table, {[w.id]: {name: w.project, active: w.active}}));
+  // On récupère les données temporelles
+  const ids = Object.keys(table);
+  const dataTimes = runtime.getAllDataOf(ids);
+  res.json(Object.assign(data, {
+    ok: true,
+    data: table,
+    times: dataTimes
+  }));
+});
 
 app.post('/tasks/save', (req, res) => {
   const allData = req.body;

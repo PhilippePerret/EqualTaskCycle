@@ -26,7 +26,8 @@ export class Prefs { /* singleton */
   }
 
   public getLang(){ return this.data.lang || 'en' } /* <=========== TODO */
-  public getSavedData(){ return this.data }
+  public getSavedData(){ return this.data; }
+  public getFile(){ return this.data.file; }
   
   /**
    * Pour ouvrir le fichier des données

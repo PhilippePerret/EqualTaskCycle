@@ -12,6 +12,7 @@ ui:
     dont_save_time_and_report: Don’t save Time and Report
     finish: Finish
     not_anymore: Not anymore
+    ok: OK
     open_min: open
     open_project: OPEN
     pause: PAUSE
@@ -32,6 +33,7 @@ ui:
     stop_report: STOP Report
     task_editing: Task Editing
     tasks: Tasks
+    times_report: Times Report
     tools: Tools
   thing:
     Clock: Clock
@@ -106,3 +108,6 @@ ui:
       open:
         name: Open manual
         desc: This tool allows you to open the application manual in your language, in PDF format.
+    times_report:
+      name: Time Report of Work
+      desc: This tool provides a report of current (active) tasks along with their respective durations.

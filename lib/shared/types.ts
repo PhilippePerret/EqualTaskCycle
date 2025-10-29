@@ -2,6 +2,12 @@
 
 export type RecType = {[x: string]: any};
 
+export type ButtonType = {
+  text: string;
+  onclick: Function;
+  role?: 'default' | 'cancel';
+}
+
 export interface WorkType {
     id: string;
     project: string;

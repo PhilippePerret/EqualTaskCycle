@@ -18271,9 +18271,69 @@ init_Locale();
 init_Locale();
 init_flash();
 init_utils();
+
+// lib/client/Panel.ts
+init_Locale();
+
+class Panel {
+  data;
+  obj;
+  btnOk;
+  fldContent;
+  built = false;
+  constructor(data) {
+    this.data = data;
+  }
+  setContent(contenu) {
+    this.fldContent.innerHTML = contenu;
+  }
+  onOk(ev) {
+    stopEvent(ev);
+    this.close();
+  }
+  show() {
+    this.built || this.build();
+    this.obj.classList.remove("hidden");
+  }
+  close() {
+    this.obj.classList.add("hidden");
+  }
+  build() {
+    const o = document.createElement("DIV");
+    o.classList.add(...["panel", "hidden"]);
+    const tit = document.createElement("DIV");
+    tit.classList.add("panel-title");
+    tit.innerHTML = this.data.title;
+    o.appendChild(tit);
+    const c = document.createElement("DIV");
+    c.classList.add("panel-content");
+    c.innerHTML = this.data.content;
+    o.appendChild(c);
+    this.fldContent = c;
+    const f = document.createElement("FOOTER");
+    o.appendChild(f);
+    this.btnOk = document.createElement("BUTTON");
+    this.btnOk.innerHTML = t("ui.button.ok");
+    f.appendChild(this.btnOk);
+    document.body.appendChild(o);
+    this.obj = o;
+    this.built = true;
+    this.observe();
+  }
+  observe() {
+    this.btnOk.addEventListener("click", this.onOk.bind(this));
+  }
+}
+
+// lib/client/tools.ts
 class Tools {
   get TOOLS_DATA() {
     return [
+      {
+        name: t("ui.tool.times_report.name"),
+        description: t("ui.tool.times_report.desc"),
+        method: this.tasksReportDisplay.bind(this)
+      },
       {
         name: t("ui.tool.reset_cycle.name"),
         description: t("ui.tool.reset_cycle.desc"),
@@ -18311,6 +18371,45 @@ class Tools {
       Flash.success(t("manual.produced"));
     }
   }
+  async tasksReportDisplay(ev) {
+    stopEvent(ev);
+    const retour = await postToServer("/tasks/get-all-data", { process: "times_report tool", dataPath: prefs.getFile() });
+    if (retour.ok) {
+      console.log("RETOUR: ", retour);
+      let tableau = [];
+      tableau.push(["Tâche", "Temps cycle", "travaillé", "restant", "total"].join(" | "));
+      tableau.push(["---", "---", "---", "---", "---"].join(" | "));
+      retour.times.forEach((dtimes) => {
+        const idw = dtimes.id;
+        const wdata = retour.data[idw];
+        if (Number(wdata.active) === 0) {
+          return;
+        }
+        const line = [
+          wdata.name,
+          dtimes.defaultLeftTime,
+          dtimes.defaultLeftTime - dtimes.leftTime,
+          dtimes.leftTime,
+          dtimes.totalTime
+        ].join(" | ");
+        tableau.push(line);
+      });
+      tableau = tableau.map((line) => `| ${line} |`).join(`
+`);
+      tableau = markdown(tableau);
+      if (this.TimesReportPanel === undefined) {
+        this.TimesReportPanel = new Panel({
+          title: t("ui.title.times_report"),
+          buttons: "ok",
+          content: tableau
+        });
+      } else {
+        this.TimesReportPanel.setContent(tableau);
+      }
+      this.TimesReportPanel.show();
+    }
+  }
+  TimesReportPanel;
   build() {
     if (this.built) {
       return;
@@ -18365,6 +18464,9 @@ class Prefs {
   }
   getSavedData() {
     return this.data;
+  }
+  getFile() {
+    return this.data.file;
   }
   async onOpenDataFile(ev) {
     stopEvent(ev);

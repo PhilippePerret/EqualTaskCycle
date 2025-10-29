@@ -2,9 +2,11 @@ import { t } from "../shared/Locale.js";
 import { DGet, stopEvent } from "../../public/js/dom.js";
 import { Flash } from "../../public/js/flash.js";
 import { ui } from "./ui";
-import { postToServer } from "../shared/utils.js";
+import { markdown, postToServer } from "../shared/utils.js";
 import { Work } from "./work.js";
 import { prefs } from "./prefs.js";
+import type { RecType } from "../shared/types.js";
+import { Panel } from "./Panel.js";
 
 interface ToolType {
   name: string;
@@ -15,6 +17,11 @@ interface ToolType {
 class Tools { /* singleton */
 
   private get TOOLS_DATA(): ToolType[] { return [
+    {
+      name: t('ui.tool.times_report.name'),
+      description: t('ui.tool.times_report.desc'),
+      method: this.tasksReportDisplay.bind(this)
+    },
     {
       name: t('ui.tool.reset_cycle.name'), 
       description: t('ui.tool.reset_cycle.desc'), 
@@ -34,7 +41,6 @@ class Tools { /* singleton */
 
   // -------- TOOLS ----------
 
-  /* Client-side */
   private async resetCycle(ev: Event) {
     ev && stopEvent(ev);
     const retour = await postToServer('/tool/reset-cycle', {process: t('ui.tool.reset_cycle.name')});
@@ -60,6 +66,48 @@ class Tools { /* singleton */
     if (retour.ok) { Flash.success(t('manual.produced')) }
   }
 
+  // --- //
+
+  /**
+   * Affichage du rapport de temps.
+   */
+  private async tasksReportDisplay(ev: Event){
+    stopEvent(ev);
+    const retour = await postToServer('/tasks/get-all-data', {process: 'times_report tool', dataPath: prefs.getFile()});
+    if (retour.ok) {
+      console.log("RETOUR: ", retour);
+      let tableau: string | string[] = []
+      tableau.push(['Tâche', 'Temps cycle', 'travaillé', 'restant', 'total'].join(' | '))
+      tableau.push(['---', '---', '---', '---', '---'].join(' | '));
+      retour.times.forEach((dtimes: RecType) => {
+        const idw = dtimes.id;
+        const wdata = retour.data[idw];
+        if (Number(wdata.active) === 0) { return }
+        const line = [
+          wdata.name, 
+          dtimes.defaultLeftTime,
+          dtimes.defaultLeftTime - dtimes.leftTime,
+          dtimes.leftTime,
+          dtimes.totalTime
+        ].join (' | ');
+        (tableau as string[]).push(line)
+      })
+      tableau = tableau.map(line => `| ${line} |`).join("\n");
+      tableau = markdown(tableau);
+      // console.log("tableau", tableau);
+      if (undefined === this.TimesReportPanel) {
+        this.TimesReportPanel = new Panel({
+          title: t('ui.title.times_report'),
+          buttons: 'ok',
+          content: tableau
+        })
+      } else {
+        this.TimesReportPanel.setContent(tableau);
+      }
+      this.TimesReportPanel.show();
+    };  
+  }
+  private TimesReportPanel!: Panel;
   // -------- /TOOLS ----------
 
 

@@ -14,7 +14,8 @@ export class RunTime { /* singleton */
   
   private constructor(){}
   private static inst: RunTime;
-  public static getInstance(){return this.inst || (this.inst = new RunTime())}
+  public static singleton(){return this.inst || (this.inst = new RunTime())}
+
 
   private get db(){
     return this._db || (this._db = new Database(this.dbPath));
@@ -28,6 +29,17 @@ export class RunTime { /* singleton */
     this.insertNewWorks(works, defaultDuration);
   }
 
+  /**
+   * Retourne les données temporelles de toutes les tâches dont
+   * les identifiants sont fournis
+   * 
+   */
+  public getAllDataOf(ids: string[]): RecType {
+    const request = `
+    SELECT * FROM works WHERE id IN (${ids.map(_s => '?').join(', ')})
+    `;
+    return this.db.query(request).all(...ids);
+  }
   /**
    * @return les infos temporelles du travail d'identifiant workId
    * 
@@ -339,4 +351,4 @@ export class RunTime { /* singleton */
   }
 }
 
-export const runtime = RunTime.getInstance();
+export const runtime = RunTime.singleton();

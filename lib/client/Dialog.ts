@@ -23,15 +23,9 @@
  * 
  */
 import log from 'electron-log/renderer';
-import type { RecType } from '../shared/types';
+import type { RecType, ButtonType } from '../shared/types';
 import type { KeyboardEvent } from 'react';
 import { stopEvent } from '../../public/js/dom';
-
-type ButtonType = {
-  text: string;
-  onclick: Function;
-  role?: 'default' | 'cancel';
-}
 
 export class Dialog {
 

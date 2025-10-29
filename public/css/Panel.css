@@ -1,0 +1,23 @@
+div.panel {
+  background-color: inherit;
+  position: fixed;
+  top: 0; 
+  left: 0;
+  bottom:0;
+  right:0;
+  z-index: 100
+}
+
+div.panel div.panel-title {
+  border-bottom: 1px solid #CCC;
+  background-color: #d3cdcd;
+  padding: 1vh 4vw;
+  font-size: 0.8em;
+  letter-spacing: 0.3px;
+  font-family: arial, helvetica, geneva;
+  color: black;
+  text-align: center;
+}
+div.panel div.panel-content {
+  padding: 1em;
+}

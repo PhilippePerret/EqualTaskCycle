@@ -12,6 +12,7 @@ ui:
     dont_save_time_and_report: Ne sauver ni temps ni rapport
     finish: Finir
     not_anymore: Non
+    ok: OK
     open_min: ouvrir
     open_project: PROJET
     pause: ⏸
@@ -31,6 +32,7 @@ ui:
     project: Projet
     stop_report: Rapport d’arrêt
     task_editing: Édition des tâches
+    times_report: Rapport temporel
     tasks: Tâches
     tools: Outils
   thing:
@@ -106,3 +108,6 @@ ui:
       open:
         name: Ouvrir le manuel
         desc: Cet outil vous permet d'ouvrir le manuel de l'application, dans votre langue, au format PDF.
+    times_report:
+      name: Rapport temporel des travaux
+      desc: Cet outil présente un rapport des tâches courantes (actives) avec leurs temps respectifs.
