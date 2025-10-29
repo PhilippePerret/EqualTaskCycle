@@ -30,7 +30,7 @@ export async function postToServer(route: string, data: RecType){
         case 500:
           return {
             ok: false, 
-            error: `Internal Server Error (route: /${route}, process: ${data.process || 'inconnu (add it to data)'})`, 
+            error: `Internal Server Error (route: ${route}, process: ${data.process || 'inconnu (add it to data)'})`, 
             process: 'fetch'
           }
         case 404:

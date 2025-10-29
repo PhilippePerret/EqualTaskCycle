@@ -2,11 +2,12 @@ import os from 'os';
 import path from 'path';
 import { existsSync } from 'fs';
 import { Database } from "bun:sqlite"
-import type { RecType, WorkType } from "../shared/types";
+import { DEFAULT_WORK, type RecType, type WorkType } from "../shared/types";
 import { userDataPath } from './constants_server';
 import { startOfToday } from '../shared/utils';
 import { t } from '../shared/Locale';
 import { prefs } from './prefs';
+import log from 'electron-log/main';
 
 class DBWorks {
 
@@ -42,11 +43,26 @@ class DBWorks {
     return this.run(request, {data: ids}) as WorkType[];
   }
 
-  public setWorksData(_data: WorkType[]) {
-    throw new Error('Je dois apprendre à sauver toutes les données')
-  }
-  public saveAllWorks(_data: WorkType[]) {
-    throw new Error('Je dois apprendre à sauver toutes les données')
+  public saveAllWorks(works: WorkType[]): {ok: boolean, error: ''} {
+    log.info("Works to save:", works);
+    try {
+      const colonnes  = Object.keys(DEFAULT_WORK);
+      const interos   = colonnes.map(c => `?`)
+      const request = `INSERT OR REPLACE INTO works (${colonnes.join(', ')}) VALUES (${interos.join(', ')})`;
+      // log.info("REQUEST:", request);
+      const upsertWork = this.db.prepare(request);
+      const trans = this.db.transaction((works: WorkType[]) => {
+        works.forEach((work: RecType) => {
+          const values: any[] = colonnes.map(c => work[c] || (DEFAULT_WORK as any)[c]);
+          // log.info("COLUMNS VALUE: ", values);
+          upsertWork.run(values as any);
+        })
+      });
+      trans(works);
+      return {ok: true, error: ''}
+    } catch(err) {
+      return {ok: false, error: (err as any).message}
+    }
   }
 
   private createNewWork(work: WorkType){

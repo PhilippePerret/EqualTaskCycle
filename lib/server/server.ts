@@ -174,10 +174,10 @@ app.post('/tasks/get-all-data', (req, res) => {
 });
 
 app.post('/tasks/save', (req, res) => {
-  const allData = req.body;
-  let retour = {ok: true, error: ''};
-  Work.saveAllData(allData);
-  res.json(retour);
+  const dreq = req.body;
+  const result = db.saveAllWorks(dreq.works);
+  Object.assign(dreq, result);
+  res.json(dreq);
 });
 
 app.post('/prefs/save', (req, res) => {
@@ -192,6 +192,12 @@ app.post('/localization/get-all', (req, res) => {
   retour.locales.ui.app.mode = process.env.ETC_MODE;
   res.json(retour);
 });
+
+app.post('/task/check-folder-existence', (req, res) => {
+  const dreq = req.body;
+  const folderExists: boolean = existsSync(dreq.folder);
+  res.json(Object.assign(dreq, {ok: true, folderExists: folderExists, error: ''}));
+})
 
 app.post('/tool/reset-cycle', async (req, res) => {
   log.info("->route /tool/reset-cycle")

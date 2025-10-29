@@ -17222,7 +17222,7 @@ async function postToServer(route, data) {
         case 500:
           return {
             ok: false,
-            error: `Internal Server Error (route: /${route}, process: ${data.process || "inconnu (add it to data)"})`,
+            error: `Internal Server Error (route: ${route}, process: ${data.process || "inconnu (add it to data)"})`,
             process: "fetch"
           };
         case 404:
@@ -18721,30 +18721,34 @@ var help = Help.getInst();
 window.help = help;
 
 // lib/shared/types.ts
-var WorkProps = ["active", "id", "project", "content", "duration", "folder", "script"];
+var DEFAULT_WORK = {
+  id: "defaultid",
+  active: 0,
+  project: "PROJET",
+  content: "DEFAULT CONTENT",
+  folder: "/path/to/default",
+  defaultLeftTime: 0,
+  script: "",
+  totalTime: 0,
+  cycleTime: 0,
+  leftTime: 0,
+  cycleCount: 0,
+  startedAt: null,
+  lastWorkedAt: null,
+  report: ""
+};
 
 // lib/client/editing.ts
 init_flash();
 init_utils();
-
-// node_modules/nanoid/url-alphabet/index.js
-var urlAlphabet = "useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict";
-
-// node_modules/nanoid/index.browser.js
-var nanoid = (size = 21) => {
-  let id = "";
-  let bytes = crypto.getRandomValues(new Uint8Array(size |= 0));
-  while (size--) {
-    id += urlAlphabet[bytes[size] & 63];
-  }
-  return id;
-};
-
-// lib/client/editing.ts
 init_Locale();
 var import_renderer4 = __toESM(require_renderer2(), 1);
+var WorkProps = Object.keys(DEFAULT_WORK);
 
 class Editing {
+  originalWorks;
+  modifiedWorks;
+  changesetWorks;
   get section() {
     return DGet("section#editing");
   }
@@ -18752,23 +18756,93 @@ class Editing {
     return this._configcont || (this._configcont = DGet("#editing-config-container", this.section));
   }
   _configcont;
-  collectTaskData() {
-    const newTaskData = [];
+  async collectTaskData() {
+    let newTaskData = [];
+    this.modifiedWorks = {};
     this.taskContainer.querySelectorAll(".editing-form-task").forEach((form) => {
-      newTaskData.push(this.getTaskDataIn(form));
+      const wdata = this.getTaskDataIn(form);
+      if (wdata.id === "") {
+        wdata.id = this.getIdFromProject(wdata.project);
+      }
+      Object.assign(this.modifiedWorks, { [wdata.id]: wdata });
     });
-    return newTaskData;
+    this.changesetWorks = {};
+    Object.entries(this.modifiedWorks).forEach(([idw, work]) => {
+      const originalWork = this.originalWorks[idw];
+      const modifiedWork = work[idw];
+      for (var prop in modifiedWork) {
+        Object.assign(this.changesetWorks, { [idw]: { count: 0, change: [], errors: {} } });
+        const changeset = this.changesetWorks[idw];
+        if (modifiedWork[prop] !== originalWork[prop]) {
+          changeset.count++;
+          changeset.change.push(prop);
+        }
+      }
+    });
+    let errorCount = 0;
+    Object.entries(this.changesetWorks).forEach(async ([idw, changeset]) => {
+      import_renderer4.default.info("Check des changements du travail ", idw);
+      if (changeset.count === 0) {
+        return;
+      }
+      changeset.change.forEach(async (prop) => {
+        const newValue = this.modifiedWorks[idw][prop];
+        switch (prop) {
+          case "project":
+            if (newValue === "") {
+              Object.assign(changeset.errors, { project: t("error.data.undefined_project") });
+              ++errorCount;
+            }
+            break;
+          case "id":
+            if (await this.IDAlreadyExists(newValue)) {
+              Object.assign(changeset.errors, { id: t("error.data.id_exists", [newValue]) });
+              ++errorCount;
+            }
+            break;
+          case "folder":
+            if (newValue === "") {
+              Object.assign(changeset.errors, { folder: t("error.data.folder_required") });
+              ++errorCount;
+            } else if (await this.unabledToFindProjectFolder(newValue)) {
+              Object.assign(changeset.errors, { folder: t("error.data.folder_unfound", [newValue]) });
+              ++errorCount;
+            }
+            break;
+          case "script":
+            if (newValue !== "") {
+              if (await this.unabledToFindScript(newValue)) {
+                Object.assign(changeset.errors, { script: t("error.data.script_unfound", [newValue]) });
+                ++errorCount;
+              }
+            }
+            break;
+        }
+      });
+    });
+    import_renderer4.default.info("Fin du check des modifications (%s erreurs)", errorCount);
+    if (errorCount > 0) {
+      return [];
+    }
+  }
+  async IDAlreadyExists(id) {
+    const retour = await postToServer("/task/check-id-existence", { id, process: "Edition.IDAlreadyExists" });
+    return retour.ok && retour.idExists;
+  }
+  async unabledToFindProjectFolder(folder) {
+    const retour = await postToServer("/task/check-folder-existence", { process: "Editing.unfoundProjectFolder", folder });
+    console.log("Retour check folder", retour);
+    return retour.ok && retour.folderExists === false;
+  }
+  async unabledToFindScript(script) {
+    const retour = await postToServer("/script/check-existence", { process: "Editing.unabledToFindScript", script });
+    return retour.ok && retour.scriptExiste === false;
   }
   getTaskDataIn(form) {
     const taskData = {};
     WorkProps.forEach((prop) => {
       let value = DGet(`.form-task-${prop}`, form).value;
       if (value !== "") {
-        if (prop === "active") {
-          value = (0, eval)(value);
-        } else if (prop === "duration") {
-          value = Number(value);
-        }
         Object.assign(taskData, { [prop]: value });
       }
     });
@@ -18784,6 +18858,8 @@ class Editing {
     }
     const works = retour.works;
     import_renderer4.default.info("Works retreaved", works);
+    this.originalWorks = {};
+    works.forEach((w) => Object.assign(this.originalWorks, { [w.id]: w }));
     DGet("span#tasks-count", this.section).innerHTML = works.length;
     works.forEach((work) => {
       this.createNewTask(work);
@@ -18804,15 +18880,10 @@ class Editing {
   }
   peupleWorkForm(obj, work) {
     WorkProps.forEach((prop) => {
+      console.log("prop: '%s'", prop);
       const field = DGet(`.form-task-${prop}`, obj);
       let value = work[prop];
-      if (prop === "active") {
-        if (value === undefined) {
-          value = true;
-        }
-        value = String(value);
-      }
-      field.value = String(value || "");
+      field.value = value === undefined ? "" : String(value);
     });
     DGet("span.task-id-disp", obj).innerHTML = work.id;
   }
@@ -18848,17 +18919,55 @@ class Editing {
   }
   onAddTask() {
     const owork = this.createNewTask({
-      id: nanoid().toLowerCase(),
+      id: "",
       project: t("ui.text.your_project"),
       content: t("ui.text.temp_description"),
       folder: t("ui.text.path_example"),
       active: 0
     });
     owork.scrollIntoView({ behavior: "smooth", block: "start" });
+    owork.querySelector("input.form-task-project").addEventListener("change", this.findIdIfRequied.bind(this, owork));
+  }
+  findIdIfRequied(owork, ev) {
+    const projectField = owork.querySelector("input.form-task-project");
+    const idField = owork.querySelector("input.form-task-id");
+    const dispField = owork.querySelector(".task-id-disp");
+    let idProjet;
+    if (idField.value === "") {
+      const project = projectField.value.trim();
+      if (project === "") {
+        idProjet = this.getDefaultId();
+      } else {
+        idProjet = this.getIdFromProject(project);
+      }
+      idField.value = idProjet;
+      dispField.innerHTML = idProjet;
+    }
+  }
+  getDefaultId() {
+    const now = String(new Date().getTime());
+    const len = now.length;
+    return `prj${this.suffixFromDate(8)}`;
+  }
+  getIdFromProject(project) {
+    if (project === "") {
+      project = "UnnamedProject";
+    }
+    const idp = project.toLowerCase().replace(/[^a-zA-Z-0-9 ]/g, "").split(" ").map((seg) => seg.length > 3 ? seg.substring(0, 3) : seg).join("");
+    return idp + this.suffixFromDate(4);
+  }
+  suffixFromDate(long) {
+    const now = String(new Date().getTime());
+    const len = now.length;
+    return now.substring(len - long, len);
   }
   async onSaveData() {
-    const collectedData = this.collectTaskData();
-    const retour = await postToServer("/tasks/save", collectedData);
+    const collectedData = await this.collectTaskData();
+    if (collectedData.length === 0) {
+      console.logt("PAS D'ENREGISTREMENT");
+      return;
+    }
+    const retour = await postToServer("/tasks/save", { process: "Editing.onSaveData", works: collectedData });
     if (retour.ok) {
       Flash.success(t("task.saved"));
       const curWId = Work.currentWork.id;
@@ -18881,14 +18990,14 @@ class Editing {
     listenBtn("editing-add", this.onAddTask.bind(this));
     listenBtn("editing-save", this.onSaveData.bind(this));
   }
-  static getIntance() {
+  static singleton() {
     return this._inst || (this._inst = new Editing);
   }
   static _inst;
   constructor() {}
   _formtemp;
 }
-var editor = Editing.getIntance();
+var editor = Editing.singleton();
 
 // lib/client/main.ts
 class Client {

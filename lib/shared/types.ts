@@ -14,8 +14,8 @@ export interface WorkType {
     project: string;
     content: string;
     folder: string; // Required (to watch activity)
-    defaultLeftTime?: number;
     script?: string; // path du script de démarrage
+    defaultLeftTime?: number;
     totalTime: number;  // Le nombre total de minutes de travail
     cycleTime: number;  // Le nombre de minutes travaillées dans le cycle courant
     leftTime: number;   // Nombre de minutes restant pour finir le cycle
@@ -24,17 +24,22 @@ export interface WorkType {
     lastWorkedAt: number | undefined; // Date de dernier travail
     report: string; // Le Stop Report (rapport de fin, bâton de relais)
 }
-export const WorkProps = ['active', 'id','project', 'content', 'duration','folder', 'script'];
-
-// export interface RunTimeInfosType {
-//   totalTime: number;  // Le nombre total de minutes de travail
-//   cycleTime: number;  // Le nombre de minutes travaillées dans le cycle courant
-//   leftTime: number;   // Nombre de minutes restant pour finir le cycle
-//   cycleCount: number; // Nombre de cycles
-//   startedAt: number;  // Date de démarrage du travail
-//   lastWorkedAt: number; // Date de dernier travail
-//   report: string; // Le Stop Report (rapport de fin, bâton de relais)
-// }
+export const DEFAULT_WORK = {
+  id: 'defaultid',
+  active: 0,
+  project: 'PROJET',
+  content: 'DEFAULT CONTENT',
+  folder: '/path/to/default',
+  defaultLeftTime: 0,
+  script: '',
+  totalTime: 0,
+  cycleTime: 0,
+  leftTime: 0,
+  cycleCount: 0,
+  startedAt: null,
+  lastWorkedAt: null,
+  report: ''
+}
 
 export interface PrefsDataType {
   duree: number;

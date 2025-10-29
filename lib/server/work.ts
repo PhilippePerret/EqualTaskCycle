@@ -1,11 +1,11 @@
 import db from "./db";
 import { prefs } from "./prefs";
-import type { RecType, WorkType } from "../shared/types";
+import { DEFAULT_WORK, type RecType, type WorkType } from "../shared/types";
 import { t } from '../shared/Locale';
 import { startOfToday } from "../shared/utils";
 import log from 'electron-log/main';
 
-export class Work {
+export class Work /* server */ {
   public static defaultDuration: number;
 
   /**
@@ -13,6 +13,13 @@ export class Work {
    */
   public static init() {
     this.defaultDuration = prefs.data.duree;
+    this.prepareDefaultWork(this.defaultDuration);
+  }
+  private static prepareDefaultWork(dureeDefault: number){
+    Object.assign(DEFAULT_WORK, {
+      defaultLeftTime: dureeDefault,
+      leftTime: dureeDefault
+    })
   }
 
   public static get(workId: string): WorkType {
@@ -71,11 +78,6 @@ export class Work {
     return {ok: false, error: 'Ça ne doit pas pouvoir arriver'}
   }; 
   private static deuxiemeFois: boolean = false;
-
-  public static saveAllData(allData: WorkType[]) {
-    db.setWorksData(allData);
-  }
-
 
   private static noActiveWork(): boolean {
     return db.findAll('active = 1').length === 0;
