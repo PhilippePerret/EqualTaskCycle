@@ -10,6 +10,19 @@ table {
   border-spacing: 0;
 }
 
+table thead {
+  background-color: #26515c;
+}
+body.light table thead {
+  color: white;
+}
+table thead th:nth-child(1) {
+  border-top-left-radius: 0.5em;
+}
+table thead th:last-child {
+  border-top-right-radius: 0.5em;
+}
+
 table td,
 table th {
   padding: 4px 12px;

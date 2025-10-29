@@ -18448,6 +18448,8 @@ class Tools {
 var tools = Tools.getInstance();
 
 // lib/client/prefs.ts
+var import_renderer3 = __toESM(require_renderer2(), 1);
+
 class Prefs {
   data;
   fieldsReady = false;
@@ -18459,6 +18461,7 @@ class Prefs {
   async init() {
     const retour = await postToServer("/prefs/load", { process: "Prefs.init" });
     if (retour.ok) {
+      import_renderer3.default.info("Prefs remontées", retour.prefs);
       this.setData(retour.prefs);
       this.observeButtons();
     }

@@ -17369,7 +17369,7 @@ var init_Locale = __esm(() => {
 });
 
 // lib/client/main.ts
-var import_renderer3 = __toESM(require_renderer2(), 1);
+var import_renderer4 = __toESM(require_renderer2(), 1);
 init_Locale();
 // lib/client/work.ts
 init_flash();
@@ -18455,6 +18455,8 @@ class Tools {
 var tools = Tools.getInstance();
 
 // lib/client/prefs.ts
+var import_renderer3 = __toESM(require_renderer2(), 1);
+
 class Prefs {
   data;
   fieldsReady = false;
@@ -18466,6 +18468,7 @@ class Prefs {
   async init() {
     const retour = await postToServer("/prefs/load", { process: "Prefs.init" });
     if (retour.ok) {
+      import_renderer3.default.info("Prefs remontées", retour.prefs);
       this.setData(retour.prefs);
       this.observeButtons();
     }
@@ -18894,7 +18897,7 @@ var editor = Editing.getIntance();
 // lib/client/main.ts
 class Client {
   async init() {
-    import_renderer3.default.info("=== INITIALISATION CLIENT ===");
+    import_renderer4.default.info("=== INITIALISATION CLIENT ===");
     await this.initObjet(prefs, "Prefs");
     await this.initObjet(loc, "Locale", prefs.getLang());
     this.initObjetSync(ui, "UI", prefs.getSavedData());
@@ -18911,7 +18914,7 @@ class Client {
     console.log("Il a répondu non");
   }
   initObjetSync(objet, name, args) {
-    import_renderer3.default.info(`${name} init…`);
+    import_renderer4.default.info(`${name} init…`);
     let res;
     if (args) {
       res = objet.init(args);
@@ -18919,13 +18922,13 @@ class Client {
       res = objet.init();
     }
     if (res) {
-      import_renderer3.default.info("  -- ok");
+      import_renderer4.default.info("  -- ok");
     } else {
-      import_renderer3.default.warn(`Problem with ${name} initialisation`);
+      import_renderer4.default.warn(`Problem with ${name} initialisation`);
     }
   }
   async initObjet(objet, name, args) {
-    import_renderer3.default.info(`${name} init…`);
+    import_renderer4.default.info(`${name} init…`);
     let res;
     if (args) {
       res = await objet.init(args);
@@ -18933,9 +18936,9 @@ class Client {
       res = await objet.init();
     }
     if (res) {
-      import_renderer3.default.info("  -- ok");
+      import_renderer4.default.info("  -- ok");
     } else {
-      import_renderer3.default.warn(`Problem with ${name} initialisation`);
+      import_renderer4.default.warn(`Problem with ${name} initialisation`);
     }
   }
   static inst;

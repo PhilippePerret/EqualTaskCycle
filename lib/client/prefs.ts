@@ -6,6 +6,7 @@ import { ui } from "./ui";
 import { listenBtn, postToServer } from "../shared/utils";
 import { t } from '../shared/Locale';
 import { tools } from "./tools";
+import log from 'electron-log/renderer';
 
 export class Prefs { /* singleton */
 
@@ -19,6 +20,7 @@ export class Prefs { /* singleton */
   public async init(): Promise<boolean> {
     const retour = await postToServer('/prefs/load', {process: 'Prefs.init'});
     if (retour.ok) {
+      log.info('Prefs remontées', retour.prefs);
       this.setData(retour.prefs);
       this.observeButtons();
     }
