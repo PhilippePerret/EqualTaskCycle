@@ -20,7 +20,7 @@ export class Panel {
   ){}
 
   setContent(contenu: string){
-    this.fldContent.innerHTML = contenu;
+    this.fldContent.innerText = contenu;
   }
 
   onOk(ev: MouseEvent){

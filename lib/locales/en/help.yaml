@@ -1,5 +1,10 @@
 help:
   show: Show help
+  times:
+    duree_cycle: Execution time for one work cycle.
+    duree_left: Remaining execution time for the job in the current cycle.
+    duree_totale: Total execution time (all cycles) performed on the job.
+    duree_worked: Execution time already performed on the job.
   manual:
     title: ETC Manual
     ordre: >

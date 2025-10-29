@@ -18096,6 +18096,9 @@ class Clock {
     horloge.push(`${mns > 9 ? "" : "0"}${mns}’`);
     return horloge.join(" h ");
   }
+  mn2h(mn) {
+    return this.time2horloge(mn);
+  }
   get clockContainer() {
     return this._clockcont || (this._clockcont = DGet("div#clock-container"));
   }
@@ -18278,7 +18281,7 @@ class Panel {
     this.data = data;
   }
   setContent(contenu) {
-    this.fldContent.innerHTML = contenu;
+    this.fldContent.innerText = contenu;
   }
   onOk(ev) {
     stopEvent(ev);
@@ -18370,8 +18373,8 @@ class Tools {
     if (retour.ok) {
       console.log("RETOUR: ", retour);
       let tableau = [];
-      tableau.push(["Tâche", "Temps cycle", "travaillé", "restant", "total"].join(" | "));
-      tableau.push(["---", "---", "---", "---", "---"].join(" | "));
+      tableau.push([t("ui.thing.Work"), `${t("ui.thing.Cycle")}<sup>1</sup>`, `${t("ui.title.worked")}<sup>2</sup>`, `${t("ui.title.left")}<sup>3</sup>`, `${t("ui.title.total")}<sup>4</sup>`].join(" | "));
+      tableau.push(["---", ":---:", ":---:", ":---:", ":---:"].join(" | "));
       retour.times.forEach((dtimes) => {
         const idw = dtimes.id;
         const wdata = retour.data[idw];
@@ -18380,16 +18383,25 @@ class Tools {
         }
         const line = [
           wdata.name,
-          dtimes.defaultLeftTime,
-          dtimes.defaultLeftTime - dtimes.leftTime,
-          dtimes.leftTime,
-          dtimes.totalTime
+          clock.mn2h(dtimes.defaultLeftTime),
+          clock.mn2h(dtimes.defaultLeftTime - dtimes.leftTime),
+          clock.mn2h(dtimes.leftTime),
+          clock.mn2h(dtimes.totalTime)
         ].join(" | ");
         tableau.push(line);
       });
+      tableau.push(" | | | | ");
       tableau = tableau.map((line) => `| ${line} |`).join(`
 `);
       tableau = markdown(tableau);
+      tableau += `
+      <div style="margin-top:2em">
+      <sup>1</sup> ${t("help.times.duree_cycle")}<br />
+      <sup>2</sup> ${t("help.times.duree_worked")}<br />
+      <sup>3</sup> ${t("help.times.duree_left")}<br />
+      <sup>4</sup> ${t("help.times.duree_totale")}<br />
+      </div>
+      `.replace(/^\s+/gm, "");
       if (this.TimesReportPanel === undefined) {
         this.TimesReportPanel = new Panel({
           title: t("ui.title.times_report"),

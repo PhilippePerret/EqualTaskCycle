@@ -1,6 +1,11 @@
 ---
 help:
   show: Afficher l’aide
+  times:
+    duree_cycle: Durée d’exécution pour un cycle de travail.
+    duree_left: Durée d’exécution restant à accomplir sur le travail dans le cycle courant.
+    duree_totale: Durée d’exécution totale (tous les cycles) effectuée sur le travail.
+    duree_worked: Durée d’exécution déjà effectuée sur le travail.
   manual:
     title: Manuel ETC
     ordre: >

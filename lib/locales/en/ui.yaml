@@ -3,6 +3,7 @@ lang: en
 appName: "ETC"
 
 ui:
+  colon: ": "
   app:
     name: "ETC"
     mode: '' # renseigné au chargement
@@ -28,6 +29,7 @@ ui:
     confirmation_required: Confirmation required
     content: Content
     help: Help
+    left: Left # Time Left
     preferences: Preferences
     project: Project
     stop_report: STOP Report
@@ -35,10 +37,13 @@ ui:
     tasks: Tasks
     times_report: Times Report
     tools: Tools
+    total: Total
+    worked: Worked
   thing:
     Clock: Clock
     Chronometer: Carhronometer
     Countdown: Countdown
+    Cycle: Cycle
     Duration: Duration
     guil_close: '"'
     guil_open: '"'
@@ -46,6 +51,7 @@ ui:
     minutes: minutes
     Folder: Folder
     Theme: Theme
+    Work: Work
     works_file: Works File
   adj:
     active_m: active
@@ -59,6 +65,7 @@ ui:
     light: light
     Light: Light
   text:
+    all_times_minutes: All times are expressed in minutes
     are_you_still_working: "Are you still working on this task?"
     baton_relais: Relay baton
     counter_mode: Counter Mode

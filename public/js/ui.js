@@ -17382,6 +17382,9 @@ class Clock {
     horloge.push(`${mns > 9 ? "" : "0"}${mns}’`);
     return horloge.join(" h ");
   }
+  mn2h(mn) {
+    return this.time2horloge(mn);
+  }
   get clockContainer() {
     return this._clockcont || (this._clockcont = DGet("div#clock-container"));
   }

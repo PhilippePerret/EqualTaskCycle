@@ -7,6 +7,7 @@ import { Work } from "./work.js";
 import { prefs } from "./prefs.js";
 import type { RecType } from "../shared/types.js";
 import { Panel } from "./Panel.js";
+import { clock } from "./Clock.js";
 
 interface ToolType {
   name: string;
@@ -77,23 +78,32 @@ class Tools { /* singleton */
     if (retour.ok) {
       console.log("RETOUR: ", retour);
       let tableau: string | string[] = []
-      tableau.push(['Tâche', 'Temps cycle', 'travaillé', 'restant', 'total'].join(' | '))
-      tableau.push(['---', '---', '---', '---', '---'].join(' | '));
+      tableau.push([t('ui.thing.Work'), `${t('ui.thing.Cycle')}<sup>1</sup>`, `${t('ui.title.worked')}<sup>2</sup>`, `${t('ui.title.left')}<sup>3</sup>`, `${t('ui.title.total')}<sup>4</sup>`].join(' | '))
+      tableau.push(['---', ':---:', ':---:', ':---:', ':---:'].join(' | '));
       retour.times.forEach((dtimes: RecType) => {
         const idw = dtimes.id;
         const wdata = retour.data[idw];
         if (Number(wdata.active) === 0) { return }
         const line = [
           wdata.name, 
-          dtimes.defaultLeftTime,
-          dtimes.defaultLeftTime - dtimes.leftTime,
-          dtimes.leftTime,
-          dtimes.totalTime
+          clock.mn2h(dtimes.defaultLeftTime),
+          clock.mn2h(dtimes.defaultLeftTime - dtimes.leftTime),
+          clock.mn2h(dtimes.leftTime),
+          clock.mn2h(dtimes.totalTime)
         ].join (' | ');
         (tableau as string[]).push(line)
-      })
+      });
+      (tableau as string[]).push(' | | | | ');
       tableau = tableau.map(line => `| ${line} |`).join("\n");
       tableau = markdown(tableau);
+      tableau += `
+      <div style="margin-top:2em">
+      <sup>1</sup> ${t('help.times.duree_cycle')}<br />
+      <sup>2</sup> ${t('help.times.duree_worked')}<br />
+      <sup>3</sup> ${t('help.times.duree_left')}<br />
+      <sup>4</sup> ${t('help.times.duree_totale')}<br />
+      </div>
+      `.replace(/^\s+/gm, '');
       // console.log("tableau", tableau);
       if (undefined === this.TimesReportPanel) {
         this.TimesReportPanel = new Panel({

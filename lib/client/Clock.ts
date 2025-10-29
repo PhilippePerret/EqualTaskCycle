@@ -20,7 +20,7 @@ class Clock {
 
   private counterMode!: CounterModeType ;
 
-
+  // Reçoit des minutes est retourne "x h y’"
   public time2horloge(mn: number) {
     let hrs = Math.floor(mn / 60);
     let mns = Math.round(mn % 60);
@@ -30,6 +30,7 @@ class Clock {
     // horloge.push('00');
     return horloge.join(' h ');
   }
+  public mn2h(mn: number){return this.time2horloge(mn)}
 
   private get clockContainer(){
     return this._clockcont || (this._clockcont = DGet('div#clock-container'))

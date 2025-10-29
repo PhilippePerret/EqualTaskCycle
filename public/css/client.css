@@ -13,6 +13,11 @@ body {
 .w180 {width: 180px;}
 .w200 {width: 200px;}
 
+sup {
+  font-weight: normal!important;
+  margin-left: 4px;
+}
+
 span[onclick] {
   color: darkblue;
   cursor: pointer;

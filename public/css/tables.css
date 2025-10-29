@@ -1,0 +1,19 @@
+body.dark {
+  --light-color: #444343;
+  --dark-color: white;
+}
+body.light {
+  --light-color: #b5b5b5;
+  --dark-color: black;
+}
+table {
+  border-spacing: 0;
+}
+
+table td,
+table th {
+  padding: 4px 12px;
+  border-top: 1px solid;
+  border-top-color: var(--light-color);
+  margin: 0;
+}

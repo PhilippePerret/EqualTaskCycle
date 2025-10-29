@@ -3,6 +3,7 @@ lang: fr
 appName: "ETC"
 
 ui:
+  colon: " : "
   app:
     name: "ETC"
     mode: '' # renseigné au chargement
@@ -28,6 +29,7 @@ ui:
     confirmation_required: Confirmation requise
     content: Contenu
     help: Aide
+    left: Restant # Time Left
     preferences: Préférences
     project: Projet
     stop_report: Rapport d’arrêt
@@ -35,10 +37,13 @@ ui:
     times_report: Rapport temporel
     tasks: Tâches
     tools: Outils
+    total: Total
+    worked: Travaillé
   thing:
     Clock: Horloge
     Chronometer: Chronomètre
     Countdown: Compte à rebours
+    Cycle: Cycle
     Duration: Durée
     guil_close: ' »'
     guil_open: '« '
@@ -46,6 +51,7 @@ ui:
     minutes: minutes
     Folder: Dossier
     Theme: Thème
+    Work: Travail
     works_file: Fichier des travaux
   adj:
     active_m: actif
@@ -59,6 +65,7 @@ ui:
     light: clair
     Light: Clair
   text:
+    all_times_minutes: Tous les temps sont exprimés en minutes
     are_you_still_working: "Êtes-vous encore en train de travailler ?"
     baton_relais: Bâton de relais
     counter_mode: Mode de compteur
