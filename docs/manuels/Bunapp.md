@@ -4,6 +4,15 @@
 
 Elle permet une application rapide (Bun/Zig) et entièrement personnalisable au niveau de l’interface (HTML/CSS)
 
+## Fonctionnalités à présenter
+
+*(dans cette section, mettre toutes les fonctionnalités qu’on veut présenter)*
+
+* Fenêtre de dialogue Apple-like synchrone et asynchrone (`Dialog.ts`)
+* Gestion des erreurs de formulaire (sur les travaux) avec un changeset un peu comme dans elixir (`this.originalWorks`, `this.modifiedWorks`, `this.changesetWorks`).
+* Redémarrage automatique du serveur en cas de panne (arrive souvent).
+* Gestion facile des appels serveurs avec **`postToServer`**.
+
 ## Packager
 
 ~~~shell

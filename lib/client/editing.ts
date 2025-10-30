@@ -60,7 +60,7 @@ class Editing {
         }
       }
 
-      console.info("DES ERREURS SONT SURVENUES")
+      console.info("--- DES ERREURS SONT SURVENUES ---")
       return [] /* pour ne pas enregistrer */
     } else {
       // No error
@@ -218,7 +218,7 @@ class Editing {
     listenBtn('remove', this.onRemove.bind(this, work), owork);
     const menuActive = DGet('.form-work-active', owork)
     menuActive.addEventListener('change', (ev: Event) => {
-      const actif = menuActive.value === 'true';
+      const actif = menuActive.value === '1';
       owork.classList[actif?'remove':'add']('off'); 
     });
   }
@@ -258,10 +258,10 @@ class Editing {
     } as WorkType);
     owork.scrollIntoView({ behavior: 'smooth', block: 'start' });
     (owork.querySelector('input.form-work-project') as HTMLInputElement)
-    .addEventListener('change', this.findIdIfRequied.bind(this, owork));
+    .addEventListener('change', this.findIdIfRequired.bind(this, owork));
   }
 
-  private findIdIfRequied(owork: HTMLDivElement, ev: Event){
+  private findIdIfRequired(owork: HTMLDivElement, ev: Event){
     const projectField = (owork.querySelector('input.form-work-project') as HTMLInputElement);
     const idField = (owork.querySelector('input.form-work-id') as HTMLInputElement);
     const dispField = owork.querySelector('.task-id-disp') as HTMLSpanElement;
@@ -310,10 +310,6 @@ class Editing {
       console.log("--- PAS D'ENREGISTREMENT ---")
       return 
     }
-
-    console.info("Travaux à enregistrer : ", collectedData);
-    console.info("On ne fait rien pour le moment")
-    return // on ne fait rien pour le moment
 
     const retour = await postToServer('/tasks/save', {process: 'Editing.onSaveData', works: collectedData});
     if (retour.ok){ 

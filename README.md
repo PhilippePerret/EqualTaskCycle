@@ -6,6 +6,32 @@ Par exemple, si nous avons 5 tâches, et un temps par défaut de 2 heures, les t
 
 ---
 
+## Essai (mode développement)
+
+Démarrer l’application avec : 
+
+~~~shell
+bun run start
+~~~
+
+Pour redémarrer l’application en purgeant bien tous les éléments :
+
+~~~shell
+bun run reset
+~~~
+
+> Pour que cette commande fonctionne, il faut mettre à la racine du dossier un fichier `.secret/password` avec son mot de passe.
+
+Produire une release à l’aide de (après avoir incrémenté la version dans `package.json` :
+
+~~~shell
+bun run build
+~~~
+
+
+
+---
+
 <a name="travail-par-cycle"></a>
 
 ## Travail par cycle
@@ -21,7 +47,7 @@ Ce mode par cycle permet de faire avancer plusieurs gros chantiers de front sans
 L’application/interface est composée de trois parties.
 
 * La [**Zone de travail**](#zone-travail) proprement dite, on la tâche est présentée, où elle sera lancée et le temps comptabilisé.
-* La [**Zone de préférences**](#zone-preferences), pour régler les préférences d’interface principalement
+* La [**Zone de préférences**](#zone-preferences), pour régler les préférences d’interface principalement (et voir les outils utiles).
 * La [**Zone d’enregistrement**](#zone-enregistrement). Pour enregistrer les tâches, les modifier ainsi que régler les paramètres généraux et les valeurs par défaut.
 
 <a name="zone-travail"></a>
@@ -60,7 +86,7 @@ Pour régler ce mode, rejoindre les préférences (⚙️) et choisir le mode «
 
 ## Mode Electron
 
-Pour pouvoir enrouler l’application à l’intérieur d’une application *Electron*, nous avons besoin de mettre son code dans le dossier `./Electron`. Il faut donc veiller à être dans le bon dossier lorsqu’on joue une commande.
+Pour pouvoir enrouler l’application à l’intérieur d’une application *Electron*, nous avons besoin de mettre son code dans le dossier `./electron`. Il faut donc veiller à être dans le bon dossier lorsqu’on joue une commande.
 
 Voici un petit rappel :
 
