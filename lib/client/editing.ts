@@ -129,6 +129,9 @@ class Editing {
           if (await this.unabledToFindScript(newValue)){
             Object.assign(changeset.errors, {'script': t('error.data.script_unfound', [newValue])});
             ++ errorCount;
+          } else if (await this.isNotExecutable(newValue)){
+            Object.assign(changeset.errors, {'script': t('error.data.script_not_executable', [newValue])});
+            ++ errorCount;
           }
         }
         break;
@@ -152,6 +155,11 @@ class Editing {
   private async unabledToFindScript(script: string): Promise<boolean> {
     const retour = await postToServer('/check/file-existence', {process: 'Editing.unabledToFindScript', file: script}) as any;
     return retour.ok && retour.fileExists === false;
+  }
+
+  private async isNotExecutable(script: string): Promise<boolean> {
+    const retour = await postToServer('/check/file-executable', {process: 'Editing.isNotExecutable', file: script}) as any;
+    return retour.ok && retour.isExecutable === false;
   }
 
   getTaskDataIn(form: HTMLDivElement): WorkType {

@@ -1,10 +1,9 @@
 import express from 'express';
 import path from 'path';
-import yaml from 'js-yaml';
 import { HOST, PORT } from '../../public/js/constants';
 import { Work } from "./work";
 import { prefs } from './prefs';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, statSync } from 'fs';
 import { execFileSync, execSync } from 'child_process';
 import type { RecType, WorkType } from '../shared/types';
 import { activTracker } from './activityTracker';
@@ -203,6 +202,13 @@ app.post('/check/file-existence', (req, res) => {
   const dreq = req.body;
   const fileExists: boolean = existsSync(dreq.file);
   res.json(Object.assign(dreq, {ok: true, fileExists: fileExists, error: ''}));
+})
+
+app.post('/check/file-executable', (req, res) => {
+  const dreq = req.body;
+  const stats = statSync(dreq.file);
+  const isExecutable = !!(stats.mode & 0o111);
+  res.json(Object.assign(dreq, {ok: true, isExecutable, error: ''}));
 })
 
 app.post('/tool/reset-cycle', async (req, res) => {
