@@ -4,7 +4,7 @@ export type RecType = {[x: string]: any};
 
 export type ButtonType = {
   text: string;
-  onclick: Function;
+  onclick: Function | string;
   role?: 'default' | 'cancel';
 }
 

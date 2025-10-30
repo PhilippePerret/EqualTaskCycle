@@ -6,6 +6,7 @@ import { listenBtn, postToServer } from "../shared/utils";
 import { t } from '../shared/Locale';
 import { Work } from "./work";
 import log from 'electron-log/renderer';
+import { Dialog } from "./Dialog";
 
 class Editing {
 
@@ -29,32 +30,7 @@ class Editing {
    * au script etc.)
    */
   private async collectTaskData(): Promise<WorkType[]> {
-    console.info("originalWorks", this.originalWorks);
-    this.modifiedWorks = {};
-    this.taskContainer.querySelectorAll('.editing-form-work').forEach( (form: HTMLDivElement) => {
-      const wdata = this.getTaskDataIn(form);
-      if (wdata.id === '') { wdata.id = this.getIdFromProject(wdata.project) }
-      Object.assign(this.modifiedWorks, {[wdata.id]: wdata});
-    });
-    console.info("modifiedWorks", this.modifiedWorks);
-    // Relève des changements
-    this.changesetWorks = {}
-    Object.entries(this.modifiedWorks).forEach(([idw, work]:[string, WorkType]) => {
-      const originalWork = (this.originalWorks[idw] as any) || {}; // creating
-      const modifiedWork = work as any;
-      // console.log("originalWork = ", originalWork);
-      // console.log("modifiedWork = ", modifiedWork);
-      Object.assign(this.changesetWorks, {[idw]: {id: idw, count: 0, change: [], errors: {}}});
-      for(var prop of WORK_PROPS){
-        const changeset = this.changesetWorks[idw] as any;
-        // console.log("Compare '%s' avec '%s' (%s) et '%s' (%s) sont %s", prop, modifiedWork[prop], typeof modifiedWork[prop], originalWork[prop], typeof originalWork[prop], modifiedWork[prop] !== originalWork[prop] ? 'différent' : 'égaux');
-        if (modifiedWork[prop] !== originalWork[prop]) {
-          (this.changesetWorks[idw] as any).count ++;
-          (this.changesetWorks[idw] as any).change.push(prop);
-        }
-      }
-    });
-    console.info("changesetWorks avant", this.changesetWorks);
+    this.retreaveWorksDiff();
     // Étude des problèmes éventuels
     let errorCount = 0;
     for(const [idw, changeset] of Object.entries(this.changesetWorks)){
@@ -351,9 +327,85 @@ class Editing {
     }
   }
 
-  // Pour finir l'édition et revenir au panneau principal
-  stopEditing(){
+  // 
+  /**
+   * Pour finir l'édition et revenir au panneau principal
+   * 
+   * Mais on doit vérifier qu'aucune chose ne soit à enregistrer,
+   * une nouvelle tâche, une suppression de tâche ou autre. Pour
+   * ce faire, on compare la liste originale avec la liste actuelle.
+   */
+  async stopEditing(){
+    console.log("-> stopEditing")
+    if (this.isOriginalListDifferentFromCurrent()){
+      const retour = await (this.closeConfirmDialog.showAsync());
+      if (retour === 'cancel') { 
+        log.info("Abandon de la fermeture");
+        return;
+      }
+    } else {
+      console.log("Aucune changement noté.");
+    }
     ui.toggleSection('work');
+    console.log("<- stopEditing")
+  }
+
+  private get closeConfirmDialog(): Dialog{
+    return this._closeconfdial || (this._closeconfdial = new Dialog({
+        title: t('ui.title.confirmation_close'),
+        message: t('ui.text.when_works_modified_add_or_remove'),
+        buttons: [
+          {text: t('ui.button.close_anyway'), onclick: 'close-even'},
+          {text: t('ui.button.abandon'), role: 'default', onclick: 'cancel'}
+        ],
+        icon: 'images/icon.png'
+      }))
+  }
+  private _closeconfdial!: Dialog;
+  /**
+   * Return True if list of works has changed (creation, deletion, change)
+   */
+  isOriginalListDifferentFromCurrent(): boolean {
+    return this.retreaveWorksDiff() > 0;
+  }
+
+
+  /**
+   * Fonction qui va renseigner this.modifiedWorks avec les données
+   * actuellement affichées/modifiées pour pouvoir ensuite contrôler
+   * les changements (this.changesetWorks).
+   * 
+   * @return Le nombre de changements enregistrés
+   */
+  private retreaveWorksDiff(): number {
+    console.info("originalWorks", this.originalWorks);
+    this.modifiedWorks = {};
+    this.taskContainer.querySelectorAll('.editing-form-work').forEach( (form: HTMLDivElement) => {
+      const wdata = this.getTaskDataIn(form);
+      if (wdata.id === '') { wdata.id = this.getIdFromProject(wdata.project) }
+      Object.assign(this.modifiedWorks, {[wdata.id]: wdata});
+    });
+    console.info("modifiedWorks", this.modifiedWorks);
+    // Relève des changements
+    this.changesetWorks = {};
+    let totalChangeCount = 0;
+    Object.entries(this.modifiedWorks).forEach(([idw, work]:[string, WorkType]) => {
+      const originalWork = (this.originalWorks[idw] as any) || {}; // creating
+      const modifiedWork = work as any;
+      // console.log("originalWork = ", originalWork);
+      // console.log("modifiedWork = ", modifiedWork);
+      Object.assign(this.changesetWorks, {[idw]: {id: idw, count: 0, change: [], errors: {}}});
+      for(var prop of WORK_PROPS){
+        // console.log("Compare '%s' avec '%s' (%s) et '%s' (%s) sont %s", prop, modifiedWork[prop], typeof modifiedWork[prop], originalWork[prop], typeof originalWork[prop], modifiedWork[prop] !== originalWork[prop] ? 'différent' : 'égaux');
+        if (modifiedWork[prop] !== originalWork[prop]) {
+          (this.changesetWorks[idw] as any).count ++;
+          (this.changesetWorks[idw] as any).change.push(prop);
+          ++ totalChangeCount;
+        }
+      }
+    });
+    console.info("changesetWorks", this.changesetWorks);
+    return totalChangeCount;
   }
 
   init(){

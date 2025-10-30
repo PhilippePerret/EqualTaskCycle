@@ -17636,6 +17636,13 @@ var import_renderer = __toESM(require_renderer2(), 1);
 
 class Dialog {
   data;
+  static items = {};
+  static get(dialogId) {
+    return this.items[dialogId];
+  }
+  static register(dialog) {
+    Object.assign(this.items, { [dialog.id]: dialog });
+  }
   _built = false;
   fallbackOnTimeout = () => {};
   timer;
@@ -17644,8 +17651,14 @@ class Dialog {
   box;
   title;
   message;
+  get id() {
+    return this.data.id;
+  }
   constructor(data) {
     this.data = data;
+    if (this.data.id) {
+      Dialog.register(this);
+    }
   }
   show(values2 = undefined) {
     import_renderer.default.info("-> Dialog.show");
@@ -17657,6 +17670,22 @@ class Dialog {
       this.timer = setTimeout(this.onTimeout.bind(this), this.data.timeout * 1000);
     }
     import_renderer.default.info("<- Dialog.show");
+  }
+  async showAsync(values2 = undefined) {
+    import_renderer.default.info("-> Dialog.showAsync");
+    return new Promise((resolve2, _reject) => {
+      this.resolve = resolve2;
+      this.data.buttons.forEach((button) => {
+        if (typeof button.onclick !== "function") {
+          button.onclick = this.onClickButtonWithValue.bind(this, button.onclick);
+        }
+      });
+      this.show(values2);
+    });
+  }
+  resolve;
+  onClickButtonWithValue(value, ev) {
+    this.resolve(value);
   }
   close() {
     if (this.timer) {
@@ -17710,7 +17739,6 @@ class Dialog {
     }
   }
   build() {
-    import_renderer.default.info("-> Dialog.build()");
     const o = document.createElement("DIV");
     o.className = "dialog hidden";
     if (this.data.title) {
@@ -17745,7 +17773,6 @@ class Dialog {
       }
       bts.appendChild(b);
     });
-    import_renderer.default.info("<- Dialog.build()");
     this.box = o;
     document.body.appendChild(this.box);
     this._built = true;
@@ -18745,7 +18772,6 @@ init_flash();
 init_utils();
 init_Locale();
 var import_renderer4 = __toESM(require_renderer2(), 1);
-
 class Editing {
   originalWorks;
   modifiedWorks;
@@ -18758,30 +18784,7 @@ class Editing {
   }
   _configcont;
   async collectTaskData() {
-    console.info("originalWorks", this.originalWorks);
-    this.modifiedWorks = {};
-    this.taskContainer.querySelectorAll(".editing-form-work").forEach((form) => {
-      const wdata = this.getTaskDataIn(form);
-      if (wdata.id === "") {
-        wdata.id = this.getIdFromProject(wdata.project);
-      }
-      Object.assign(this.modifiedWorks, { [wdata.id]: wdata });
-    });
-    console.info("modifiedWorks", this.modifiedWorks);
-    this.changesetWorks = {};
-    Object.entries(this.modifiedWorks).forEach(([idw, work]) => {
-      const originalWork = this.originalWorks[idw] || {};
-      const modifiedWork = work;
-      Object.assign(this.changesetWorks, { [idw]: { id: idw, count: 0, change: [], errors: {} } });
-      for (var prop of WORK_PROPS) {
-        const changeset = this.changesetWorks[idw];
-        if (modifiedWork[prop] !== originalWork[prop]) {
-          this.changesetWorks[idw].count++;
-          this.changesetWorks[idw].change.push(prop);
-        }
-      }
-    });
-    console.info("changesetWorks avant", this.changesetWorks);
+    this.retreaveWorksDiff();
     let errorCount = 0;
     for (const [idw, changeset] of Object.entries(this.changesetWorks)) {
       errorCount = await this.checkChangeset(changeset, errorCount);
@@ -19035,8 +19038,62 @@ class Editing {
       curWork.dispatchData();
     }
   }
-  stopEditing() {
+  async stopEditing() {
+    console.log("-> stopEditing");
+    if (this.isOriginalListDifferentFromCurrent()) {
+      const retour = await this.closeConfirmDialog.showAsync();
+      if (retour === "cancel") {
+        import_renderer4.default.info("Abandon de la fermeture");
+        return;
+      }
+    } else {
+      console.log("Aucune changement noté.");
+    }
     ui.toggleSection("work");
+    console.log("<- stopEditing");
+  }
+  get closeConfirmDialog() {
+    return this._closeconfdial || (this._closeconfdial = new Dialog({
+      title: t("ui.title.confirmation_close"),
+      message: t("ui.text.when_works_modified_add_or_remove"),
+      buttons: [
+        { text: t("ui.button.close_anyway"), onclick: "close-even" },
+        { text: t("ui.button.abandon"), role: "default", onclick: "cancel" }
+      ],
+      icon: "images/icon.png"
+    }));
+  }
+  _closeconfdial;
+  isOriginalListDifferentFromCurrent() {
+    return this.retreaveWorksDiff() > 0;
+  }
+  retreaveWorksDiff() {
+    console.info("originalWorks", this.originalWorks);
+    this.modifiedWorks = {};
+    this.taskContainer.querySelectorAll(".editing-form-work").forEach((form) => {
+      const wdata = this.getTaskDataIn(form);
+      if (wdata.id === "") {
+        wdata.id = this.getIdFromProject(wdata.project);
+      }
+      Object.assign(this.modifiedWorks, { [wdata.id]: wdata });
+    });
+    console.info("modifiedWorks", this.modifiedWorks);
+    this.changesetWorks = {};
+    let totalChangeCount = 0;
+    Object.entries(this.modifiedWorks).forEach(([idw, work]) => {
+      const originalWork = this.originalWorks[idw] || {};
+      const modifiedWork = work;
+      Object.assign(this.changesetWorks, { [idw]: { id: idw, count: 0, change: [], errors: {} } });
+      for (var prop of WORK_PROPS) {
+        if (modifiedWork[prop] !== originalWork[prop]) {
+          this.changesetWorks[idw].count++;
+          this.changesetWorks[idw].change.push(prop);
+          ++totalChangeCount;
+        }
+      }
+    });
+    console.info("changesetWorks", this.changesetWorks);
+    return totalChangeCount;
   }
   init() {
     this.observeButtons();

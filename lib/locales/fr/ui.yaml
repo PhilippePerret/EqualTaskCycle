@@ -8,10 +8,14 @@ ui:
     name: "ETC"
     mode: '' # renseigné au chargement
   button:
+    abandon: Renoncer
+    cancel: Annuler
     change: UNE AUTRE
     close: Fermer
+    close_anyway: Fermer malgré tout
     dont_save_time_and_report: Ne sauver ni temps ni rapport
     finish: Finir
+    giveUp: Renoncer
     not_anymore: Non
     ok: OK
     open_min: ouvrir
@@ -27,6 +31,7 @@ ui:
   title:
     config_data: Données de configuration
     confirmation_required: Confirmation requise
+    confirmation_close: Confirmation de fermeture
     content: Contenu
     help: Aide
     left: Restant # Time Left
@@ -94,6 +99,7 @@ ui:
     to_stop_and_next: Pour arrêter la tâche et passer à la suivante
     total_duration: Durée totale
     ui_theme: Thème interface
+    when_works_modified_add_or_remove: "Des travaux ont été modifiés, ajoutés ou supprimés. Voulez-vous vraiment fermer et perdre ces changements ?"
     your_project: "Votre projet/Tâche"
     description_stop_report_modele: |
       Description de ce qu'il faudra faire à la prochaine session.

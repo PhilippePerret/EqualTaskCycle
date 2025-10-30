@@ -17809,6 +17809,13 @@ var import_renderer = __toESM(require_renderer2(), 1);
 
 class Dialog {
   data;
+  static items = {};
+  static get(dialogId) {
+    return this.items[dialogId];
+  }
+  static register(dialog) {
+    Object.assign(this.items, { [dialog.id]: dialog });
+  }
   _built = false;
   fallbackOnTimeout = () => {};
   timer;
@@ -17817,8 +17824,14 @@ class Dialog {
   box;
   title;
   message;
+  get id() {
+    return this.data.id;
+  }
   constructor(data) {
     this.data = data;
+    if (this.data.id) {
+      Dialog.register(this);
+    }
   }
   show(values2 = undefined) {
     import_renderer.default.info("-> Dialog.show");
@@ -17830,6 +17843,22 @@ class Dialog {
       this.timer = setTimeout(this.onTimeout.bind(this), this.data.timeout * 1000);
     }
     import_renderer.default.info("<- Dialog.show");
+  }
+  async showAsync(values2 = undefined) {
+    import_renderer.default.info("-> Dialog.showAsync");
+    return new Promise((resolve2, _reject) => {
+      this.resolve = resolve2;
+      this.data.buttons.forEach((button) => {
+        if (typeof button.onclick !== "function") {
+          button.onclick = this.onClickButtonWithValue.bind(this, button.onclick);
+        }
+      });
+      this.show(values2);
+    });
+  }
+  resolve;
+  onClickButtonWithValue(value, ev) {
+    this.resolve(value);
   }
   close() {
     if (this.timer) {
@@ -17883,7 +17912,6 @@ class Dialog {
     }
   }
   build() {
-    import_renderer.default.info("-> Dialog.build()");
     const o = document.createElement("DIV");
     o.className = "dialog hidden";
     if (this.data.title) {
@@ -17918,7 +17946,6 @@ class Dialog {
       }
       bts.appendChild(b);
     });
-    import_renderer.default.info("<- Dialog.build()");
     this.box = o;
     document.body.appendChild(this.box);
     this._built = true;

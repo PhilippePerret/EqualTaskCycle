@@ -1,22 +1,54 @@
 /**
  * Une librairie pour "dialoguer" avec l'utilisateur.
  * 
+ * Affiche une belle fenêtre macOs-like pour permettre à l'user de
+ * faire un choix ou confirmer une action.
+ * 
+ * La fenêtre fonctionne en mode synchrone (show) ou asynchrone
+ * (showAsync).
+ * 
+ * MODE SYNCHRONE
+ * --------------
+ * On définit les données comme ci-dessous en précisant quelle 
+ * fonction devra être invoquée par quel bouton.
+ * (onclick: <Function>)
+ * 
+ * Et on fait : 
+ * 
+ *  new Dialog({...}).show([...]);
+ *  // (on passe tout de suite ici)
+ * 
+ * MODE ASYNCHRONE
+ * ---------------
+ * On définit les données comme ci-dessous en précisant quelle
+ * VALEUR devra être renvoyée par quel bouton
+ * (onclick: <Any value>)
+ * 
+ * Et on fait :
+ * 
+ *  const retour: any = await (new Dialog({...}).showAsync([...]))
+ *  if (retour = ....) { .... }
+ * 
  * Usage
  * -----
  *  
  *  // Définition du dialogue
  *  const data = {
+ *    id: "identifiant unique optionnel",
  *    message: "Le message affiché avec _0_ comme texte variable",
  *    title: "Le titre du message",
  *    buttons: [ // boutons dans l'ordre
- *      {text: "OK", onclick: <methode to call>},
- *      idem (ajouter 'default: true' pour le bouton par défaut et 
- *      'cancel: true' pour le bouton d'annulation)
+ *      {text: "OK", onclick: <methode to call | any value>[, role: 'default'|'cancel']},
  *    ],
- *    icon: '/path/to/icon.png',
+ *    icon: 'images/icon.png',
  *    timeout: <nombre secondes>, // si la fenêtre doit se fermer toute seule
  *    onTimeout: <Function> // ce qu'il faut faire en cas de timeout
  *  }
+ * 
+ * L'idée est de faire des fenêtres réutilisables. En précisant l'id, on
+ * peut enregistrer une fenêtre et la rappeler par Dialog.get(id).
+ * On met les nouvelles valeurs dans le premier argument de show ou 
+ * showAsync pour modifier le dialogue.
  *  const dial = new Dialog(data);
  *  dial.show(["valeur pour _0_", "valeur pour _1_", etc.])
  *  // Attend et traite la réponse en fonction de +data+
@@ -29,6 +61,26 @@ import { stopEvent } from '../../public/js/dom';
 
 export class Dialog {
 
+  private static items: {[x: string]: Dialog} = {};
+  /**
+   * Retourne une fenêtre de dialogue enregistrée
+   * 
+   * Mettre un id dans les données pour l'enregistrer
+   * Mettre les nouvelles valeurs en appelant show ou showAsync pour
+   * l'adapter à la situation.
+   * 
+   * @param dialogId Identifiant de la fenêtre Dialog enregistrée
+   */
+  public static get(dialogId: string){
+    return this.items[dialogId];
+  }
+
+  private static register(dialog: Dialog) {
+    Object.assign(this.items, {[dialog.id as string]: dialog});
+  }
+
+  // ==== INSTANCE ====
+
   private _built: boolean = false;
   private fallbackOnTimeout: Function = ()=>{}
   private timer?: number;
@@ -37,9 +89,11 @@ export class Dialog {
   private box!: HTMLDivElement; // La boite principale
   private title?: HTMLDivElement;
   private message!: HTMLDivElement;
+  public get id(){return this.data.id }
 
   constructor(
     private data:{
+      id?: string,
       title?: string,
       message: string,
       defaultAnswer?: string, // pour une demande
@@ -48,7 +102,9 @@ export class Dialog {
       onTimeout?: Function,
       icon: string
     }
-  ){}
+  ){
+    if (this.data.id) { Dialog.register(this)}
+  }
 
   show(values: string[] | undefined = undefined){
     log.info('-> Dialog.show');
@@ -61,6 +117,28 @@ export class Dialog {
       this.timer = setTimeout(this.onTimeout.bind(this), this.data.timeout * 1000);
     }
     log.info('<- Dialog.show');
+  }
+
+  async showAsync(values: string[] | undefined = undefined): Promise<any> {
+    log.info('-> Dialog.showAsync');
+    return new Promise((resolve: Function, _reject: Function) => {
+      this.resolve = resolve;
+      // this.reject = reject;
+      this.data.buttons.forEach((button: ButtonType) => {
+        if ('function' !== typeof button.onclick){
+          button.onclick = this.onClickButtonWithValue.bind(this, button.onclick);
+        }
+      });
+      this.show(values);
+    })
+  }
+  private resolve?: Function;
+  // private reject?: Function;
+
+  // Quand onclick est défini par une valeur plutôt que par une
+  // fonction
+  private onClickButtonWithValue(value: any, ev: MouseEvent){
+    (this.resolve as Function)(value);
   }
 
   private close(){
@@ -118,8 +196,6 @@ export class Dialog {
   }
 
   build(){
-    log.info('-> Dialog.build()');
-    
     const o = document.createElement('DIV') as HTMLDivElement;
     o.className = 'dialog hidden';
     if (this.data.title) {
@@ -154,7 +230,6 @@ export class Dialog {
       }
       bts.appendChild(b);
     })
-    log.info('<- Dialog.build()');
     this.box = o;
     document.body.appendChild(this.box);
     this._built = true;

@@ -8,10 +8,14 @@ ui:
     name: "ETC"
     mode: '' # renseigné au chargement
   button:
+    abandon: Abandon
+    cancel: Cancel
     change: CHANGE
     close: Close
+    close_anyway: Close anyway
     dont_save_time_and_report: Don’t save Time and Report
     finish: Finish
+    giveUp: Abandon
     not_anymore: Not anymore
     ok: OK
     open_min: open
@@ -27,6 +31,7 @@ ui:
   title:
     config_data: Config Data
     confirmation_required: Confirmation required
+    confirmation_close: Close confirmation
     content: Content
     help: Help
     left: Left # Time Left
@@ -94,6 +99,7 @@ ui:
     to_stop_and_next: To stop the task and move to the next one
     total_duration: Total duration
     ui_theme: UI Theme
+    when_works_modified_add_or_remove: "Some works have been modified, added, or removed. Do you really want to close? (all changes will be lost)"
     your_project: "Your project/Task"
     description_stop_report_modele: |
       Description of what will need to be done in the next session.
