@@ -61,20 +61,20 @@ class Flash {
   static calcReadingTime(str) {
     return str.split(" ").length * 300 * 4;
   }
-  static notice(message) {
+  static notice(message, options) {
     this.buildMessage({ content: message, type: "notice" });
   }
-  static info(message) {
-    return this.notice(message);
+  static info(message, options) {
+    return this.notice(message, options);
   }
-  static success(message) {
-    this.buildMessage({ content: message, type: "success" });
+  static success(message, options) {
+    this.buildMessage({ content: message, type: "success", options });
   }
-  static warning(message) {
-    this.buildMessage({ content: message, type: "warning" });
+  static warning(message, options) {
+    this.buildMessage({ content: message, type: "warning", options });
   }
-  static error(message) {
-    this.buildMessage({ content: message, type: "error" });
+  static error(message, options) {
+    this.buildMessage({ content: message, type: "error", options });
   }
   static buildMessage(data) {
     new FlashMessage(data);
@@ -95,9 +95,10 @@ class Flash {
 class FlashMessage {
   constructor(data) {
     this.data = data;
+    this.options = data.options || {};
     this.build();
     this.show();
-    if (this.type != "error")
+    if (this.type != "error" || this.options.keep === false)
       this.temporize();
     this.observe();
   }

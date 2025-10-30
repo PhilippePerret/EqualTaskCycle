@@ -9,6 +9,13 @@ body {
 .tiny {font-size: 0.8em;}
 .mono {font-family: monospace, 'Courier New', Courier}
 
+.error, .error * {
+  border: 1px solid red;
+}
+.error, .error * {
+  background-color: rgb(221, 148, 148);
+}
+
 .w120 {width: 120px;}
 .w180 {width: 180px;}
 .w200 {width: 200px;}
@@ -172,6 +179,7 @@ div.buttons {
 }
 .row-flex {
   display: flex;
+  flex-wrap: wrap;
 }
 .row-flex, .row {
   margin-bottom: 0.5em;
@@ -190,6 +198,15 @@ div.buttons {
   flex: 1 1 auto;
   margin-left: 0!important;
 }
+.row-flex div.err {
+  flex-basis: 100%;
+  margin-left: 160px;
+  background-color: red;
+  font-family: arial, helvetica, geneva;
+  font-size: 10pt;
+  color: white;
+}
+
 .row-flex input + label {
   flex: 1 1 auto;
   margin-left: 0.5em;

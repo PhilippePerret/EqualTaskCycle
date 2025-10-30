@@ -17124,20 +17124,20 @@ class Flash {
   static calcReadingTime(str2) {
     return str2.split(" ").length * 300 * 4;
   }
-  static notice(message) {
+  static notice(message, options) {
     this.buildMessage({ content: message, type: "notice" });
   }
-  static info(message) {
-    return this.notice(message);
+  static info(message, options) {
+    return this.notice(message, options);
   }
-  static success(message) {
-    this.buildMessage({ content: message, type: "success" });
+  static success(message, options) {
+    this.buildMessage({ content: message, type: "success", options });
   }
-  static warning(message) {
-    this.buildMessage({ content: message, type: "warning" });
+  static warning(message, options) {
+    this.buildMessage({ content: message, type: "warning", options });
   }
-  static error(message) {
-    this.buildMessage({ content: message, type: "error" });
+  static error(message, options) {
+    this.buildMessage({ content: message, type: "error", options });
   }
   static buildMessage(data) {
     new FlashMessage(data);
@@ -17158,9 +17158,10 @@ class Flash {
 class FlashMessage {
   constructor(data) {
     this.data = data;
+    this.options = data.options || {};
     this.build();
     this.show();
-    if (this.type != "error")
+    if (this.type != "error" || this.options.keep === false)
       this.temporize();
     this.observe();
   }
@@ -18737,13 +18738,13 @@ var DEFAULT_WORK = {
   lastWorkedAt: null,
   report: ""
 };
+var WORK_PROPS = Object.keys(DEFAULT_WORK);
 
 // lib/client/editing.ts
 init_flash();
 init_utils();
 init_Locale();
 var import_renderer4 = __toESM(require_renderer2(), 1);
-var WorkProps = Object.keys(DEFAULT_WORK);
 
 class Editing {
   originalWorks;
@@ -18757,94 +18758,137 @@ class Editing {
   }
   _configcont;
   async collectTaskData() {
-    let newTaskData = [];
+    console.info("originalWorks", this.originalWorks);
     this.modifiedWorks = {};
-    this.taskContainer.querySelectorAll(".editing-form-task").forEach((form) => {
+    this.taskContainer.querySelectorAll(".editing-form-work").forEach((form) => {
       const wdata = this.getTaskDataIn(form);
       if (wdata.id === "") {
         wdata.id = this.getIdFromProject(wdata.project);
       }
       Object.assign(this.modifiedWorks, { [wdata.id]: wdata });
     });
+    console.info("modifiedWorks", this.modifiedWorks);
     this.changesetWorks = {};
     Object.entries(this.modifiedWorks).forEach(([idw, work]) => {
-      const originalWork = this.originalWorks[idw];
-      const modifiedWork = work[idw];
-      for (var prop in modifiedWork) {
-        Object.assign(this.changesetWorks, { [idw]: { count: 0, change: [], errors: {} } });
+      const originalWork = this.originalWorks[idw] || {};
+      const modifiedWork = work;
+      Object.assign(this.changesetWorks, { [idw]: { id: idw, count: 0, change: [], errors: {} } });
+      for (var prop of WORK_PROPS) {
         const changeset = this.changesetWorks[idw];
         if (modifiedWork[prop] !== originalWork[prop]) {
-          changeset.count++;
-          changeset.change.push(prop);
+          this.changesetWorks[idw].count++;
+          this.changesetWorks[idw].change.push(prop);
         }
       }
     });
+    console.info("changesetWorks avant", this.changesetWorks);
     let errorCount = 0;
-    Object.entries(this.changesetWorks).forEach(async ([idw, changeset]) => {
-      import_renderer4.default.info("Check des changements du travail ", idw);
-      if (changeset.count === 0) {
-        return;
-      }
-      changeset.change.forEach(async (prop) => {
-        const newValue = this.modifiedWorks[idw][prop];
-        switch (prop) {
-          case "project":
-            if (newValue === "") {
-              Object.assign(changeset.errors, { project: t("error.data.undefined_project") });
-              ++errorCount;
-            }
-            break;
-          case "id":
-            if (await this.IDAlreadyExists(newValue)) {
-              Object.assign(changeset.errors, { id: t("error.data.id_exists", [newValue]) });
-              ++errorCount;
-            }
-            break;
-          case "folder":
-            if (newValue === "") {
-              Object.assign(changeset.errors, { folder: t("error.data.folder_required") });
-              ++errorCount;
-            } else if (await this.unabledToFindProjectFolder(newValue)) {
-              Object.assign(changeset.errors, { folder: t("error.data.folder_unfound", [newValue]) });
-              ++errorCount;
-            }
-            break;
-          case "script":
-            if (newValue !== "") {
-              if (await this.unabledToFindScript(newValue)) {
-                Object.assign(changeset.errors, { script: t("error.data.script_unfound", [newValue]) });
-                ++errorCount;
-              }
-            }
-            break;
-        }
-      });
+    for (const [idw, changeset] of Object.entries(this.changesetWorks)) {
+      errorCount = await this.checkChangeset(changeset, errorCount);
+    }
+    console.info("Fin du check des modifications (%s erreurs)", errorCount);
+    WORK_PROPS.forEach((prop) => {
+      this.taskContainer.querySelectorAll("div.err").forEach((o) => o.innerHTML = "");
+      this.taskContainer.querySelectorAll(".error").forEach((o) => o.classList.remove("error"));
     });
-    import_renderer4.default.info("Fin du check des modifications (%s erreurs)", errorCount);
     if (errorCount > 0) {
+      Flash.error(t("error.data.error_found", [String(errorCount)]), { keep: false });
+      for (let [idw, changeset] of Object.entries(this.changesetWorks)) {
+        if (changeset.count === 0) {
+          continue;
+        }
+        const form = DGet(`div#work-${idw}`);
+        for (const [prop, errMsg] of Object.entries(changeset.errors)) {
+          const oprop = DGet(`.form-work-${prop}`, form);
+          const oErr = DGet(`.form-work-${prop}-err`, form);
+          oprop.classList.add("error");
+          oErr.innerHTML = errMsg;
+        }
+      }
+      console.info("DES ERREURS SONT SURVENUES");
       return [];
+    } else {
+      return Object.values(this.changesetWorks).filter((ch) => ch.count > 0).map((ch) => this.modifiedWorks[ch.id]);
     }
   }
+  async checkChangeset(changeset, errorCount) {
+    const idw = changeset.id;
+    console.info("Check des changements du travail ", idw);
+    if (changeset.count === 0) {
+      return errorCount;
+    }
+    for (const prop of changeset.change) {
+      const newValue = this.modifiedWorks[idw][prop];
+      switch (prop) {
+        case "project":
+          if (newValue === "") {
+            Object.assign(changeset.errors, { project: t("error.data.undefined_project") });
+            ++errorCount;
+          }
+          break;
+        case "id":
+          if (await this.IDAlreadyExists(newValue)) {
+            Object.assign(changeset.errors, { id: t("error.data.id_exists", [newValue]) });
+            ++errorCount;
+          }
+          break;
+        case "folder":
+          if (newValue === "") {
+            Object.assign(changeset.errors, { folder: t("error.data.folder_required") });
+            ++errorCount;
+          } else if (await this.unabledToFindProjectFolder(newValue)) {
+            Object.assign(changeset.errors, { folder: t("error.data.folder_unfound", [newValue]) });
+            ++errorCount;
+          }
+          break;
+        case "script":
+          if (newValue !== "") {
+            if (await this.unabledToFindScript(newValue)) {
+              Object.assign(changeset.errors, { script: t("error.data.script_unfound", [newValue]) });
+              ++errorCount;
+            }
+          }
+          break;
+      }
+    }
+    console.info("errorCount fin checkChangeset: %i", errorCount);
+    return errorCount;
+  }
   async IDAlreadyExists(id) {
-    const retour = await postToServer("/task/check-id-existence", { id, process: "Edition.IDAlreadyExists" });
+    const retour = await postToServer("/check/id-existence", { id, process: "Edition.IDAlreadyExists" });
     return retour.ok && retour.idExists;
   }
   async unabledToFindProjectFolder(folder) {
-    const retour = await postToServer("/task/check-folder-existence", { process: "Editing.unfoundProjectFolder", folder });
+    const retour = await postToServer("/check/folder-existence", { process: "Editing.unfoundProjectFolder", folder });
     console.log("Retour check folder", retour);
     return retour.ok && retour.folderExists === false;
   }
   async unabledToFindScript(script) {
-    const retour = await postToServer("/script/check-existence", { process: "Editing.unabledToFindScript", script });
-    return retour.ok && retour.scriptExiste === false;
+    const retour = await postToServer("/check/file-existence", { process: "Editing.unabledToFindScript", file: script });
+    return retour.ok && retour.fileExists === false;
   }
   getTaskDataIn(form) {
     const taskData = {};
-    WorkProps.forEach((prop) => {
-      let value = DGet(`.form-task-${prop}`, form).value;
-      if (value !== "") {
-        Object.assign(taskData, { [prop]: value });
+    WORK_PROPS.forEach((prop) => {
+      const field = DGet(`.form-work-${prop}`, form);
+      let value = field.value.trim();
+      const dataFieldType = field.dataset.type;
+      if (value === "null" || value === null) {
+        value = null;
+      } else {
+        switch (dataFieldType) {
+          case "string":
+            value = String(value);
+            break;
+          case "number":
+            value = Number(value);
+            break;
+          case "number-or-nil":
+            value = value === "" ? null : Number(value);
+            break;
+        }
       }
+      Object.assign(taskData, { [prop]: value });
     });
     return taskData;
   }
@@ -18866,10 +18910,11 @@ class Editing {
     });
   }
   get formClone() {
-    return this._formtemp || (this._formtemp = this.section.querySelector(".editing-form-task"));
+    return this._formtemp || (this._formtemp = this.section.querySelector(".editing-form-work"));
   }
   createNewTask(work) {
     const owork = this.formClone.cloneNode(true);
+    owork.id = `work-${work.id}`;
     this.taskContainer.appendChild(owork);
     this.peupleWorkForm(owork, work);
     this.observeWorkForm(owork, work);
@@ -18879,11 +18924,14 @@ class Editing {
     return owork;
   }
   peupleWorkForm(obj, work) {
-    WorkProps.forEach((prop) => {
-      console.log("prop: '%s'", prop);
-      const field = DGet(`.form-task-${prop}`, obj);
+    WORK_PROPS.forEach((prop) => {
+      const field = DGet(`.form-work-${prop}`, obj);
       let value = work[prop];
-      field.value = value === undefined ? "" : String(value);
+      if (value === "null") {
+        work[prop] = null;
+        value = null;
+      }
+      field.value = typeof value === "undefined" ? "" : value;
     });
     DGet("span.task-id-disp", obj).innerHTML = work.id;
   }
@@ -18891,7 +18939,7 @@ class Editing {
     listenBtn("up", this.onUp.bind(this, owork), owork);
     listenBtn("down", this.onDown.bind(this, owork), owork);
     listenBtn("remove", this.onRemove.bind(this, work), owork);
-    const menuActive = DGet(".form-task-active", owork);
+    const menuActive = DGet(".form-work-active", owork);
     menuActive.addEventListener("change", (ev) => {
       const actif = menuActive.value === "true";
       owork.classList[actif ? "remove" : "add"]("off");
@@ -18926,11 +18974,11 @@ class Editing {
       active: 0
     });
     owork.scrollIntoView({ behavior: "smooth", block: "start" });
-    owork.querySelector("input.form-task-project").addEventListener("change", this.findIdIfRequied.bind(this, owork));
+    owork.querySelector("input.form-work-project").addEventListener("change", this.findIdIfRequied.bind(this, owork));
   }
   findIdIfRequied(owork, ev) {
-    const projectField = owork.querySelector("input.form-task-project");
-    const idField = owork.querySelector("input.form-task-id");
+    const projectField = owork.querySelector("input.form-work-project");
+    const idField = owork.querySelector("input.form-work-id");
     const dispField = owork.querySelector(".task-id-disp");
     let idProjet;
     if (idField.value === "") {
@@ -18964,9 +19012,12 @@ class Editing {
   async onSaveData() {
     const collectedData = await this.collectTaskData();
     if (collectedData.length === 0) {
-      console.logt("PAS D'ENREGISTREMENT");
+      console.log("--- PAS D'ENREGISTREMENT ---");
       return;
     }
+    console.info("Travaux à enregistrer : ", collectedData);
+    console.info("On ne fait rien pour le moment");
+    return;
     const retour = await postToServer("/tasks/save", { process: "Editing.onSaveData", works: collectedData });
     if (retour.ok) {
       Flash.success(t("task.saved"));

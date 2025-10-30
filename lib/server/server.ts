@@ -193,10 +193,16 @@ app.post('/localization/get-all', (req, res) => {
   res.json(retour);
 });
 
-app.post('/task/check-folder-existence', (req, res) => {
+app.post('/check/folder-existence', (req, res) => {
   const dreq = req.body;
   const folderExists: boolean = existsSync(dreq.folder);
   res.json(Object.assign(dreq, {ok: true, folderExists: folderExists, error: ''}));
+})
+
+app.post('/check/file-existence', (req, res) => {
+  const dreq = req.body;
+  const fileExists: boolean = existsSync(dreq.file);
+  res.json(Object.assign(dreq, {ok: true, fileExists: fileExists, error: ''}));
 })
 
 app.post('/tool/reset-cycle', async (req, res) => {

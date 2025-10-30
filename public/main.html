@@ -113,43 +113,50 @@
       <!-- Container pour afficher et éditer les tâches -->
     </div>
     <!-- TÂCHE À CLONER -->
-    <div class="editing-form-task hidden off" data-id="0" style="width:600px;">
-      <input type="hidden" class="form-task-id" value="" />
-      <input type="hidden" class="form-task-defaultLeftTime" value="" />
-      <input type="hidden" class="form-task-totalTime" value="" />
-      <input type="hidden" class="form-task-cycleTime" value="" />
-      <input type="hidden" class="form-task-leftTime" value="" />
-      <input type="hidden" class="form-task-cycleCount" value="" />
-      <input type="hidden" class="form-task-startedAt" value="" />
-      <input type="hidden" class="form-task-lastWorkedAt" value="" />
-      <input type="hidden" class="form-task-report" value="" />
+    <div id="work-0" class="editing-form-work hidden off" data-id="0" style="width:600px;">
+      <input type="hidden" class="form-work-id" value="" />
+      <input type="hidden" class="form-work-defaultLeftTime" value="" data-type="number" />
+      <input type="hidden" class="form-work-totalTime" value="" data-type="number" />
+      <input type="hidden" class="form-work-cycleTime" value="" data-type="number" />
+      <input type="hidden" class="form-work-leftTime" value="" data-type="number" />
+      <input type="hidden" class="form-work-cycleCount" value="" data-type="number" />
+      <input type="hidden" class="form-work-startedAt" value="" data-type="number-or-nil" />
+      <input type="hidden" class="form-work-lastWorkedAt" value="" data-type="number-or-nil" />
+      <input type="hidden" class="form-work-report" value="" data-type="string" />
 
       <div class="row">
         <span class="task-id-disp tiny mono fright"></span>
-        <select class="form-task-active small">
+        <select class="form-work-active small" data-type="number">
           <option value="1">t(ui.adj.Active_m)</option>
           <option value="0">t(ui.adj.Inactive_m)</option>
         </select>
       </div>
       <div class="row-flex">
         <label>t(ui.title.project)</label>
-        <input type="text" class="form-task-project" />
+        <input type="text" class="form-work-project" data-type="string" />
+        <div class="form-work-project-err err"></div>
       </div>
+
       <div class="row-flex">
         <label>t(ui.title.content)</label>
-        <textarea class="form-task-content"></textarea>
+        <textarea class="form-work-content" data-type="string"></textarea>
+        <div class="form-work-content-err err"></div>
       </div>
       <div class="row-flex">
         <label>t(ui.thing.Folder)</label>
-        <input type="text" class="form-task-folder"/>
+        <input type="text" class="form-work-folder" data-type="string"/>
+        <div class="form-work-folder-err err"></div>
       </div>
       <div class="row-flex">
-        <label>Script</label><input type="text" class="form-task-script"/>
+        <label>Script</label>
+        <input type="text" class="form-work-script" data-type="string"/>
+        <div class="form-work-script-err err"></div>
       </div>
       <div class="row">
         <label>t(ui.thing.Duration)</label>
-        <input type="number" max="1000" min="15" class="form-task-duration"/>
+        <input type="number" max="1000" min="15" class="form-work-duration" data-type="number"/>
         <label>t(ui.thing.minutes)</label>
+        <div class="form-work-duration-err err"></div>
       </div>
       <div class="btns">
         <button class="btn-up" title="t(ui.text.to_move_up)">⬆</button>

@@ -8,11 +8,14 @@ error:
   task_already_changed_today: "Task has been already changed today (only one exemption per day…)."
   unfound_field: "Unfound field: _0_"
   data:
-    undefined_project: Undefined Project Title
+    undefined_project: "Project Title is required."
     id_exists: "_0_ ID is already in use."
-    folder_required: "Folder of work is mandatory (cf. manual)"
-    folder_unfound: "_0_ folder's work is unfound"
-    script_unfound: "_0_ script is unfound"
+    folder_required: "Folder of work is mandatory (cf. manual)."
+    folder_unfound: "this folder of work is unfound."
+    script_unfound: "_0_ script is unfound."
+    script_not_executable: "This script is not executable."
+
+    error_found: "Errors found: _0_."
 files:
   unfound_at_path: "Unfound _0_ at '_1_'"
 locales:

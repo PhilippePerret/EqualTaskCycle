@@ -60,82 +60,82 @@ section#current-work-container div#current-work-times div.libelles span {
   font-size: 9pt;
 }
 
-section#editing div#editing-form-task {
+section#editing div#editing-form-work {
   font-size: 1.2em;
 }
 
-div.editing-form-task {
+div.editing-form-work {
   border-radius: 0.5em;
   padding: 1em 1em 4px 1em;
   margin-bottom: 0.5em;
 }
-body.dark div.editing-form-task {
+body.dark div.editing-form-work {
   border: 1px solid #CCC;
   background-color: #585959;
 }
-body.light div.editing-form-task {
+body.light div.editing-form-work {
   border: 1px solid #5790cd;
   background-color: #afced4
 }
 
-div.editing-form-task input.form-task-project {
+div.editing-form-work input.form-work-project {
   color: white;
   font-size: 1.1em;
   padding:4px 0.5em;
 }
-body.dark div.editing-form-task input.form-task-project {
+body.dark div.editing-form-work input.form-work-project {
   font-weight: bold;
   background-color: #6d1c7c;
 }
-body.light div.editing-form-task input.form-task-project {
+body.light div.editing-form-work input.form-work-project {
   background-color: #5790cd;
 }
 
-div.editing-form-task textarea.form-task-content {
+div.editing-form-work textarea.form-work-content {
   height: 80px;
   font-family: Georgia, serif, 'Times New Roman', Times;
 }
-div.editing-form-task textarea.form-task-content:focus {
+div.editing-form-work textarea.form-work-content:focus {
   font-size: 1.1em;
   height: 180px;
 }
-div.editing-form-task input.form-task-folder,
-div.editing-form-task input.form-task-script {
+div.editing-form-work input.form-work-folder,
+div.editing-form-work input.form-work-script {
   font-size: 11pt;
 }
 
-div.editing-form-task div.btns {
+div.editing-form-work div.btns {
   text-align: right;
   margin-top: -1em;
 }
-div.editing-form-task div.btns button {
+div.editing-form-work div.btns button {
   border: none;
   border-radius: none;
   padding: 0 4px;
   font-size: 12pt;
 }
 
-body.dark div.editing-form-task div.btns button {
+body.dark div.editing-form-work div.btns button {
   background-color: inherit;
   color: white;
 }
-body.light div.editing-form-task div.btns button {
+body.light div.editing-form-work div.btns button {
   background-color: inherit;
   color: black;
 }
-body.dark div.editing-form-task div.btns button:active {
+body.dark div.editing-form-work div.btns button:active {
   background-color: whitesmoke;
   color: black;
 }
-body.light div.editing-form-task div.btns button:active {
+body.light div.editing-form-work div.btns button:active {
   background-color: rgb(4, 202, 4);
   color: white;
 }
 
-div.editing-form-task input.form-task-duration {
+div.editing-form-work input.form-work-duration {
   width: 60px;
 }
 
-div.editing-form-task.off {
+div.editing-form-work.off {
   opacity: 0.5;
 }

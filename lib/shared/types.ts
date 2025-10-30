@@ -40,6 +40,7 @@ export const DEFAULT_WORK = {
   lastWorkedAt: null,
   report: ''
 }
+export const WORK_PROPS = Object.keys(DEFAULT_WORK);
 
 export interface PrefsDataType {
   duree: number;

@@ -6,6 +6,10 @@ const userDataPath = app.getPath('userData');
 const log = require('electron-log/main');
 log.initialize();
 
+const WITH_CONSOLE_DEV = true;
+// const WITH_CONSOLE_DEV = false;
+
+
 let server = null;
 
 const path = require('path');
@@ -68,9 +72,6 @@ app.whenReady().then(() => {
   //*/
 
   startAServer();
-
-
-  const WITH_CONSOLE_DEV = false;
   
   const win = new BrowserWindow({
     x: 10,
