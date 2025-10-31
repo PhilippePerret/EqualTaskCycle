@@ -3,9 +3,8 @@
   "productName": "ETC",
   "description": "Application de gestion cyclique de travaux",
   "author": "Philicare<philippe.perret@yahoo.fr>",
-  "version": "0.4.2",
+  "version": "0.4.17",
   "private": true,
-  "type": "module",
   "main": "electron/main.js",
   "devDependencies": {
     "@electron/rebuild": "^4.0.1",
@@ -13,6 +12,7 @@
     "@types/bun": "latest",
     "@types/express": "^5.0.3",
     "@types/js-yaml": "^4.0.9",
+    "electron": "38.3.0",
     "electron-builder": "^26.0.12"
   },
   "scripts": {
@@ -21,7 +21,8 @@
     "start": "bun pm cache rm && npx electron .",
     "check-locales": "bun run scripts/check_locales.ts",
     "build": "electron-builder",
-    "postinstall": "electron-builder install-app-deps"
+    "postinstall": "electron-builder install-app-deps",
+    "force-vide-cache-macos": "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user"
   },
   "peerDependencies": {
     "typescript": "^5"

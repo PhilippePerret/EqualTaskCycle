@@ -7074,7 +7074,7 @@ function ccount(value, character) {
   return count;
 }
 
-// node_modules/escape-string-regexp/index.js
+// node_modules/mdast-util-find-and-replace/node_modules/escape-string-regexp/index.js
 function escapeStringRegexp(string3) {
   if (typeof string3 !== "string") {
     throw new TypeError("Expected a string");
