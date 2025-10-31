@@ -60,7 +60,7 @@ export class Work /* server */ {
       if (this.noActiveWork()) {
         // <= Pas de tâche active
         // => C'est une erreur handicapante
-        return {ok: false, error: t('task.any_active')}
+        return {ok: false, error: t('work.any_active')}
       } else if (this.noWorkWithRestTime()) {
         // <= Plus aucune tâche active n'a de leftTime
         // => On initie un nouveau cycle

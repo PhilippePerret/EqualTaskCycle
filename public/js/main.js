@@ -17548,16 +17548,16 @@ class Work {
   static _obj;
   static async getCurrent(options = {}) {
     Object.assign(options, { process: "Work::getCurrent" });
-    const retour = await postToServer("/task/get-current", options);
+    const retour = await postToServer("/work/get-current", options);
     if (retour.ok === false) {
       return false;
     }
-    if (retour.task.ok === false) {
-      Flash.error(t("task.any_active"));
+    if (retour.work.ok === false) {
+      Flash.error(t("work.any_active"));
       return false;
     } else {
       ui.resetBackgroundColor();
-      this.displayWork(retour.task, retour.options);
+      this.displayWork(retour.work, retour.options);
       return true;
     }
   }
@@ -17967,7 +17967,7 @@ class UI {
   async onChange(ev) {
     ev && stopEvent2(ev);
     const curwork = Work.currentWork;
-    const result = await postToServer("/task/change", { process: "UI.onChange", workId: curwork.id });
+    const result = await postToServer("/work/change", { process: "UI.onChange", workId: curwork.id });
     if (result.ok) {
       if (await Work.getCurrent({ but: curwork.id })) {
         this.btnChange.hide();
@@ -18042,7 +18042,7 @@ class UI {
         this.onChange.bind(this),
         false,
         2,
-        t("ui.text.to_choose_another_task")
+        t("ui.text.to_choose_another_work")
       ],
       [
         "Stop",
@@ -18058,7 +18058,7 @@ class UI {
         this.onPause.bind(this),
         true,
         1,
-        t("ui.text.to_pause_the_task")
+        t("ui.text.to_pause_the_work")
       ],
       [
         "Start",
@@ -18066,7 +18066,7 @@ class UI {
         this.onStart.bind(this),
         false,
         1,
-        t("ui.text.to_start_working_on_task")
+        t("ui.text.to_start_working_on_work")
       ],
       [
         "Restart",
@@ -18074,7 +18074,7 @@ class UI {
         this.onRestart.bind(this),
         true,
         1,
-        t("ui.text.to_restart_work_on_task")
+        t("ui.text.to_restart_work_on_work")
       ]
     ];
   }
@@ -18238,7 +18238,7 @@ class Clock {
     } else {
       displayedSeconds = this.totalRestTimeSeconds - secondesOfWork;
     }
-    const leftTime = this.taskRestTime(secondesOfWork);
+    const leftTime = this.workRestTime(secondesOfWork);
     this.clockObj.innerHTML = this.s2h(displayedSeconds);
     if (secondesOfWork % 60 === 0) {
       const thisMinute = Math.round(secondesOfWork / 60);
@@ -18275,10 +18275,10 @@ class Clock {
   }
   donneAlerteWorkDone() {
     this.bringAppToFront();
-    Flash.notice("Work time is over. Please move on to the next task.");
+    Flash.notice("Work time is over. Please move on to the next work.");
     this.alerteWorkDone = true;
   }
-  taskRestTime(minutesOfWork) {
+  workRestTime(minutesOfWork) {
     minutesOfWork = minutesOfWork / 60;
     return this.currentWork.leftTime - minutesOfWork;
   }
@@ -18377,7 +18377,7 @@ class Tools {
       {
         name: t("ui.tool.times_report.name"),
         description: t("ui.tool.times_report.desc"),
-        method: this.tasksReportDisplay.bind(this)
+        method: this.worksReportDisplay.bind(this)
       },
       {
         name: t("ui.tool.reset_cycle.name"),
@@ -18416,9 +18416,9 @@ class Tools {
       Flash.success(t("manual.produced"));
     }
   }
-  async tasksReportDisplay(ev) {
+  async worksReportDisplay(ev) {
     stopEvent(ev);
-    const retour = await postToServer("/tasks/get-all-data", { process: "times_report tool" });
+    const retour = await postToServer("/works/get-all-data", { process: "times_report tool" });
     if (retour.ok) {
       console.log("RETOUR: ", retour);
       let tableau = [];
@@ -18629,9 +18629,9 @@ t(help.terminologie.text)
 
 t(help.deroulement_travail.text)
 
-# t(help.task_list.title)
+# t(help.work_list.title)
 
-t(help.task_list.text)
+t(help.work_list.text)
   `,
   introduction: `
 ### t(help.introduction.title)
@@ -18645,15 +18645,15 @@ t(help.introduction.text)
 
 t(help.terminologie.text)
   `,
-  task_list: `
-### t(help.task_list.title)
+  work_list: `
+### t(help.work_list.title)
 
-t(help.task_list.text)
+t(help.work_list.text)
 `,
-  task_data: `
-### t(help.task_data.title)
+  work_data: `
+### t(help.work_data.title)
 
-t(help.task_data.text)
+t(help.work_data.text)
 `,
   duree_cycle_vs_duree_sess: `
 # t(help.durcycvsdursess.title)
@@ -18799,8 +18799,8 @@ class Editing {
     }
     console.info("Fin du check des modifications (%s erreurs)", errorCount);
     WORK_PROPS.forEach((prop) => {
-      this.taskContainer.querySelectorAll("div.err").forEach((o) => o.innerHTML = "");
-      this.taskContainer.querySelectorAll(".error").forEach((o) => o.classList.remove("error"));
+      this.workContainer.querySelectorAll("div.err").forEach((o) => o.innerHTML = "");
+      this.workContainer.querySelectorAll(".error").forEach((o) => o.classList.remove("error"));
     });
     if (errorCount > 0) {
       Flash.error(t("error.data.error_found", [String(errorCount)]), { keep: false });
@@ -18898,7 +18898,7 @@ class Editing {
     return retour.ok && retour.isExecutable === false;
   }
   getTaskDataIn(form) {
-    const taskData = {};
+    const workData = {};
     WORK_PROPS.forEach((prop) => {
       const field = DGet(`.form-work-${prop}`, form);
       let value = field.value.trim();
@@ -18918,15 +18918,15 @@ class Editing {
             break;
         }
       }
-      Object.assign(taskData, { [prop]: value });
+      Object.assign(workData, { [prop]: value });
     });
-    return taskData;
+    return workData;
   }
   async startEditing() {
     ui.toggleSection("editing");
-    const container = this.taskContainer;
+    const container = this.workContainer;
     container.innerHTML = "";
-    const retour = await postToServer("/tasks/all", { process: "Editing.startEditing" });
+    const retour = await postToServer("/works/all", { process: "Editing.startEditing" });
     if (retour.ok === false) {
       return;
     }
@@ -18934,7 +18934,7 @@ class Editing {
     import_renderer4.default.info("Works retreaved", works);
     this.originalWorks = {};
     works.forEach((w) => Object.assign(this.originalWorks, { [w.id]: w }));
-    DGet("span#tasks-count", this.section).innerHTML = works.length;
+    DGet("span#works-count", this.section).innerHTML = works.length;
     works.forEach((work) => {
       this.createNewTask(work);
     });
@@ -18945,7 +18945,7 @@ class Editing {
   createNewTask(work) {
     const owork = this.formClone.cloneNode(true);
     owork.id = `work-${work.id}`;
-    this.taskContainer.appendChild(owork);
+    this.workContainer.appendChild(owork);
     this.peupleWorkForm(owork, work);
     this.observeWorkForm(owork, work);
     owork.classList.remove("hidden");
@@ -18963,7 +18963,7 @@ class Editing {
       }
       field.value = typeof value === "undefined" ? "" : value;
     });
-    DGet("span.task-id-disp", obj).innerHTML = work.id;
+    DGet("span.work-id-disp", obj).innerHTML = work.id;
   }
   observeWorkForm(owork, work) {
     listenBtn("up", this.onUp.bind(this, owork), owork);
@@ -18998,7 +18998,7 @@ class Editing {
       }
       if (retour.ok) {
         DGet(`div#work-${work.id}`).remove();
-        Flash.notice(t("task.destroy", [work.project]));
+        Flash.notice(t("work.destroy", [work.project]));
       }
     }
   }
@@ -19014,8 +19014,8 @@ class Editing {
     }));
   }
   _dialconfrem;
-  get taskContainer() {
-    return DGet("div#editing-tasks-container");
+  get workContainer() {
+    return DGet("div#editing-works-container");
   }
   onAddTask() {
     const owork = this.createNewTask({
@@ -19031,7 +19031,7 @@ class Editing {
   findIdIfRequired(owork, ev) {
     const projectField = owork.querySelector("input.form-work-project");
     const idField = owork.querySelector("input.form-work-id");
-    const dispField = owork.querySelector(".task-id-disp");
+    const dispField = owork.querySelector(".work-id-disp");
     let idProjet;
     if (idField.value === "") {
       const project = projectField.value.trim();
@@ -19075,9 +19075,9 @@ class Editing {
       console.log("--- PAS D'ENREGISTREMENT ---");
       return;
     }
-    const retour = await postToServer("/tasks/save", { process: "Editing.onSaveData", works: collectedData });
+    const retour = await postToServer("/works/save", { process: "Editing.onSaveData", works: collectedData });
     if (retour.ok) {
-      Flash.success(t("task.saved"));
+      Flash.success(t("work.saved"));
       const curWId = Work.currentWork.id;
       const curWData = collectedData.find((w) => w.id === curWId);
       const curWork = Work.currentWork;
@@ -19117,7 +19117,7 @@ class Editing {
   retreaveWorksDiff() {
     console.info("originalWorks", this.originalWorks);
     this.modifiedWorks = {};
-    this.taskContainer.querySelectorAll(".editing-form-work").forEach((form) => {
+    this.workContainer.querySelectorAll(".editing-form-work").forEach((form) => {
       const wdata = this.getTaskDataIn(form);
       if (wdata.id === "") {
         wdata.id = this.getIdFromProject(wdata.project);

@@ -3,9 +3,9 @@ space: ' '
 app:
   is_ready: L'application est prête.
 error:
-  no_other_task_complete_that_one: "Aucun autre travail trouvé, vous devez finir celui-ci."
+  no_other_work_complete_that_one: "Aucun autre travail trouvé, vous devez finir celui-ci."
   occurred: "Une erreur est survenue : _0_"
-  task_already_changed_today: "La tâche a déjà été changée aujourd'hui (une seule dérogation par jour…)."
+  work_already_changed_today: "La tâche a déjà été changée aujourd'hui (une seule dérogation par jour…)."
   unfound_field: "Champ introuvable : _0_"
   data:
     undefined_project: "Le titre du projet est requis."
@@ -29,7 +29,7 @@ locales:
 manual:
   produced: "Manuel produit avec succès dans votre dossier Documents"
   not_produced: "Impossible de produire le manuel d’ETC…"
-task:
+work:
   very_first_one: "Vous devez éditer les préférences en cliquant sur le bouton ⚙️.\n\nEnsuite, vous pouvez cliquer sur le bouton ✍🏽 pour établir la liste de vos travaux (et peut-être détruire celui-ci quand vous en aurez fini)."
   destroy: 'Destruction de la tâche « _0_ » effectuée. Sniff…'
   any_active: Aucune tâche active.

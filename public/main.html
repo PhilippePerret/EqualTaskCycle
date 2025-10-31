@@ -93,7 +93,7 @@
     <footer>
       <div style="float:left;">
         <button class="btn-prefs short" title="t(ui.text.to_open_preferences)">⚙️</button>
-        <button class="btn-editing-start short" title="t(ui.text.to_edit_tasks_and_data)">✍🏽</button>
+        <button class="btn-editing-start short" title="t(ui.text.to_edit_works_and_data)">✍🏽</button>
         <button class="btn-help-toggle" title="t(ui.text.to_find_help)">🛟</button>
       </div>
     </footer>
@@ -107,9 +107,9 @@
 
   -->
   <section id="editing" class="hidden">
-    <h2>t(ui.title.task_editing) <span class="small">(<span id="tasks-count">---</span>)</span></h2>
+    <h2>t(ui.title.work_editing) <span class="small">(<span id="works-count">---</span>)</span></h2>
 
-    <div id="editing-tasks-container">
+    <div id="editing-works-container">
       <!-- Container pour afficher et éditer les tâches -->
     </div>
     <!-- TÂCHE À CLONER -->
@@ -124,7 +124,7 @@
       <input type="hidden" class="form-work-report" value="" data-type="string" />
 
       <div class="row">
-        <span class="task-id-disp tiny mono fright"></span>
+        <span class="work-id-disp tiny mono fright"></span>
         <select class="form-work-active small" data-type="number">
           <option value="1">t(ui.adj.Active_m)</option>
           <option value="0">t(ui.adj.Inactive_m)</option>
@@ -168,7 +168,7 @@
       </div>
     </div>      
     <footer>
-      <button class="btn-editing-add fleft" title="t(ui.text.to_add_a_task)">➕</button>
+      <button class="btn-editing-add fleft" title="t(ui.text.to_add_a_work)">➕</button>
       <button class="btn-editing-end" class="small">t(ui.button.finish)</button>
       <button class="btn-editing-save" class="small">t(ui.button.save)</button>
     </footer>
@@ -206,13 +206,13 @@
       <div class="row">
         <label>t(ui.text.order)</label>
         <input type="checkbox" id="prefs-random" />
-        <label for="prefs-random">t(ui.text.tasks_in_random_order)</label>
+        <label for="prefs-random">t(ui.text.works_in_random_order)</label>
       </div>
       
       <div class="row">
         <label></label>
         <input type="checkbox" id="prefs-shortest" />
-        <label for="prefs-shortest">t(ui.text.shortest_tasks_first)</label>
+        <label for="prefs-shortest">t(ui.text.shortest_works_first)</label>
       </div>
     
       <div class="row">

@@ -10,7 +10,7 @@ help:
     ordre: >
       intro
       term
-      task_data
+      work_data
       stop_report
       durcycvsdursess
 
@@ -18,30 +18,30 @@ help:
     title: How Task Progress Works
     level: '##'
     text: |
-      Everything starts when ETC selects the first task from your list, 
+      Everything starts when ETC selects the first work from your list, 
       or a random one if you’ve chosen that option.
       
-      The task appears in the window, along with several buttons:
+      The work appears in the window, along with several buttons:
 
       | Button | Name | Action |
       | --- | --- | --- |
-      | t(ui.button.start) | Start | Begins work on the task. A timer shows either the elapsed time or the remaining time (for the cycle), depending on your settings. |
-      | t(ui.button.change) | Another Task | If you don’t like the suggested task, you can request another one. Note: this option can only be used once per session. |
+      | t(ui.button.start) | Start | Begins work on the work. A timer shows either the elapsed time or the remaining time (for the cycle), depending on your settings. |
+      | t(ui.button.change) | Another Task | If you don’t like the suggested work, you can request another one. Note: this option can only be used once per session. |
       | t(ui.button.open_project) | Open Project | Opens the project folder on your desktop. |
-      | t(ui.button.run) | Run Script | If a script is defined for the task, this button lets you run it. |
+      | t(ui.button.run) | Run Script | If a script is defined for the work, this button lets you run it. |
 
       To start tracking time, click the t(ui.button.start) button.  
       If you’ve selected the **Stopwatch** mode, time starts counting up from 0:00:00.  
-      If you’ve selected the **Countdown** mode, the timer starts from the duration set for the task in the cycle (usually two hours), or from the custom session time you’ve defined for that specific task, and counts down to zero.
+      If you’ve selected the **Countdown** mode, the timer starts from the duration set for the work in the cycle (usually two hours), or from the custom session time you’ve defined for that specific work, and counts down to zero.
 
       You can pause your work at any time using the t(ui.button.pause) button.  
-      The timer will stop until you resume the task by clicking t(ui.button.restart).
+      The timer will stop until you resume the work by clicking t(ui.button.restart).
 
       After working for at least one minute, you can decide to stop by clicking t(ui.button.stop).
 
       You can also let the timer run until the end. When the time is almost up, 
       the application will notify you that the session is nearly over and that 
-      it’s time to move on to the next task.
+      it’s time to move on to the next work.
 
       A panel titled t(ui.title.stop_report) will then appear.  
       This panel allows you to record a short report. The report isn’t meant only 
@@ -54,8 +54,8 @@ help:
       discard the recorded time if, for example, you feel the session wasn’t 
       productive.
 
-      Once you save your report, ETC updates the task’s time and immediately 
-      presents the next task in your workflow.
+      Once you save your report, ETC updates the work’s time and immediately 
+      presents the next work in your workflow.
 
   set_preferences:
     title: Setting Your Preferences
@@ -66,35 +66,35 @@ help:
       There, you can set the following options:
 
       * the **language** of the interface and messages,  
-      * the **default task duration** within a cycle (not the total completion time),  
+      * the **default work duration** within a cycle (not the total completion time),  
       * the **UI mode**, dark or light,  
       * the appearance of the **clock** (or stopwatch),  
       * the **time tracking mode**, either continuous or countdown,  
-      * the **task selection mode**, either random or sequential, depending on the order in your list.
+      * the **work selection mode**, either random or sequential, depending on the order in your list.
 
       *(You’ll also find some useful tools in this panel to reset the current cycle or open the external manual.)*
 
       Once you’ve made your changes, close the preferences window after saving them,  
       so that all updates are applied correctly.
 
-  define_tasks:
+  define_works:
     title: Defining Your Task List
     level: "##"
     text: |
-      To define your list of tasks, open the task panel using the ✍🏽 button.  
-      This is where you can create and manage your **tasks**, **projects**, or **jobs** —  
+      To define your list of works, open the work panel using the ✍🏽 button.  
+      This is where you can create and manage your **works**, **projects**, or **jobs** —  
       whatever term you prefer.
 
-      Use the “➕” button to create a new task, which will be added to the bottom of the list.  
-      When you first launch the application, this list should contain only one sample task.
+      Use the “➕” button to create a new work, which will be added to the bottom of the list.  
+      When you first launch the application, this list should contain only one sample work.
 
       Fill in the fields with the information you want.  
       (Even if most properties are self-explanatory, you can find detailed explanations  
-      in help(task_data).)
+      in help(work_data).)
 
-      Once you’ve set up your list and arranged the tasks in order using the arrow buttons,  
+      Once you’ve set up your list and arranged the works in order using the arrow buttons,  
       save it by clicking t(ui.button.save).  
-      You’ll then return to the main panel, ready to start your first task.
+      You’ll then return to the main panel, ready to start your first work.
 
   terminologie:
     title: Terminology
@@ -102,7 +102,7 @@ help:
     text: |
       | Term | | Description |
       | --- | --- | --- |
-      | Job | | A *job* here does not correspond to a task. It is closer to a “project.” It evolves over *cycles* and may require dozens or even hundreds of hours to complete. |
+      | Job | | A *job* here does not correspond to a work. It is closer to a “project.” It evolves over *cycles* and may require dozens or even hundreds of hours to complete. |
       | Cycle duration | | Each job has a *cycle duration* which roughly corresponds to the execution time during a single work session (although, in reality, this duration may cover several sessions). |
       | Finalization duration | | The *cycle duration* above should not be confused with the total time required to fully complete the job. These two durations are unrelated. |
       | Cycle | | A *cycle* corresponds to a full execution of all current jobs. NOTE: when we say *full execution* here, it does NOT mean the full completion of the job, but **only its <em>cycle duration</em>**. A job may require 400 hours to complete; if its *cycle duration* is 2 hours, it is considered completed in a cycle once it has been worked on for 2 hours. |
@@ -115,10 +115,10 @@ help:
     level: '##'
     text: |
       The *end report* appears when you stop (STOP) working
-      on a specific task.
+      on a specific work.
       
       The *end report* is used to prepare for the next work cycle,
-      so the task can be resumed as quickly and efficiently
+      so the work can be resumed as quickly and efficiently
       as possible.
 
       To write this report, you should project yourself into the next
@@ -127,41 +127,41 @@ help:
       note the files you're working on and the exact lines involved.
 
       The supported format is [Markdown](https://en.wikipedia.org/wiki/Markdown).
-  task_data:
+  work_data:
     title: Task data
     level: '##'
     text: |
       | Property | | Description |
       | --- | --- | --- |
-      | Active/Inactive | | This menu allows you to enable or disable a task. A disabled task will not appear in your work cycle. |
-      | Project | | The title of the project or task. |
+      | Active/Inactive | | This menu allows you to enable or disable a work. A disabled work will not appear in your work cycle. |
+      | Project | | The title of the project or work. |
       | Content | | Here you define what needs to be done, concretely. It is a [Markdown](https://${pref.getLang()}.wikipedia.org/wiki/Markdown) text, so it can include simple formatting. |
-      | Folder | | The path to the folder. This information is crucial as it allows tracking activity on the task. |
+      | Folder | | The path to the folder. This information is crucial as it allows tracking activity on the work. |
       | Script | | The strength of this app lies in allowing you to define a script to be executed at any time during the work (often beforehand). This script, which can be in any language, opens up unlimited possibilities. |
-      | Duration | | Sets a duration specific to the task. If this value is not defined, the default duration is used. |
+      | Duration | | Sets a duration specific to the work. If this value is not defined, the default duration is used. |
       | Session duration | | Optionally, you can define a session duration different from the cycle duration. Subtle, yet clear in practice. For full understanding, consult help(durcycvsdursess). |
   introduction:
     title: INTRODUCTION
     level: '##'
     text: |
       Welcome to the modular help system of the ETC application
-      (Etcetera), which allows you to work on several tasks in parallel.
+      (Etcetera), which allows you to work on several works in parallel.
 
       The operation of this application is radically different
       from what you may be used to and is particularly well-suited
       to situations where you have multiple projects running concurrently,
       without neglecting any of them, by dedicating time each day
       or each week to each one.
-  task_list:
+  work_list:
     title: Task list
     level: '##'
     text: |
-      The task list is the first thing to define in order to use
+      The work list is the first thing to define in order to use
       the application.
 
       Simply click on the ✍🏽 button in the main window
-      to open the tasks and general data panel.
-      Then click the “+” button to add a task.
+      to open the works and general data panel.
+      Then click the “+” button to add a work.
       The process is intuitive, but let’s detail the various
       properties you can define:
 
@@ -171,12 +171,12 @@ help:
 
       | Property | | Description |
       | --- | --- | --- |
-      | Active/Inactive | | This menu lets you enable or disable a task. A disabled task will not appear in your work cycle. |
+      | Active/Inactive | | This menu lets you enable or disable a work. A disabled work will not appear in your work cycle. |
       | Project | | The title of the project or work item. |
       | Content | | This is where you specify what needs to be done, concretely. It is written in [Markdown](https://${pref.getLang()}.wikipedia.org/wiki/Markdown), so it can include simple formatting. |
-      | Folder | | The path to the folder. This information is crucial, as it allows the application to track activity on the task. |
+      | Folder | | The path to the folder. This information is crucial, as it allows the application to track activity on the work. |
       | Script | | The strength of this app lies in allowing you to define a script to be executed at any time during the work process (often before). This script, written in any language, opens up unlimited possibilities. |
-      | Duration | | Defines a duration specific to the task. If not specified, the default duration is used. |
+      | Duration | | Defines a duration specific to the work. If not specified, the default duration is used. |
       | Session duration | | Optionally, a session duration can be defined, different from the cycle duration. Subtle, yet clear once understood. See hlink(Cycle duration versus session duration, duree_cycle_vs_duree_sess) for details. |
 
   durcycvsdursess:
@@ -185,11 +185,11 @@ help:
     text: |
       When a session duration is defined (necessarily shorter
       than the cycle duration), the application behaves differently
-      with the task: instead of waiting until the end of the task’s
-      “cycle duration” (or default duration) to terminate the current task,
+      with the work: instead of waiting until the end of the work’s
+      “cycle duration” (or default duration) to terminate the current work,
       it ends it once the *session duration* is reached (see the example below).
 
-      Concretely, this allows you to allocate more total time to a task
+      Concretely, this allows you to allocate more total time to a work
       within a cycle while defining a standard work duration per session
       (i.e., per day). Otherwise, the user must monitor the time manually—
       that’s the key difference.
@@ -198,16 +198,16 @@ help:
 
       ### With identical durations
 
-      Imagine six tasks without defined durations. The cycle duration
+      Imagine six works without defined durations. The cycle duration
       will then match the session duration. If this is set to 2 hours,
       the process will unfold as follows:
 
-      - Upon launching the application, an initial task (e.g., T4) is
+      - Upon launching the application, an initial work (e.g., T4) is
         randomly selected. The user works on it for 2 hours.
-      - After 2 hours, they are notified and another task (e.g., T2) is proposed.
+      - After 2 hours, they are notified and another work (e.g., T2) is proposed.
       - After another 2 hours, they are notified again and move on.
-      - At the end of an 8-hour day, four tasks will have been completed.
-      - The next day, the 5th (e.g., T1) and 6th (e.g., T3) tasks are proposed.
+      - At the end of an 8-hour day, four works will have been completed.
+      - The next day, the 5th (e.g., T1) and 6th (e.g., T3) works are proposed.
         After about 4 hours, one full cycle will have been completed,
         and a new one begins.
 
@@ -218,19 +218,19 @@ help:
 
       ### With different durations
 
-      In this scenario, task T2 requires twice as much work, and the user
+      In this scenario, work T2 requires twice as much work, and the user
       decides to allocate twice as much time—4 hours per cycle.
 
-      - The day starts with task T6.
-      - After 2 hours, the application proposes the next task,
+      - The day starts with work T6.
+      - After 2 hours, the application proposes the next work,
         T2. If the user doesn’t want to work 4 hours straight, they can
         stop after around 2 hours.
       - The application records the work time and notes that
         time remains on this project.
-      - It then proposes the next task.
-      - At the end of the day, as before, two tasks remain untouched,
+      - It then proposes the next work.
+      - At the end of the day, as before, two works remain untouched,
         and there are 2 hours left on T2.
-      - The next day, the app proposes those two tasks plus the remaining
+      - The next day, the app proposes those two works plus the remaining
         2 hours on T2.
 
       This approach is perfectly valid and convenient even if one
@@ -246,14 +246,14 @@ help:
       but only 2 hours per session (per day). We therefore set its
       *session duration* to 2 hours.
 
-      - The day starts normally, for example with task T1.
+      - The day starts normally, for example with work T1.
       - After 2 hours, the app suggests switching to T2.
       - Two hours later—since that’s the defined *session duration*—
-        the app suggests moving on to the next task (though the user may
+        the app suggests moving on to the next work (though the user may
         refuse and continue working on T2).
       - The user moves on.
       - And so on, until the next day.
 
-      Naturally, these examples only featured one task with varying durations,
-      but in reality, each task may have its own *cycle duration* and
+      Naturally, these examples only featured one work with varying durations,
+      but in reality, each work may have its own *cycle duration* and
       *session duration* to accommodate any workflow.

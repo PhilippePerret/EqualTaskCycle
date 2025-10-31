@@ -17493,7 +17493,7 @@ class Clock {
     } else {
       displayedSeconds = this.totalRestTimeSeconds - secondesOfWork;
     }
-    const leftTime = this.taskRestTime(secondesOfWork);
+    const leftTime = this.workRestTime(secondesOfWork);
     this.clockObj.innerHTML = this.s2h(displayedSeconds);
     if (secondesOfWork % 60 === 0) {
       const thisMinute = Math.round(secondesOfWork / 60);
@@ -17530,10 +17530,10 @@ class Clock {
   }
   donneAlerteWorkDone() {
     this.bringAppToFront();
-    Flash.notice("Work time is over. Please move on to the next task.");
+    Flash.notice("Work time is over. Please move on to the next work.");
     this.alerteWorkDone = true;
   }
-  taskRestTime(minutesOfWork) {
+  workRestTime(minutesOfWork) {
     minutesOfWork = minutesOfWork / 60;
     return this.currentWork.leftTime - minutesOfWork;
   }
@@ -17724,16 +17724,16 @@ class Work {
   static _obj;
   static async getCurrent(options = {}) {
     Object.assign(options, { process: "Work::getCurrent" });
-    const retour = await postToServer("/task/get-current", options);
+    const retour = await postToServer("/work/get-current", options);
     if (retour.ok === false) {
       return false;
     }
-    if (retour.task.ok === false) {
-      Flash.error(t("task.any_active"));
+    if (retour.work.ok === false) {
+      Flash.error(t("work.any_active"));
       return false;
     } else {
       ui.resetBackgroundColor();
-      this.displayWork(retour.task, retour.options);
+      this.displayWork(retour.work, retour.options);
       return true;
     }
   }
@@ -18143,7 +18143,7 @@ class UI {
   async onChange(ev) {
     ev && stopEvent2(ev);
     const curwork = Work.currentWork;
-    const result = await postToServer("/task/change", { process: "UI.onChange", workId: curwork.id });
+    const result = await postToServer("/work/change", { process: "UI.onChange", workId: curwork.id });
     if (result.ok) {
       if (await Work.getCurrent({ but: curwork.id })) {
         this.btnChange.hide();
@@ -18218,7 +18218,7 @@ class UI {
         this.onChange.bind(this),
         false,
         2,
-        t("ui.text.to_choose_another_task")
+        t("ui.text.to_choose_another_work")
       ],
       [
         "Stop",
@@ -18234,7 +18234,7 @@ class UI {
         this.onPause.bind(this),
         true,
         1,
-        t("ui.text.to_pause_the_task")
+        t("ui.text.to_pause_the_work")
       ],
       [
         "Start",
@@ -18242,7 +18242,7 @@ class UI {
         this.onStart.bind(this),
         false,
         1,
-        t("ui.text.to_start_working_on_task")
+        t("ui.text.to_start_working_on_work")
       ],
       [
         "Restart",
@@ -18250,7 +18250,7 @@ class UI {
         this.onRestart.bind(this),
         true,
         1,
-        t("ui.text.to_restart_work_on_task")
+        t("ui.text.to_restart_work_on_work")
       ]
     ];
   }
@@ -18320,9 +18320,9 @@ t(help.terminologie.text)
 
 t(help.deroulement_travail.text)
 
-# t(help.task_list.title)
+# t(help.work_list.title)
 
-t(help.task_list.text)
+t(help.work_list.text)
   `,
   introduction: `
 ### t(help.introduction.title)
@@ -18336,15 +18336,15 @@ t(help.introduction.text)
 
 t(help.terminologie.text)
   `,
-  task_list: `
-### t(help.task_list.title)
+  work_list: `
+### t(help.work_list.title)
 
-t(help.task_list.text)
+t(help.work_list.text)
 `,
-  task_data: `
-### t(help.task_data.title)
+  work_data: `
+### t(help.work_data.title)
 
-t(help.task_data.text)
+t(help.work_data.text)
 `,
   duree_cycle_vs_duree_sess: `
 # t(help.durcycvsdursess.title)

@@ -41,8 +41,8 @@ class Editing {
 
     // Avant d'afficher les erreurs, on nettoie les champs
     WORK_PROPS.forEach((prop: string) => {
-      this.taskContainer.querySelectorAll('div.err').forEach((o: HTMLDivElement) => o.innerHTML = '');
-      this.taskContainer.querySelectorAll('.error').forEach((o: HTMLElement) => o.classList.remove('error'));
+      this.workContainer.querySelectorAll('div.err').forEach((o: HTMLDivElement) => o.innerHTML = '');
+      this.workContainer.querySelectorAll('.error').forEach((o: HTMLElement) => o.classList.remove('error'));
     });
 
     if (errorCount > 0) { 
@@ -152,7 +152,7 @@ class Editing {
   }
 
   getTaskDataIn(form: HTMLDivElement): WorkType {
-    const taskData: RecType = {};
+    const workData: RecType = {};
     WORK_PROPS.forEach((prop: string) => {
       const field = DGet(`.form-work-${prop}`, form)
       let value: string | number | undefined | null = field.value.trim();
@@ -166,9 +166,9 @@ class Editing {
           case 'number-or-nil': value = value === '' ? null : Number(value); break;
         }
       }
-      Object.assign(taskData, {[prop]: value});
+      Object.assign(workData, {[prop]: value});
     })
-    return taskData as WorkType;
+    return workData as WorkType;
   }
 
   /**
@@ -178,9 +178,9 @@ class Editing {
    */
   async startEditing(){
     ui.toggleSection('editing');
-    const container = this.taskContainer;
+    const container = this.workContainer;
     container.innerHTML = '';
-    const retour: RecType = await postToServer('/tasks/all', {process: 'Editing.startEditing'});
+    const retour: RecType = await postToServer('/works/all', {process: 'Editing.startEditing'});
     if (retour.ok === false ) { return }
     // --- TACHES/WORKS ---
     const works = retour.works;
@@ -191,7 +191,7 @@ class Editing {
     this.originalWorks = {};
     works.forEach((w: WorkType) => Object.assign(this.originalWorks, {[w.id]: w}))
     // Indication du nombre de travaux dans le titre
-    DGet('span#tasks-count', this.section).innerHTML = works.length;
+    DGet('span#works-count', this.section).innerHTML = works.length;
     // Créer tous les formulaires pour les tâches
     works.forEach((work: WorkType) => { this.createNewTask(work) })
   }
@@ -203,7 +203,7 @@ class Editing {
   private createNewTask(work: WorkType): HTMLDivElement {
     const owork:HTMLDivElement = this.formClone.cloneNode(true) as HTMLDivElement;
     owork.id = `work-${work.id}`;
-    this.taskContainer.appendChild(owork);
+    this.workContainer.appendChild(owork);
     this.peupleWorkForm(owork, work);
     this.observeWorkForm(owork, work);
     owork.classList.remove('hidden');
@@ -223,7 +223,7 @@ class Editing {
       }
       field.value = typeof value === 'undefined' ? '' : value;
     });
-    DGet('span.task-id-disp', obj).innerHTML = work.id;
+    DGet('span.work-id-disp', obj).innerHTML = work.id;
   }
   private observeWorkForm(owork: HTMLDivElement, work: WorkType){
     listenBtn('up', this.onUp.bind(this, owork), owork);
@@ -264,7 +264,7 @@ class Editing {
       }
       if (retour.ok) {
         DGet(`div#work-${work.id}`).remove();
-        Flash.notice(t('task.destroy', [work.project]));
+        Flash.notice(t('work.destroy', [work.project]));
       }
     }
   }
@@ -281,8 +281,8 @@ class Editing {
   }
   private _dialconfrem!: Dialog;
 
-  private get taskContainer(){
-    return DGet('div#editing-tasks-container');
+  private get workContainer(){
+    return DGet('div#editing-works-container');
   }
 
   onAddTask(){
@@ -301,7 +301,7 @@ class Editing {
   private findIdIfRequired(owork: HTMLDivElement, ev: Event){
     const projectField = (owork.querySelector('input.form-work-project') as HTMLInputElement);
     const idField = (owork.querySelector('input.form-work-id') as HTMLInputElement);
-    const dispField = owork.querySelector('.task-id-disp') as HTMLSpanElement;
+    const dispField = owork.querySelector('.work-id-disp') as HTMLSpanElement;
 
     let idProjet: string;
     if (idField.value === '') {
@@ -356,9 +356,9 @@ class Editing {
       return 
     }
 
-    const retour = await postToServer('/tasks/save', {process: 'Editing.onSaveData', works: collectedData});
+    const retour = await postToServer('/works/save', {process: 'Editing.onSaveData', works: collectedData});
     if (retour.ok){ 
-      Flash.success(t('task.saved'));
+      Flash.success(t('work.saved'));
       // On actualise la tâche affichée (courante)
       const curWId = Work.currentWork.id;
       const curWData = collectedData.find(w => w.id === curWId);
@@ -421,7 +421,7 @@ class Editing {
   private retreaveWorksDiff(): number {
     console.info("originalWorks", this.originalWorks);
     this.modifiedWorks = {};
-    this.taskContainer.querySelectorAll('.editing-form-work').forEach( (form: HTMLDivElement) => {
+    this.workContainer.querySelectorAll('.editing-form-work').forEach( (form: HTMLDivElement) => {
       const wdata = this.getTaskDataIn(form);
       if (wdata.id === '') { wdata.id = this.getIdFromProject(wdata.project) }
       Object.assign(this.modifiedWorks, {[wdata.id]: wdata});

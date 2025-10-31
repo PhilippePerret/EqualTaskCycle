@@ -273,7 +273,7 @@ class DBWorks {
       id: 'start',
       active: 1,
       project: "ETC",
-      content: t('task.very_first_one'),
+      content: t('work.very_first_one'),
       folder: path.join(os.homedir(), 'Documents'),
       leftTime: this.defaultLeftTime,
       defaultLeftTime: this.defaultLeftTime,

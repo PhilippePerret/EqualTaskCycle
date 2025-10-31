@@ -39,8 +39,8 @@ ui:
     preferences: Preferences
     project: Project
     stop_report: STOP Report
-    task_editing: Works Editing
-    tasks: Tasks
+    work_editing: Works Editing
+    works: Tasks
     times_report: Times Report
     tools: Tools
     total: Total
@@ -71,7 +71,7 @@ ui:
     Light: Light
   text:
     all_times_minutes: All times are expressed in minutes
-    are_you_still_working: "Are you still working on this task?"
+    are_you_still_working: "Are you still working on this work?"
     baton_relais: Relay baton
     confirmation_suppression_work: 'Do you confirm the deletion of the work/project "_0_"?'
     counter_mode: Counter Mode
@@ -81,24 +81,24 @@ ui:
     lang: Lang
     order: Order
     path_example: "required/path/to/project"
-    shortest_tasks_first: Shortest tasks first
-    tasks_in_random_order: Tasks in random order
-    temp_description: "Description of your project/task.Set active to true to active it."
+    shortest_works_first: Shortest works first
+    works_in_random_order: Tasks in random order
+    temp_description: "Description of your project/work.Set active to true to active it."
     time_left: Time left
-    to_add_a_task: To create a new task
-    to_choose_another_task: "To change task (but be careful: only once per session!)"
+    to_add_a_work: To create a new work
+    to_choose_another_work: "To change work (but be careful: only once per session!)"
     to_destroy: To destroy
-    to_edit_tasks_and_data: To edit tasks and general data
+    to_edit_works_and_data: To edit works and general data
     to_find_help: To get help
     to_move_up: To move up
     to_move_down: To move down
     to_open_preferences: To open and edit preferences
     to_open_project_folder: To open project folder
-    to_pause_the_task: To take a break before resuming
-    to_restart_work_on_task: To resume working on this task
-    to_run_script: To run the script associated with the task
-    to_start_working_on_task: Pour commencer à travailler sur la tâche
-    to_stop_and_next: To stop the task and move to the next one
+    to_pause_the_work: To take a break before resuming
+    to_restart_work_on_work: To resume working on this work
+    to_run_script: To run the script associated with the work
+    to_start_working_on_work: Pour commencer à travailler sur la tâche
+    to_stop_and_next: To stop the work and move to the next one
     total_duration: Total duration
     ui_theme: UI Theme
     when_works_modified_add_or_remove: "Some works have been modified, added, or removed. Do you really want to close? (all changes will be lost)"
@@ -123,4 +123,4 @@ ui:
         desc: This tool allows you to open the application manual in your language, in PDF format.
     times_report:
       name: Time Report of Work
-      desc: This tool provides a report of current (active) tasks along with their respective durations.
+      desc: This tool provides a report of current (active) works along with their respective durations.

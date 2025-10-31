@@ -160,7 +160,7 @@ class Clock {
     let displayedSeconds: number;
     if (this.counterMode === 'clock') { displayedSeconds = secondesOfWork}
     else /* countdown */ { displayedSeconds = this.totalRestTimeSeconds - secondesOfWork}
-    const leftTime = this.taskRestTime(secondesOfWork);
+    const leftTime = this.workRestTime(secondesOfWork);
     /****************************************
      * AFFICHAGE DU TEMPS DANS L'INTERFACE  *
      ****************************************/
@@ -209,7 +209,7 @@ class Clock {
   }
   private donneAlerteWorkDone(){
     this.bringAppToFront();
-    Flash.notice('Work time is over. Please move on to the next task.');
+    Flash.notice('Work time is over. Please move on to the next work.');
     this.alerteWorkDone = true;
   }
 
@@ -217,7 +217,7 @@ class Clock {
    * Retourne le nombre de minutes restantes avant la fin.
    * Attention, la méthode est appelée toutes les demi-secondes.
    */
-  private taskRestTime(minutesOfWork: number): number {
+  private workRestTime(minutesOfWork: number): number {
     minutesOfWork = minutesOfWork / 60;
     return this.currentWork.leftTime - minutesOfWork;
   }

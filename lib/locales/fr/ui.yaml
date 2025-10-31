@@ -39,9 +39,9 @@ ui:
     preferences: Préférences
     project: Projet
     stop_report: Rapport d’arrêt
-    task_editing: Édition des travaux
+    work_editing: Édition des travaux
     times_report: Rapport temporel
-    tasks: Tâches
+    works: Tâches
     tools: Outils
     total: Total
     worked: Travaillé
@@ -81,23 +81,23 @@ ui:
     lang: Langue
     order: Ordre
     path_example: "chemin/vers/projet/requis"
-    shortest_tasks_first: Les plus courtes d’abord
-    tasks_in_random_order: Tâches au hasard
+    shortest_works_first: Les plus courtes d’abord
+    works_in_random_order: Tâches au hasard
     temp_description: "Description de votre projet/tâche. Mettre en actif pour l'activer."
     time_left: Temps restant
-    to_add_a_task: "Pour ajouter/créer une tâche"
-    to_choose_another_task: "Pour changer de tâche (mais attention : une seule fois par session !"
+    to_add_a_work: "Pour ajouter/créer une tâche"
+    to_choose_another_work: "Pour changer de tâche (mais attention : une seule fois par session !"
     to_destroy: Pour détruire définitivement
-    to_edit_tasks_and_data: Pour éditer les tâches et les données générales
+    to_edit_works_and_data: Pour éditer les tâches et les données générales
     to_find_help: Pour obtenir de l'aide
     to_move_up: Pour remonter
     to_move_down: Pour descendre
     to_open_preferences: Pour ouvrir et modifier les préférences
     to_open_project_folder: Pour ouvrir le dossier du projet
-    to_pause_the_task: Pour faire un break avant de reprendre
-    to_restart_work_on_task: Pour reprendre le travail sur cette tâche
+    to_pause_the_work: Pour faire un break avant de reprendre
+    to_restart_work_on_work: Pour reprendre le travail sur cette tâche
     to_run_script: Pour lancer le script associé à la tâche
-    to_start_working_on_task: To start working on the task
+    to_start_working_on_work: To start working on the work
     to_stop_and_next: Pour arrêter la tâche et passer à la suivante
     total_duration: Durée totale
     ui_theme: Thème interface

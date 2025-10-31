@@ -32,9 +32,9 @@ t(help.terminologie.text)
 
 t(help.deroulement_travail.text)
 
-# t(help.task_list.title)
+# t(help.work_list.title)
 
-t(help.task_list.text)
+t(help.work_list.text)
   `,
   
   introduction: `
@@ -52,16 +52,16 @@ t(help.terminologie.text)
   `,
 
 
-task_list: `
-### t(help.task_list.title)
+work_list: `
+### t(help.work_list.title)
 
-t(help.task_list.text)
+t(help.work_list.text)
 `,
 
-task_data: `
-### t(help.task_data.title)
+work_data: `
+### t(help.work_data.title)
 
-t(help.task_data.text)
+t(help.work_data.text)
 `,
 
 

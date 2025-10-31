@@ -79,7 +79,7 @@ export function listenBtn(id: string, method: Function, container = document.bod
 export function markdown(md: string): string {
   const result = unified()
     .use(remarkParse)
-    .use(remarkGfm)          // Support GFM (task lists, tables, etc.)
+    .use(remarkGfm)          // Support GFM (work lists, tables, etc.)
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeStringify, { allowDangerousHtml: true })
     .processSync(md);  

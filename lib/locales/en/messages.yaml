@@ -3,9 +3,9 @@ space: ''
 app:
   is_ready: App is ready.
 error:
-  no_other_task_complete_that_one: "No other tasks found. You must complete that one."
+  no_other_work_complete_that_one: "No other works found. You must complete that one."
   occurred: "An error occurred: _0_"
-  task_already_changed_today: "Task has been already changed today (only one exemption per day…)."
+  work_already_changed_today: "Task has been already changed today (only one exemption per day…)."
   unfound_field: "Unfound field: _0_"
   data:
     undefined_project: "Project Title is required."
@@ -29,10 +29,10 @@ locales:
 manual:
   produced: "Manual produced successfully in your Documents folder"
   not_produced: "Fail to produce the ETC Manual…"
-task:
-  very_first_one: "You must edit the preferences by clicking the ⚙️ button.\n\nThen, you can click the ✍🏽 button to create your first tasks (and maybe delete this one)."
-  destroy: 'Destroy task _0_'
-  any_active: No active task.
+work:
+  very_first_one: "You must edit the preferences by clicking the ⚙️ button.\n\nThen, you can click the ✍🏽 button to create your first works (and maybe delete this one)."
+  destroy: 'Destroy work _0_'
+  any_active: No active work.
   saved: Tasks saved successfully
 times:
   dont_add_and_save: "I don’t add & save time"

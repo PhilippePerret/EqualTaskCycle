@@ -21,7 +21,7 @@ class Tools { /* singleton */
     {
       name: t('ui.tool.times_report.name'),
       description: t('ui.tool.times_report.desc'),
-      method: this.tasksReportDisplay.bind(this)
+      method: this.worksReportDisplay.bind(this)
     },
     {
       name: t('ui.tool.reset_cycle.name'), 
@@ -72,9 +72,9 @@ class Tools { /* singleton */
   /**
    * Affichage du rapport de temps.
    */
-  private async tasksReportDisplay(ev: Event){
+  private async worksReportDisplay(ev: Event){
     stopEvent(ev);
-    const retour = await postToServer('/tasks/get-all-data', {process: 'times_report tool'});
+    const retour = await postToServer('/works/get-all-data', {process: 'times_report tool'});
     if (retour.ok) {
       console.log("RETOUR: ", retour);
       let tableau: string | string[] = []

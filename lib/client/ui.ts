@@ -170,7 +170,7 @@ export class UI {
   private async onChange(ev: Event){
     ev && stopEvent(ev);
     const curwork: Work = Work.currentWork;
-    const result = await postToServer('/task/change', {process: 'UI.onChange', workId: curwork.id});
+    const result = await postToServer('/work/change', {process: 'UI.onChange', workId: curwork.id});
     if ( result.ok ) {
       if (await Work.getCurrent({but: curwork.id})) {
         (this.btnChange as Button).hide();
@@ -232,15 +232,15 @@ export class UI {
       ['openFolder', t('ui.button.open_project'), this.onOpenFolder.bind(this), false, 2,
         t('ui.text.to_open_project_folder')],
       ['Change', t('ui.button.change'), this.onChange.bind(this), false, 2,
-        t('ui.text.to_choose_another_task')],
+        t('ui.text.to_choose_another_work')],
       ['Stop', t('ui.button.stop'), this.onStop.bind(this), true, 1, 
         t('ui.text.to_stop_and_next')],
       ['Pause', t('ui.button.pause'), this.onPause.bind(this), true, 1,
-        t('ui.text.to_pause_the_task')],
+        t('ui.text.to_pause_the_work')],
       ['Start', t('ui.button.start'), this.onStart.bind(this), false, 1,
-        t('ui.text.to_start_working_on_task')],
+        t('ui.text.to_start_working_on_work')],
       ['Restart', t('ui.button.restart'), this.onRestart.bind(this), true, 1,
-        t('ui.text.to_restart_work_on_task')]
+        t('ui.text.to_restart_work_on_work')]
       ];
   }
 }

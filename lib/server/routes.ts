@@ -54,13 +54,13 @@ export function setupRoutes(app: Express) {
     });
   });
 
-  app.post('/task/get-current', (req, res) => {
-    log.info("-> /task/get-current");
+  app.post('/work/get-current', (req, res) => {
+    log.info("-> /work/get-current");
     let result = {ok: true, error: ''};
     const options = req.body
     try {
       Object.assign(result, {
-        task: Work.getCurrentWork(options),
+        work: Work.getCurrentWork(options),
         options: { canChange: db.lastChangeIsFarEnough()}
       });
     } catch(err) {
@@ -69,31 +69,31 @@ export function setupRoutes(app: Express) {
     res.json(result);
   });
 
-  app.post('/task/change', (req, res) => {
+  app.post('/work/change', (req, res) => {
     const dreq = req.body;
     let result: {
       ok: boolean,
       error: string,
-      task?: RecType & WorkType
-    } = {ok: true, error: '', task: undefined};
+      work?: RecType & WorkType
+    } = {ok: true, error: '', work: undefined};
 
     // Est-ce qu'on peut changer la tâche ?
     if (db.lastChangeIsFarEnough()) {
-      const retour = Work.getCurrentWork({but: dreq.taskId});
+      const retour = Work.getCurrentWork({but: dreq.workId});
       // choisir une autre
       if ((retour as any).ok === false) {
         result = {
           ok: false,
-          error: t('error.no_other_task_complete_that_one'),
-          task: Work.get(dreq.taskId)
+          error: t('error.no_other_work_complete_that_one'),
+          work: Work.get(dreq.workId)
         }
       } else {
-        Object.assign(result, {task: retour as WorkType})
+        Object.assign(result, {work: retour as WorkType})
       }
       // Enregistrer la transaction
       db.setLastChange();
     } else {
-      result = {ok: false, error: t('error.task_already_changed_today')}
+      result = {ok: false, error: t('error.work_already_changed_today')}
     }
     res.json(result);
   });
@@ -108,13 +108,13 @@ export function setupRoutes(app: Express) {
   // Retourne toutes les tâches, mais seulement les
   // information dans le fichier des données, pas les
   // temps.
-  app.post('/tasks/all', (req, res) => {
+  app.post('/works/all', (req, res) => {
     const dreq = req.body;
     Object.assign(dreq, {ok: true, works: db.getAllWorks()})
     res.json(dreq);
   });
 
-  app.post('/tasks/get-all-data', (req, res) => {
+  app.post('/works/get-all-data', (req, res) => {
     const data: RecType = req.body;
     const works = db.getAllActiveWorks();
     res.json(Object.assign(data, {
@@ -123,7 +123,7 @@ export function setupRoutes(app: Express) {
     }));
   });
 
-  app.post('/tasks/save', (req, res) => {
+  app.post('/works/save', (req, res) => {
     const dreq = req.body;
     const result = db.saveAllWorks(dreq.works);
     Object.assign(dreq, result);

@@ -79,19 +79,19 @@ export class Work {
   /**
    * Récupère la tâche courante côté serveur et l'affiche.
    * 
-   * options peut définir but: <task id> pour exclure une
+   * options peut définir but: <work id> pour exclure une
    * tâche des résultats.
    */
   public static async getCurrent(options: RecType = {}): Promise<boolean> {
     Object.assign(options, {process: 'Work::getCurrent'})
-    const retour: RecType = await postToServer('/task/get-current', options);
+    const retour: RecType = await postToServer('/work/get-current', options);
     if (retour.ok === false) { return false}
-    if (retour.task.ok === false) { // <= il n'y aucune tâche active
-      Flash.error(t('task.any_active'));
+    if (retour.work.ok === false) { // <= il n'y aucune tâche active
+      Flash.error(t('work.any_active'));
       return false;
     } else {
       ui.resetBackgroundColor();
-      this.displayWork(retour.task, retour.options);
+      this.displayWork(retour.work, retour.options);
       return true;
     }
   }

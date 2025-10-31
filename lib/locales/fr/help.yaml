@@ -13,7 +13,7 @@ help:
       presentation
       exemple_utilisation
       terminologie
-      task_data
+      work_data
       deroulement_travail
       stop_report
       durcycvsdursess
@@ -64,7 +64,7 @@ help:
       
       Grâce à ETC, vous allez pouvoir organiser tout ça. D'abord vous
       avez commencé par définir votre liste de tâches 
-      (help(define_tasks)) et vous avez réglé vos préférences 
+      (help(define_works)) et vous avez réglé vos préférences 
       (help(set_preferences)).
 
       Comment ? En travaillant par *CYCLE*. 
@@ -207,7 +207,7 @@ help:
       * l'apparence de l'**horloge** (ou du chronomètre),
       * le **mode de décompte du temps**, soit continu, soit en compte à rebours,
       * le **chemin d'accès au fichier des tâches** (qui se créera avec les
-      tâches que vous définirez — help(define_tasks)),
+      tâches que vous définirez — help(define_works)),
       * le mode de **choix des tâches**, aléatoire ou continu suivant 
       l'ordre dans la liste que vous avez établie,
 
@@ -218,7 +218,7 @@ help:
       Vous refermez la fenêtre après avoir enregistré les nouvelles
       informations pour que tout soit pris en compte.
 
-  define_tasks:
+  define_works:
     title: Définir la liste des tâches
     level: "##"
     text: |
@@ -233,7 +233,7 @@ help:
 
       Remplissez les champs avec les informations que vous souhaitez
       (même si les propriétés sont assez explicites, vous trouverez dans 
-      la section help(task_data) toutes les informations précises).
+      la section help(work_data) toutes les informations précises).
 
       Lorsque vous avez établi votre liste, que vous avez organisé les
       tâches dans l'ordre grâce aux flèches, pouvez enregistrer la liste
@@ -275,7 +275,7 @@ help:
       | Temps restant | | Un *tps. r.* correspond au temps qui reste à accomplir sur le travail pour qu'il ait achevé son cycle. |
       | Temps effectué | | Le *tps. e.* correspond au temps consacré au travail/projet dans le cycle courant. |
       | Temps total | | Le *temps total* est le temps véritablement effectué sur le travail au cours de tous les cycles. |
-  task_data:
+  work_data:
     title: Données d’un travail
     level: '##'
     text: |
@@ -321,7 +321,7 @@ help:
       [Markdown](https://fr.wikipedia.org/wiki/Markdown), pratique pour sa
       simplicité et sa mise en œuvre.
 
-  task_list:
+  work_list:
     title: Liste des travaux
     level: '##'
     text: |
@@ -336,7 +336,7 @@ help:
 
       t(help.terminologie.text)
 
-      t(help.task_data.text)
+      t(help.work_data.text)
 
   durcycvsdursess:
     title: Durée cycle versus durée session
