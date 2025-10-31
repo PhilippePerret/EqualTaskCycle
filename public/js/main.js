@@ -18828,7 +18828,7 @@ class Editing {
           console.error(`[collectTaskData] Unable to find (form) div#work-${idw} (idw = ${idw})…`);
         }
       }
-      console.info("--- DES ERREURS SONT SURVENUES ---");
+      import_renderer4.default.info("--- DES ERREURS SONT SURVENUES ---");
       return [];
     } else {
       return Object.values(this.changesetWorks).filter((ch) => ch.count > 0).map((ch) => this.modifiedWorks[ch.id]);
@@ -18877,7 +18877,7 @@ class Editing {
           break;
       }
     }
-    console.info("errorCount fin checkChangeset: %i", errorCount);
+    import_renderer4.default.info("errorCount end checkChangeset: %i", errorCount);
     return errorCount;
   }
   async IDAlreadyExists(id) {
@@ -18973,6 +18973,11 @@ class Editing {
     listenBtn("up", this.onUp.bind(this, owork), owork);
     listenBtn("down", this.onDown.bind(this, owork), owork);
     listenBtn("remove", this.onRemove.bind(this, work), owork);
+    owork.querySelectorAll('input[type="text"]').forEach((o) => {
+      o.addEventListener("focus", () => {
+        o.select();
+      });
+    });
     const menuActive = DGet(".form-work-active", owork);
     menuActive.addEventListener("change", (ev) => {
       const actif = menuActive.value === "1";

@@ -73,7 +73,7 @@ class Editing {
         }
       }
 
-      console.info("--- DES ERREURS SONT SURVENUES ---")
+      log.info("--- DES ERREURS SONT SURVENUES ---")
       return [] /* pour ne pas enregistrer */
     } else {
       // No error
@@ -126,7 +126,7 @@ class Editing {
         break;
       }
     }
-    console.info("errorCount fin checkChangeset: %i", errorCount);
+    log.info("errorCount end checkChangeset: %i", errorCount);
     return errorCount;
   }
 
@@ -234,6 +234,9 @@ class Editing {
     listenBtn('up', this.onUp.bind(this, owork), owork);
     listenBtn('down', this.onDown.bind(this, owork), owork);
     listenBtn('remove', this.onRemove.bind(this, work), owork);
+    owork.querySelectorAll('input[type="text"]').forEach(o => {
+      o.addEventListener('focus', () => {(o as HTMLInputElement).select()})
+    })
     const menuActive = DGet('.form-work-active', owork)
     menuActive.addEventListener('change', (ev: Event) => {
       const actif = menuActive.value === '1';
