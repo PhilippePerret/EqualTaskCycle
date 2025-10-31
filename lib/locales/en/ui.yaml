@@ -18,6 +18,7 @@ ui:
     giveUp: Abandon
     not_anymore: Not anymore
     ok: OK
+    ok_remove: "OK, remove"
     open_min: open
     open_project: OPEN
     pause: PAUSE
@@ -72,6 +73,7 @@ ui:
     all_times_minutes: All times are expressed in minutes
     are_you_still_working: "Are you still working on this task?"
     baton_relais: Relay baton
+    confirmation_suppression_work: 'Do you confirm the deletion of the work/project "_0_"?'
     counter_mode: Counter Mode
     cycle: Cycle
     default_duration: Default duration

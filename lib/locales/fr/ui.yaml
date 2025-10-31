@@ -18,6 +18,7 @@ ui:
     giveUp: Renoncer
     not_anymore: Non
     ok: OK
+    ok_remove: "Oui, détruire"
     open_min: ouvrir
     open_project: PROJET
     pause: ⏸
@@ -72,6 +73,7 @@ ui:
     all_times_minutes: Tous les temps sont exprimés en minutes
     are_you_still_working: "Êtes-vous encore en train de travailler ?"
     baton_relais: Bâton de relais
+    confirmation_suppression_work: "Confirmez-vous la destruction du travail/projet « _0_ » ?"
     counter_mode: Mode de compteur
     cycle: Cycle
     default_duration: Durée par défaut

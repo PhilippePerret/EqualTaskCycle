@@ -3578,7 +3578,15 @@ function DGet(selector, container) {
   if (container === undefined) {
     container = document.body;
   }
-  return container.querySelector(selector);
+  try {
+    return container.querySelector(selector);
+  } catch (error) {
+    if (!container) {
+      throw new Error(`[DGet] Container undefined for selector ${selector}: ${error.message}`);
+    } else {
+      throw new Error(`[DGet] Unable to find selector ${selector} in container ${container.tagName}#${container.id}: ${error.message}`);
+    }
+  }
 }
 function stopEvent(ev) {
   ev.stopPropagation();
@@ -18801,11 +18809,23 @@ class Editing {
           continue;
         }
         const form = DGet(`div#work-${idw}`);
-        for (const [prop, errMsg] of Object.entries(changeset.errors)) {
-          const oprop = DGet(`.form-work-${prop}`, form);
-          const oErr = DGet(`.form-work-${prop}-err`, form);
-          oprop.classList.add("error");
-          oErr.innerHTML = errMsg;
+        if (form) {
+          for (const [prop, errMsg] of Object.entries(changeset.errors)) {
+            const oprop = DGet(`.form-work-${prop}`, form);
+            if (oprop) {
+              oprop.classList.add("error");
+            } else {
+              throw new Error(`[collectTaskData] Unable to find field form-work-${prop} (to set classList)`);
+            }
+            const oErr = DGet(`.form-work-${prop}-err`, form);
+            if (oErr) {
+              oErr.innerHTML = errMsg;
+            } else {
+              throw new Error(`[collectTaskData] Unable to find field form-work-${prop}-err (to set innerHTML)`);
+            }
+          }
+        } else {
+          console.error(`[collectTaskData] Unable to find (form) div#work-${idw} (idw = ${idw})…`);
         }
       }
       console.info("--- DES ERREURS SONT SURVENUES ---");
@@ -18861,7 +18881,7 @@ class Editing {
     return errorCount;
   }
   async IDAlreadyExists(id) {
-    const retour = await postToServer("/check/id-existence", { id, process: "Edition.IDAlreadyExists" });
+    const retour = await postToServer("/check/id-existence", { workId: id, process: "Edition.IDAlreadyExists" });
     return retour.ok && retour.idExists;
   }
   async unabledToFindProjectFolder(folder) {
@@ -18969,9 +18989,31 @@ class Editing {
       }
     }
   }
-  onRemove(work, ev) {
-    Flash.notice(t("task.destroy", [work.id]));
+  async onRemove(work, ev) {
+    const confirmation = await this.dialogConfirmRemove.showAsync([work.project]);
+    if (confirmation === "remove") {
+      let retour = { ok: true };
+      if (this.originalWorks[work.id]) {
+        retour = postToServer("/work/remove", { process: "Editing.onRemove", workId: work.id });
+      }
+      if (retour.ok) {
+        DGet(`div#work-${work.id}`).remove();
+        Flash.notice(t("task.destroy", [work.project]));
+      }
+    }
   }
+  get dialogConfirmRemove() {
+    return this._dialconfrem || (this._dialconfrem = new Dialog({
+      title: t("ui.title.confirmation_required"),
+      message: t("ui.text.confirmation_suppression_work"),
+      buttons: [
+        { text: t("ui.button.abandon"), role: "default", onclick: "cancel" },
+        { text: t("ui.button.ok_remove"), onclick: "remove" }
+      ],
+      icon: "images/icon.png"
+    }));
+  }
+  _dialconfrem;
   get taskContainer() {
     return DGet("div#editing-tasks-container");
   }
@@ -18998,6 +19040,7 @@ class Editing {
       } else {
         idProjet = this.getIdFromProject(project);
       }
+      owork.id = `work-${idProjet}`;
       idField.value = idProjet;
       dispField.innerHTML = idProjet;
     }
@@ -19011,8 +19054,15 @@ class Editing {
     if (project === "") {
       project = "UnnamedProject";
     }
-    const idp = project.toLowerCase().replace(/[^a-zA-Z-0-9 ]/g, "").split(" ").map((seg) => seg.length > 3 ? seg.substring(0, 3) : seg).join("");
-    return idp + this.suffixFromDate(4);
+    let idp;
+    const projetBase = project.trim().toLowerCase().replace(/[^a-zA-Z-0-9 ]/g, "");
+    const words = projetBase.split(" ");
+    if (words.length > 1) {
+      idp = words.map((seg) => seg.length > 3 ? seg.substring(0, 3) : seg).join("");
+    } else {
+      idp = projetBase.substring(0, 6);
+    }
+    return `${idp}-${this.suffixFromDate(5)}`;
   }
   suffixFromDate(long) {
     const now = String(new Date().getTime());

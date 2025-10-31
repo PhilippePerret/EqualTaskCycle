@@ -153,6 +153,13 @@ export function setupRoutes(app: Express) {
     res.json(result);
   });
 
+  // Pour détruire un travail
+  app.post('/work/remove', (req, res) => {
+    const dreq = req.body;
+    db.removeWork(dreq.workId);
+    res.json(Object.assign(dreq, {ok: true, error: ''}))
+  })
+
   // Retourne toutes les tâches, mais seulement les
   // information dans le fichier des données, pas les
   // temps.
@@ -191,10 +198,15 @@ export function setupRoutes(app: Express) {
     res.json(retour);
   });
 
+  app.post('/check/id-existence', (req, res) => {
+    const dreq = req.body;
+    const idExists = db.workIdExists(dreq.workId);
+    res.json(Object.assign(dreq, {ok: true, idExists, error: ''}));
+  })
   app.post('/check/folder-existence', (req, res) => {
     const dreq = req.body;
     const folderExists: boolean = existsSync(dreq.folder);
-    res.json(Object.assign(dreq, {ok: true, folderExists: folderExists, error: ''}));
+    res.json(Object.assign(dreq, {ok: true, folderExists, error: ''}));
   })
 
   app.post('/check/file-existence', (req, res) => {

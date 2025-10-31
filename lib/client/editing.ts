@@ -52,11 +52,24 @@ class Editing {
       for(let [idw, changeset] of Object.entries(this.changesetWorks)){
         if (changeset.count === 0) { continue }
         const form = DGet(`div#work-${idw}`);
-        for(const [prop, errMsg] of Object.entries(changeset.errors)){
-          const oprop = DGet(`.form-work-${prop}`, form);
-          const oErr = DGet(`.form-work-${prop}-err`, form);
-          oprop.classList.add('error');
-          oErr.innerHTML = errMsg;
+        if (form) {
+          for(const [prop, errMsg] of Object.entries(changeset.errors)){
+            const oprop = DGet(`.form-work-${prop}`, form);
+            if (oprop) {
+              oprop.classList.add('error');
+            } else {
+                throw new Error(`[collectTaskData] Unable to find field form-work-${prop} (to set classList)`);
+            }
+
+            const oErr = DGet(`.form-work-${prop}-err`, form);
+            if (oErr) {
+              oErr.innerHTML = errMsg;
+            } else {
+              throw new Error(`[collectTaskData] Unable to find field form-work-${prop}-err (to set innerHTML)`);
+            }
+          }
+        } else {
+          console.error(`[collectTaskData] Unable to find (form) div#work-${idw} (idw = ${idw})…`);
         }
       }
 
@@ -118,7 +131,7 @@ class Editing {
   }
 
   private async IDAlreadyExists(id: string): Promise<boolean> {
-    const retour = await postToServer('/check/id-existence', {id: id, process: 'Edition.IDAlreadyExists'})
+    const retour = await postToServer('/check/id-existence', {workId: id, process: 'Edition.IDAlreadyExists'})
     return retour.ok && retour.idExists;
   }
 
@@ -240,9 +253,33 @@ class Editing {
       }
     }
   }
-  private onRemove(work: WorkType, ev: MouseEvent){
-    Flash.notice(t('task.destroy', [work.id]));
+  private async onRemove(work: WorkType, ev: MouseEvent){
+    const confirmation = await this.dialogConfirmRemove.showAsync([work.project]);
+    if (confirmation === 'remove') {
+      let retour: RecType = {ok: true};
+      if (this.originalWorks[work.id]) {
+        // <= Le travail n'a pas été créé maintenant
+        // => Il faut le détruire dans la base
+        retour = postToServer('/work/remove', {process: 'Editing.onRemove', workId: work.id}) as any;
+      }
+      if (retour.ok) {
+        DGet(`div#work-${work.id}`).remove();
+        Flash.notice(t('task.destroy', [work.project]));
+      }
+    }
   }
+  private get dialogConfirmRemove(){
+    return this._dialconfrem || (this._dialconfrem = new Dialog({
+      title: t('ui.title.confirmation_required'),
+      message: t('ui.text.confirmation_suppression_work'),
+      buttons: [
+        {text: t('ui.button.abandon'), role: 'default', onclick: 'cancel'},
+        {text: t('ui.button.ok_remove'), onclick: 'remove'}
+      ],
+      icon: 'images/icon.png'
+    }));
+  }
+  private _dialconfrem!: Dialog;
 
   private get taskContainer(){
     return DGet('div#editing-tasks-container');
@@ -274,6 +311,7 @@ class Editing {
       } else {
         idProjet = this.getIdFromProject(project);
       }
+      owork.id = `work-${idProjet}`;
       idField.value = idProjet;
       dispField.innerHTML = idProjet;
     }
@@ -285,12 +323,19 @@ class Editing {
   }
   private getIdFromProject(project: string) {
     if (project === '') { project = 'UnnamedProject'}
-    const idp = project.toLowerCase()
-      .replace(/[^a-zA-Z-0-9 ]/g, '')
-      .split(' ')
+    let idp;
+    const projetBase = project.trim().toLowerCase()
+      .replace(/[^a-zA-Z-0-9 ]/g, '');
+    const words = projetBase.split(' ')
+    if ( words.length > 1) {
+      idp = words
       .map(seg => seg.length > 3 ? seg.substring(0, 3) : seg)
       .join('');
-    return idp + this.suffixFromDate(4);
+    } else {
+      idp = projetBase.substring(0, 6);
+    }
+
+    return `${idp}-${this.suffixFromDate(5)}` ;
   }
   private suffixFromDate(long: number){
     const now = String(new Date().getTime());

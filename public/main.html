@@ -114,7 +114,6 @@
     </div>
     <!-- TÂCHE À CLONER -->
     <div id="work-0" class="editing-form-work hidden off" data-id="0" style="width:600px;">
-      <input type="hidden" class="form-work-id" value="" />
       <input type="hidden" class="form-work-defaultLeftTime" value="" data-type="number" />
       <input type="hidden" class="form-work-totalTime" value="" data-type="number" />
       <input type="hidden" class="form-work-cycleTime" value="" data-type="number" />
@@ -130,6 +129,10 @@
           <option value="1">t(ui.adj.Active_m)</option>
           <option value="0">t(ui.adj.Inactive_m)</option>
         </select>
+      </div>
+      <div class="row-flex">
+        <input type="hidden" class="form-work-id" value="" />
+        <div class="form-work-id-err err"></div>
       </div>
       <div class="row-flex">
         <label>t(ui.title.project)</label>

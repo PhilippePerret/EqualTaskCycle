@@ -31,7 +31,15 @@ function DGet(selector, container) {
   if (container === undefined) {
     container = document.body;
   }
-  return container.querySelector(selector);
+  try {
+    return container.querySelector(selector);
+  } catch (error) {
+    if (!container) {
+      throw new Error(`[DGet] Container undefined for selector ${selector}: ${error.message}`);
+    } else {
+      throw new Error(`[DGet] Unable to find selector ${selector} in container ${container.tagName}#${container.id}: ${error.message}`);
+    }
+  }
 }
 function stopEvent(ev) {
   ev.stopPropagation();

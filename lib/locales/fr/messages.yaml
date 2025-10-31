@@ -31,7 +31,7 @@ manual:
   not_produced: "Impossible de produire le manuel d’ETC…"
 task:
   very_first_one: "Vous devez éditer les préférences en cliquant sur le bouton ⚙️.\n\nEnsuite, vous pouvez cliquer sur le bouton ✍🏽 pour établir la liste de vos travaux (et peut-être détruire celui-ci quand vous en aurez fini)."
-  destroy: 'Destruction de la tâche _0_'
+  destroy: 'Destruction de la tâche « _0_ » effectuée. Sniff…'
   any_active: Aucune tâche active.
   saved: "Tâches enregistrées avec succès !"
 times:
