@@ -170,11 +170,6 @@ class DBWorks {
   }
 
   public workIdExists(workId: string): boolean {
-    // workId = 'noupro6572'
-    console.log("workId = %s", workId);
-    const res = this.db.query('SELECT 1 FROM works WHERE id = ? LIMIT 1').get(workId);
-    console.log("Res request query", res);
-    console.log("Res request !!query", !!res);
     return !!this.db.query('SELECT 1 FROM works WHERE id = ? LIMIT 1').get(workId);
   }
 
