@@ -33,7 +33,9 @@ work:
   very_first_one: "You must edit the preferences by clicking the ⚙️ button.\n\nThen, you can click the ✍🏽 button to create your first works (and maybe delete this one)."
   destroy: 'Destroy work _0_'
   any_active: No active work.
-  saved: Tasks saved successfully
+  saved: Works saved successfully
+  unchanged: "No changes detected, nothing to save."
+
 times:
   dont_add_and_save: "I don’t add & save time"
   saved: New times recorded

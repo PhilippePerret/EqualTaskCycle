@@ -33,7 +33,8 @@ work:
   very_first_one: "Vous devez éditer les préférences en cliquant sur le bouton ⚙️.\n\nEnsuite, vous pouvez cliquer sur le bouton ✍🏽 pour établir la liste de vos travaux (et peut-être détruire celui-ci quand vous en aurez fini)."
   destroy: 'Destruction de la tâche « _0_ » effectuée. Sniff…'
   any_active: Aucune tâche active.
-  saved: "Tâches enregistrées avec succès !"
+  saved: "Travaux enregistrés avec succès !"
+  unchanged: "Aucun changement détecté, rien à enregistrer."
 times:
   dont_add_and_save: Je n'ai pas ajouté et sauvé les temps
   saved: Nouveaux temps enregistrés
@@ -42,8 +43,6 @@ tool:
   cycle_reset: Cycle réinitialisé avec succès.
 report:
   empty_content: "Par prudence, videz le contenu avant d'application le modèle."
-data_file:
-  open_with_sucess: "Fichier de données ouvert avec succès."
 prefs:
   saved: "Préférences enregistrées."
 folder:

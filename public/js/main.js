@@ -18791,6 +18791,40 @@ class Editing {
     return this._configcont || (this._configcont = DGet("#editing-config-container", this.section));
   }
   _configcont;
+  async startEditing() {
+    ui.toggleSection("editing");
+    const container = this.workContainer;
+    container.innerHTML = "";
+    const retour = await postToServer("/works/all", { process: "Editing.startEditing" });
+    if (retour.ok === false) {
+      return;
+    }
+    const works = retour.works;
+    import_renderer4.default.info("Works retreaved", works);
+    this.originalWorks = {};
+    works.forEach((w) => Object.assign(this.originalWorks, { [w.id]: w }));
+    DGet("span#works-count", this.section).innerHTML = works.length;
+    works.forEach((work) => {
+      this.createNewTask(work);
+    });
+  }
+  async onSaveData() {
+    const collectedData = await this.collectTaskData();
+    if (collectedData.length === 0) {
+      console.log("--- PAS D'ENREGISTREMENT ---");
+      return;
+    }
+    const retour = await postToServer("/works/save", { process: "Editing.onSaveData", works: collectedData });
+    if (retour.ok) {
+      Flash.success(t("work.saved"));
+      this.originalWorks = JSON.parse(JSON.stringify(this.modifiedWorks));
+      const curWId = Work.currentWork.id;
+      const curWData = collectedData.find((w) => w.id === curWId);
+      const curWork = Work.currentWork;
+      curWork.updateData(curWData);
+      curWork.dispatchData();
+    }
+  }
   async collectTaskData() {
     this.retreaveWorksDiff();
     let errorCount = 0;
@@ -18831,7 +18865,9 @@ class Editing {
       import_renderer4.default.info("--- DES ERREURS SONT SURVENUES ---");
       return [];
     } else {
-      return Object.values(this.changesetWorks).filter((ch) => ch.count > 0).map((ch) => this.modifiedWorks[ch.id]);
+      const works2save = Object.values(this.changesetWorks).filter((ch) => ch.count > 0).map((ch) => this.modifiedWorks[ch.id]);
+      works2save.length || Flash.notice(t("work.unchanged"));
+      return works2save;
     }
   }
   async checkChangeset(changeset, errorCount) {
@@ -18921,23 +18957,6 @@ class Editing {
       Object.assign(workData, { [prop]: value });
     });
     return workData;
-  }
-  async startEditing() {
-    ui.toggleSection("editing");
-    const container = this.workContainer;
-    container.innerHTML = "";
-    const retour = await postToServer("/works/all", { process: "Editing.startEditing" });
-    if (retour.ok === false) {
-      return;
-    }
-    const works = retour.works;
-    import_renderer4.default.info("Works retreaved", works);
-    this.originalWorks = {};
-    works.forEach((w) => Object.assign(this.originalWorks, { [w.id]: w }));
-    DGet("span#works-count", this.section).innerHTML = works.length;
-    works.forEach((work) => {
-      this.createNewTask(work);
-    });
   }
   get formClone() {
     return this._formtemp || (this._formtemp = this.section.querySelector(".editing-form-work"));
@@ -19077,22 +19096,6 @@ class Editing {
     const now = String(new Date().getTime());
     const len = now.length;
     return now.substring(len - long, len);
-  }
-  async onSaveData() {
-    const collectedData = await this.collectTaskData();
-    if (collectedData.length === 0) {
-      console.log("--- PAS D'ENREGISTREMENT ---");
-      return;
-    }
-    const retour = await postToServer("/works/save", { process: "Editing.onSaveData", works: collectedData });
-    if (retour.ok) {
-      Flash.success(t("work.saved"));
-      const curWId = Work.currentWork.id;
-      const curWData = collectedData.find((w) => w.id === curWId);
-      const curWork = Work.currentWork;
-      curWork.updateData(curWData);
-      curWork.dispatchData();
-    }
   }
   async stopEditing() {
     console.log("-> stopEditing");

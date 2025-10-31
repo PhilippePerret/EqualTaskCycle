@@ -23,6 +23,65 @@ class Editing {
     return this._configcont || (this._configcont = DGet('#editing-config-container', this.section))
   }; private _configcont!: HTMLDivElement;
 
+
+  /**
+   * @entry
+   * 
+   * Grande fonction qui remonte les données du fichier de donnée
+   * et prépare les formulaires des données de configuration et de 
+   * tâches
+   */
+  public async startEditing(){
+    ui.toggleSection('editing');
+    const container = this.workContainer;
+    container.innerHTML = '';
+    const retour: RecType = await postToServer('/works/all', {process: 'Editing.startEditing'});
+    if (retour.ok === false ) { return }
+    // --- TACHES/WORKS ---
+    const works = retour.works;
+    log.info("Works retreaved", works);
+    // On consigne les travaux actuels pour voir ceux qui auront 
+    // changé ou été créé. On conserve les informations dans une
+    // table.
+    this.originalWorks = {};
+    works.forEach((w: WorkType) => Object.assign(this.originalWorks, {[w.id]: w}))
+    // Indication du nombre de travaux dans le titre
+    DGet('span#works-count', this.section).innerHTML = works.length;
+    // Créer tous les formulaires pour les tâches
+    works.forEach((work: WorkType) => { this.createNewTask(work) })
+  }
+
+
+  /**
+   * Pour enregistrer les nouvelles données sur les tâches.
+   * 
+   * Note : la tâche courante a peut-être été modifiée, il faut 
+   * l'actualiser.
+   */
+  private async onSaveData(){
+    const collectedData: WorkType[] = await this.collectTaskData();
+    if (collectedData.length === 0 /* erreur détectée ou no changement */) { 
+      console.log("--- PAS D'ENREGISTREMENT ---")
+      return 
+    }
+    /************************** 
+     * ===  ENREGISTREMENT  ===
+     ***************************/
+    const retour = await postToServer('/works/save', {process: 'Editing.onSaveData', works: collectedData});
+    if (retour.ok){ 
+      Flash.success(t('work.saved'));
+      // On actualise la liste originale
+      this.originalWorks = JSON.parse(JSON.stringify(this.modifiedWorks));
+      // On actualise le travail affiché dans le panneau
+      // principal (travail courant)
+      const curWId = Work.currentWork.id;
+      const curWData = collectedData.find(w => w.id === curWId);
+      const curWork = Work.currentWork;
+      curWork.updateData(curWData as WorkType);
+      curWork.dispatchData();
+    }
+  }
+
   /**
    * Fonction qui relève (et renvoie) les données des tâches dans 
    * la liste. Elle vérifie les changements et les valeurs sensibles
@@ -78,12 +137,18 @@ class Editing {
     } else {
       // No error
       // On ne prend que les travaux modifiés
-      return Object.values(this.changesetWorks)
+      const works2save = Object.values(this.changesetWorks)
         .filter((ch: RecType) => ch.count > 0)
         .map((ch: RecType) => this.modifiedWorks[ch.id]) as WorkType[];
+      works2save.length || Flash.notice(t('work.unchanged'))
+      return works2save;
     }
   }
 
+  /**
+   * Méthode qui vérifie la validité des données et consigne toutes
+   * les erreurs qui ont pu être trouvées.
+   */
   private async checkChangeset(changeset: any, errorCount: number): Promise<number> {
     const idw: string = changeset.id;
     log.info('Check des changements du travail ', idw);
@@ -169,31 +234,6 @@ class Editing {
       Object.assign(workData, {[prop]: value});
     })
     return workData as WorkType;
-  }
-
-  /**
-   * Grande fonction qui remonte les données du fichier de donnée
-   * et prépare les formulaires des données de configuration et de 
-   * tâches
-   */
-  async startEditing(){
-    ui.toggleSection('editing');
-    const container = this.workContainer;
-    container.innerHTML = '';
-    const retour: RecType = await postToServer('/works/all', {process: 'Editing.startEditing'});
-    if (retour.ok === false ) { return }
-    // --- TACHES/WORKS ---
-    const works = retour.works;
-    log.info("Works retreaved", works);
-    // On consigne les travaux actuels pour voir ceux qui auront 
-    // changé ou été créé. On conserve les informations dans une
-    // table.
-    this.originalWorks = {};
-    works.forEach((w: WorkType) => Object.assign(this.originalWorks, {[w.id]: w}))
-    // Indication du nombre de travaux dans le titre
-    DGet('span#works-count', this.section).innerHTML = works.length;
-    // Créer tous les formulaires pour les tâches
-    works.forEach((work: WorkType) => { this.createNewTask(work) })
   }
 
   private get formClone(){
@@ -349,31 +389,6 @@ class Editing {
     const now = String(new Date().getTime());
     const len = now.length;
     return now.substring(len - long, len)
-  }
-
-  /**
-   * Pour enregistrer les nouvelles données sur les tâches.
-   * 
-   * Note : la tâche courante a peut-être été modifiée, il faut 
-   * l'actualiser.
-   */
-  private async onSaveData(){
-    const collectedData: WorkType[] = await this.collectTaskData();
-    if (collectedData.length === 0 /* erreur détectée ou no changement */) { 
-      console.log("--- PAS D'ENREGISTREMENT ---")
-      return 
-    }
-
-    const retour = await postToServer('/works/save', {process: 'Editing.onSaveData', works: collectedData});
-    if (retour.ok){ 
-      Flash.success(t('work.saved'));
-      // On actualise la tâche affichée (courante)
-      const curWId = Work.currentWork.id;
-      const curWData = collectedData.find(w => w.id === curWId);
-      const curWork = Work.currentWork;
-      curWork.updateData(curWData as WorkType);
-      curWork.dispatchData();
-    }
   }
 
   // 
