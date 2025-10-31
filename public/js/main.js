@@ -18832,6 +18832,7 @@ class Editing {
     if (retour.ok) {
       Flash.success(t("work.saved"));
       this.originalWorks = JSON.parse(JSON.stringify(this.modifiedWorks));
+      this.originalOrder = String(this.modifiedOrder);
       const curWId = Work.currentWork.id;
       const curWData = collectedData.find((w) => w.id === curWId);
       const curWork = Work.currentWork;

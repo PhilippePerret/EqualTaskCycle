@@ -62,7 +62,6 @@ class Editing {
     DGet('span#works-count', this.section).innerHTML = works.length;
   }
 
-
   /**
    * Pour enregistrer les nouvelles données sur les tâches.
    * 
@@ -80,6 +79,16 @@ class Editing {
       log.info("--- PAS D'ENREGISTREMENT ---");
       return 
     }
+
+    /*s
+    console.log("Je dois enregistrer car…");
+    console.log("collectedData à enregistrer : ", collectedData);
+    console.log("Classement a changé ?", !this.orderHasNotChanged());
+    console.log("this.originalOrder:", this.originalOrder);
+    console.log("this.modifiedOrder:", this.modifiedOrder);
+    // return // Pour le test
+    //*/
+
     /**************************** 
      * ===  ENREGISTREMENT  === *
      ****************************/
@@ -92,6 +101,7 @@ class Editing {
       Flash.success(t('work.saved'));
       // On actualise la liste originale
       this.originalWorks = JSON.parse(JSON.stringify(this.modifiedWorks));
+      this.originalOrder = String(this.modifiedOrder);
       // On actualise le travail affiché dans le panneau
       // principal (travail courant)
       const curWId = Work.currentWork.id;
