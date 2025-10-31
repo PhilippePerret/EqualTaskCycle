@@ -16701,7 +16701,7 @@ class Locale {
   }
   static inst;
 }
-var __dirname = "/Users/philippeperret/Programmes/EqualTaskCycle/lib/shared", LOCALES_FOLDER, loc;
+var __dirname = "/Users/philippeperret/Programmes/ETC/lib/shared", LOCALES_FOLDER, loc;
 var init_Locale = __esm(() => {
   init_path();
   init_js_yaml();

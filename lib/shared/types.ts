@@ -1,5 +1,11 @@
 
 
+export interface ResultType {
+  ok: boolean;
+  error: string | undefined ;
+  process: string;
+}
+
 export type RecType = {[x: string]: any};
 
 export type ButtonType = {

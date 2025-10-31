@@ -134,6 +134,22 @@ class DBWorks {
   }
 
   /**
+   * Enregistrement de l'ordre des travaux
+   */
+  public saveWorksOrder(order: string | string[]){
+    order = 'string' === typeof order ? order : order.join(':');
+    const req = 'REPLACE INTO keypairs (k, v) VALUES (?, ?)';
+    this.db.run(req, ['worksOrder', order]);
+  }
+
+  public getWorksOrder(): string[] {
+    let res = this.db.query('SELECT v FROM keypairs WHERE k = ?').get('worksOrder');
+    console.log("Res: ", res);
+    res = res || {v: []};
+    return (res as any).v.split(':') as string[];
+  }
+
+  /**
    * Enregistrement de la dernière date de changement
    * (quand l'utilisateur demande à changer la tâche courante, ce
    *  qu'il ne peut faire qu'une seule fois par session/jour)

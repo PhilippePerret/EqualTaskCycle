@@ -18,6 +18,10 @@ class Editing {
   // Table pour mettre les modifications
   private changesetWorks!: {[x: string]: RecType};
 
+  // Ordre initial des travaux
+  private originalOrder!: string;
+  private modifiedOrder!: string;
+
   private get section(){ return DGet('section#editing')}
   private get configContainer(){
     return this._configcont || (this._configcont = DGet('#editing-config-container', this.section))
@@ -37,18 +41,25 @@ class Editing {
     container.innerHTML = '';
     const retour: RecType = await postToServer('/works/all', {process: 'Editing.startEditing'});
     if (retour.ok === false ) { return }
-    // --- TACHES/WORKS ---
+    console.log("retour", retour);
+    // --- WORKS ---
     const works = retour.works;
+    const order = retour.order || works.map((w: WorkType) => w.id);
+    this.originalOrder = order.join(':');
+
     log.info("Works retreaved", works);
-    // On consigne les travaux actuels pour voir ceux qui auront 
-    // changé ou été créé. On conserve les informations dans une
-    // table.
+    log.info("Order retreaved", order);
+    // On fait une table avec les travaux pour pouvoir y avoir
+    // accès plus facilement
     this.originalWorks = {};
-    works.forEach((w: WorkType) => Object.assign(this.originalWorks, {[w.id]: w}))
+    works.forEach((w: WorkType) => Object.assign(this.originalWorks, {[w.id]: w}));
+    // On crée les formulaires dans l'ordre
+    order.forEach((workId: string) => {
+      const work: WorkType = this.originalWorks[workId] as WorkType;
+      this.createNewTask(work);
+    })
     // Indication du nombre de travaux dans le titre
     DGet('span#works-count', this.section).innerHTML = works.length;
-    // Créer tous les formulaires pour les tâches
-    works.forEach((work: WorkType) => { this.createNewTask(work) })
   }
 
 
@@ -59,15 +70,24 @@ class Editing {
    * l'actualiser.
    */
   private async onSaveData(){
-    const collectedData: WorkType[] = await this.collectTaskData();
-    if (collectedData.length === 0 /* erreur détectée ou no changement */) { 
-      console.log("--- PAS D'ENREGISTREMENT ---")
+    const collectedData: WorkType[] | null = await this.collectTaskData();
+
+    if ( collectedData === null) /* erreur détectée */ {
+      return;
+    }
+    else if (collectedData.length === 0 && this.orderHasNotChanged() /* no changement */) { 
+      Flash.notice(t('work.unchanged'));
+      log.info("--- PAS D'ENREGISTREMENT ---");
       return 
     }
-    /************************** 
-     * ===  ENREGISTREMENT  ===
-     ***************************/
-    const retour = await postToServer('/works/save', {process: 'Editing.onSaveData', works: collectedData});
+    /**************************** 
+     * ===  ENREGISTREMENT  === *
+     ****************************/
+    const retour = await postToServer('/works/save', {
+      process: 'Editing.onSaveData', 
+      works: collectedData,
+      order: this.modifiedOrder
+    });
     if (retour.ok){ 
       Flash.success(t('work.saved'));
       // On actualise la liste originale
@@ -75,11 +95,15 @@ class Editing {
       // On actualise le travail affiché dans le panneau
       // principal (travail courant)
       const curWId = Work.currentWork.id;
-      const curWData = collectedData.find(w => w.id === curWId);
+      const curWData = (collectedData as WorkType[]).find(w => w.id === curWId);
       const curWork = Work.currentWork;
       curWork.updateData(curWData as WorkType);
       curWork.dispatchData();
     }
+  }
+
+  private orderHasNotChanged(){
+    return this.originalOrder === this.modifiedOrder;
   }
 
   /**
@@ -88,7 +112,7 @@ class Editing {
    * (identifiants changés ou nouveau, chemins d'accès aux dossiers,
    * au script etc.)
    */
-  private async collectTaskData(): Promise<WorkType[]> {
+  private async collectTaskData(): Promise<WorkType[] | null> {
     this.retreaveWorksDiff();
     // Étude des problèmes éventuels
     let errorCount = 0;
@@ -133,15 +157,14 @@ class Editing {
       }
 
       log.info("--- DES ERREURS SONT SURVENUES ---")
-      return [] /* pour ne pas enregistrer */
+      return null;
     } else {
       // No error
+      // -------
       // On ne prend que les travaux modifiés
-      const works2save = Object.values(this.changesetWorks)
+      return Object.values(this.changesetWorks)
         .filter((ch: RecType) => ch.count > 0)
         .map((ch: RecType) => this.modifiedWorks[ch.id]) as WorkType[];
-      works2save.length || Flash.notice(t('work.unchanged'))
-      return works2save;
     }
   }
 
@@ -444,6 +467,7 @@ class Editing {
   private retreaveWorksDiff(): number {
     console.info("originalWorks", this.originalWorks);
     this.modifiedWorks = {};
+    const orderedIds: string[] = [];
     this.workContainer.querySelectorAll('.editing-form-work').forEach( (form: HTMLDivElement) => {
       const wdata = this.getTaskDataIn(form);
       if (wdata.id === '') {
@@ -453,9 +477,11 @@ class Editing {
         wdata.id = this.getIdFromProject(wdata.project)
         this.setFormId(form, wdata);
       }
+      orderedIds.push(wdata.id);
       Object.assign(this.modifiedWorks, {[wdata.id]: wdata});
     });
-    console.info("modifiedWorks", this.modifiedWorks);
+    // console.info("modifiedWorks", this.modifiedWorks)
+    this.modifiedOrder = orderedIds.join(':');
     // Relève des changements
     this.changesetWorks = {};
     let totalChangeCount = 0;

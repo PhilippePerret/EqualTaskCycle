@@ -7,7 +7,7 @@ import db from './db';
 import { Work } from "./work";
 import { existsSync, statSync } from 'fs';
 import { execFileSync, execSync } from 'child_process';
-import type { RecType, WorkType } from '../shared/types';
+import type { RecType, ResultType, WorkType } from '../shared/types';
 import { activTracker } from './activityTracker';
 import { manual } from './Manual';
 
@@ -110,7 +110,11 @@ export function setupRoutes(app: Express) {
   // temps.
   app.post('/works/all', (req, res) => {
     const dreq = req.body;
-    Object.assign(dreq, {ok: true, works: db.getAllWorks()})
+    Object.assign(dreq, {
+      ok: true, 
+      works: db.getAllWorks(),
+      order: db.getWorksOrder()
+    })
     res.json(dreq);
   });
 
@@ -125,9 +129,13 @@ export function setupRoutes(app: Express) {
 
   app.post('/works/save', (req, res) => {
     const dreq = req.body;
-    const result = db.saveAllWorks(dreq.works);
-    Object.assign(dreq, result);
-    res.json(dreq);
+    const works = dreq.works;
+    const result: ResultType = {ok: true, error: undefined, process: dreq.process};
+    if ( works.length ) {
+      Object.assign(result, db.saveAllWorks(dreq.works))
+    }
+    Object.assign(result, db.saveWorksOrder(dreq.order))
+    res.json(result);
   });
 
   app.post('/prefs/save', (req, res) => {

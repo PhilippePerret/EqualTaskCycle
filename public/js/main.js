@@ -17375,7 +17375,7 @@ class Locale {
   }
   static inst;
 }
-var __dirname = "/Users/philippeperret/Programmes/EqualTaskCycle/lib/shared", LOCALES_FOLDER, loc;
+var __dirname = "/Users/philippeperret/Programmes/ETC/lib/shared", LOCALES_FOLDER, loc;
 var init_Locale = __esm(() => {
   init_path();
   init_js_yaml();
@@ -18784,6 +18784,8 @@ class Editing {
   originalWorks;
   modifiedWorks;
   changesetWorks;
+  originalOrder;
+  modifiedOrder;
   get section() {
     return DGet("section#editing");
   }
@@ -18799,22 +18801,34 @@ class Editing {
     if (retour.ok === false) {
       return;
     }
+    console.log("retour", retour);
     const works = retour.works;
+    const order2 = retour.order || works.map((w) => w.id);
+    this.originalOrder = order2.join(":");
     import_renderer4.default.info("Works retreaved", works);
+    import_renderer4.default.info("Order retreaved", order2);
     this.originalWorks = {};
     works.forEach((w) => Object.assign(this.originalWorks, { [w.id]: w }));
-    DGet("span#works-count", this.section).innerHTML = works.length;
-    works.forEach((work) => {
+    order2.forEach((workId) => {
+      const work = this.originalWorks[workId];
       this.createNewTask(work);
     });
+    DGet("span#works-count", this.section).innerHTML = works.length;
   }
   async onSaveData() {
     const collectedData = await this.collectTaskData();
-    if (collectedData.length === 0) {
-      console.log("--- PAS D'ENREGISTREMENT ---");
+    if (collectedData === null) {
+      return;
+    } else if (collectedData.length === 0 && this.orderHasNotChanged()) {
+      Flash.notice(t("work.unchanged"));
+      import_renderer4.default.info("--- PAS D'ENREGISTREMENT ---");
       return;
     }
-    const retour = await postToServer("/works/save", { process: "Editing.onSaveData", works: collectedData });
+    const retour = await postToServer("/works/save", {
+      process: "Editing.onSaveData",
+      works: collectedData,
+      order: this.modifiedOrder
+    });
     if (retour.ok) {
       Flash.success(t("work.saved"));
       this.originalWorks = JSON.parse(JSON.stringify(this.modifiedWorks));
@@ -18824,6 +18838,9 @@ class Editing {
       curWork.updateData(curWData);
       curWork.dispatchData();
     }
+  }
+  orderHasNotChanged() {
+    return this.originalOrder === this.modifiedOrder;
   }
   async collectTaskData() {
     this.retreaveWorksDiff();
@@ -18863,11 +18880,9 @@ class Editing {
         }
       }
       import_renderer4.default.info("--- DES ERREURS SONT SURVENUES ---");
-      return [];
+      return null;
     } else {
-      const works2save = Object.values(this.changesetWorks).filter((ch) => ch.count > 0).map((ch) => this.modifiedWorks[ch.id]);
-      works2save.length || Flash.notice(t("work.unchanged"));
-      return works2save;
+      return Object.values(this.changesetWorks).filter((ch) => ch.count > 0).map((ch) => this.modifiedWorks[ch.id]);
     }
   }
   async checkChangeset(changeset, errorCount) {
@@ -19129,15 +19144,17 @@ class Editing {
   retreaveWorksDiff() {
     console.info("originalWorks", this.originalWorks);
     this.modifiedWorks = {};
+    const orderedIds = [];
     this.workContainer.querySelectorAll(".editing-form-work").forEach((form) => {
       const wdata = this.getTaskDataIn(form);
       if (wdata.id === "") {
         wdata.id = this.getIdFromProject(wdata.project);
         this.setFormId(form, wdata);
       }
+      orderedIds.push(wdata.id);
       Object.assign(this.modifiedWorks, { [wdata.id]: wdata });
     });
-    console.info("modifiedWorks", this.modifiedWorks);
+    this.modifiedOrder = orderedIds.join(":");
     this.changesetWorks = {};
     let totalChangeCount = 0;
     Object.entries(this.modifiedWorks).forEach(([idw, work]) => {
