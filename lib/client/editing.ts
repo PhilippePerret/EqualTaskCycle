@@ -86,8 +86,8 @@ class Editing {
 
   private async checkChangeset(changeset: any, errorCount: number): Promise<number> {
     const idw: string = changeset.id;
-    // log.info('Check des changements du travail ', idw);
-    console.info('Check des changements du travail ', idw);
+    log.info('Check des changements du travail ', idw);
+    // console.info('Check des changements du travail ', idw);
     if (changeset.count === 0) { return errorCount } 
     for (const prop of changeset.change) {
       const newValue = (this.modifiedWorks as any)[idw][prop];
@@ -202,13 +202,18 @@ class Editing {
 
   private createNewTask(work: WorkType): HTMLDivElement {
     const owork:HTMLDivElement = this.formClone.cloneNode(true) as HTMLDivElement;
-    owork.id = `work-${work.id}`;
+    this.setFormId(owork, work);
     this.workContainer.appendChild(owork);
     this.peupleWorkForm(owork, work);
     this.observeWorkForm(owork, work);
     owork.classList.remove('hidden');
     if (work.active) owork.classList.remove('off');
     return owork;
+  }
+
+  private setFormId(form: HTMLDivElement, work: WorkType | string){
+    const workId = 'string' === typeof work ? work : work.id;
+    form.id = `work-${workId}`;
   }
 
 
@@ -311,7 +316,7 @@ class Editing {
       } else {
         idProjet = this.getIdFromProject(project);
       }
-      owork.id = `work-${idProjet}`;
+      this.setFormId(owork, idProjet);
       idField.value = idProjet;
       dispField.innerHTML = idProjet;
     }
@@ -326,7 +331,7 @@ class Editing {
     let idp;
     const projetBase = project.trim().toLowerCase()
       .replace(/[^a-zA-Z-0-9 ]/g, '');
-    const words = projetBase.split(' ')
+    const words = projetBase.split(/[ \/\:\-\_]/);
     if ( words.length > 1) {
       idp = words
       .map(seg => seg.length > 3 ? seg.substring(0, 3) : seg)
@@ -423,7 +428,13 @@ class Editing {
     this.modifiedWorks = {};
     this.workContainer.querySelectorAll('.editing-form-work').forEach( (form: HTMLDivElement) => {
       const wdata = this.getTaskDataIn(form);
-      if (wdata.id === '') { wdata.id = this.getIdFromProject(wdata.project) }
+      if (wdata.id === '') {
+        // ID non défini (ça arrive quand il vient d'être
+        // créé sans avoir changé le titre. Dans ce cas, 
+        // l'identifiant du "formulaire" n'est pas mis)
+        wdata.id = this.getIdFromProject(wdata.project)
+        this.setFormId(form, wdata);
+      }
       Object.assign(this.modifiedWorks, {[wdata.id]: wdata});
     });
     console.info("modifiedWorks", this.modifiedWorks);

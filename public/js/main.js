@@ -18836,7 +18836,7 @@ class Editing {
   }
   async checkChangeset(changeset, errorCount) {
     const idw = changeset.id;
-    console.info("Check des changements du travail ", idw);
+    import_renderer4.default.info("Check des changements du travail ", idw);
     if (changeset.count === 0) {
       return errorCount;
     }
@@ -18944,7 +18944,7 @@ class Editing {
   }
   createNewTask(work) {
     const owork = this.formClone.cloneNode(true);
-    owork.id = `work-${work.id}`;
+    this.setFormId(owork, work);
     this.workContainer.appendChild(owork);
     this.peupleWorkForm(owork, work);
     this.observeWorkForm(owork, work);
@@ -18952,6 +18952,10 @@ class Editing {
     if (work.active)
       owork.classList.remove("off");
     return owork;
+  }
+  setFormId(form, work) {
+    const workId = typeof work === "string" ? work : work.id;
+    form.id = `work-${workId}`;
   }
   peupleWorkForm(obj, work) {
     WORK_PROPS.forEach((prop) => {
@@ -19040,7 +19044,7 @@ class Editing {
       } else {
         idProjet = this.getIdFromProject(project);
       }
-      owork.id = `work-${idProjet}`;
+      this.setFormId(owork, idProjet);
       idField.value = idProjet;
       dispField.innerHTML = idProjet;
     }
@@ -19056,7 +19060,7 @@ class Editing {
     }
     let idp;
     const projetBase = project.trim().toLowerCase().replace(/[^a-zA-Z-0-9 ]/g, "");
-    const words = projetBase.split(" ");
+    const words = projetBase.split(/[ \/\:\-\_]/);
     if (words.length > 1) {
       idp = words.map((seg) => seg.length > 3 ? seg.substring(0, 3) : seg).join("");
     } else {
@@ -19121,6 +19125,7 @@ class Editing {
       const wdata = this.getTaskDataIn(form);
       if (wdata.id === "") {
         wdata.id = this.getIdFromProject(wdata.project);
+        this.setFormId(form, wdata);
       }
       Object.assign(this.modifiedWorks, { [wdata.id]: wdata });
     });
