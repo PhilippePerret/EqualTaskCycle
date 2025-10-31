@@ -102,7 +102,7 @@ ui:
     total_duration: Total duration
     ui_theme: UI Theme
     when_works_modified_add_or_remove: "Some works have been modified, added, or removed. Do you really want to close? (all changes will be lost)"
-    your_project: "Your project/Task"
+    your_project: "Your project/work"
     description_stop_report_modele: |
       Description of what will need to be done in the next session.
 

@@ -102,7 +102,7 @@ ui:
     total_duration: Durée totale
     ui_theme: Thème interface
     when_works_modified_add_or_remove: "Des travaux ont été modifiés, ajoutés ou supprimés. Voulez-vous vraiment fermer et perdre ces changements ?"
-    your_project: "Votre projet/Tâche"
+    your_project: "Votre projet/travail"
     description_stop_report_modele: |
       Description de ce qu'il faudra faire à la prochaine session.
 
