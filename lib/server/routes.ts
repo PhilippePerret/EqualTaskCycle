@@ -42,28 +42,6 @@ export function setupRoutes(app: Express) {
     res.json(data)
   });
 
-  app.post('/work/check-activity', async (req, res) => {
-    log.info("->route /work/check-activity");
-    req.setTimeout(30 * 60 * 1000);
-    res.setTimeout(30 * 60 * 1000);
-    let response: RecType = {};
-    try {
-      const dreq = req.body;
-      const folder: string = dreq.projectFolder;
-      const lastCheck = dreq.lastCheck;
-      const isActive = await activTracker.watchActivity(folder, lastCheck);
-      log.info('Data watcher activity:', {isActive, folder, lastCheck, date: new Date(lastCheck)});
-      if (isActive === false) {
-        // TODO Activer l'application pour voir le dialogue
-      }
-      response = {ok: true, isActive: isActive}
-    } catch (err) {
-      log.error("ERREURS IN /work/check-activity", err);
-      response = {ok: false, error: (err as any).message }
-    }
-    res.json(response);
-  });
-
   app.post('/work/save-session', (req, res) => {
     log.info("-> /work/save-session");
     const dwork = req.body;
@@ -91,39 +69,6 @@ export function setupRoutes(app: Express) {
     res.json(result);
   });
 
-  app.post('/task/open-folder', (req, res) => {
-    const dreq = req.body;
-    let result = {ok: true, error: ''};
-    if (existsSync(path.resolve(dreq.folder))) {
-      try {
-        execSync(`open -a Finder "${dreq.folder}"`);
-      } catch(err: any) {
-        console.error("ERREUR OUVERTURE FOLDER: ", err);
-        result = {ok: false, error: String(err.stderr)}
-      }
-    } else {
-      result = {ok: false, error: 'Unfound folder ' + dreq.folder};
-    }
-    res.json(result);
-  });
-
-  app.post('/task/run-script', (req, res) => {
-    const dreq = req.body;
-    let result = {ok: true, error: ''};
-    dreq.script = path.resolve(dreq.script);
-    // log.info("Je dois jouer le script", dreq.script);
-    if (existsSync(dreq.script)) {
-      try {
-        const res = execFileSync(dreq.script, {encoding: 'utf8'});
-        log.info("Résultat du script", res);
-      } catch(err: any) {
-        result = {ok: false, error: err.stderr}
-      }
-    } else {
-      result = {ok: false, error: 'Script "'+dreq.script+'"unfound.'}
-    }
-    res.json(result);
-  })
   app.post('/task/change', (req, res) => {
     const dreq = req.body;
     let result: {
@@ -198,6 +143,28 @@ export function setupRoutes(app: Express) {
     res.json(retour);
   });
 
+  app.post('/work/check-activity', async (req, res) => {
+    log.info("->route /work/check-activity");
+    req.setTimeout(30 * 60 * 1000);
+    res.setTimeout(30 * 60 * 1000);
+    let response: RecType = {};
+    try {
+      const dreq = req.body;
+      const folder: string = dreq.projectFolder;
+      const lastCheck = dreq.lastCheck;
+      const isActive = await activTracker.watchActivity(folder, lastCheck);
+      log.info('Data watcher activity:', {isActive, folder, lastCheck, date: new Date(lastCheck)});
+      if (isActive === false) {
+        // TODO Activer l'application pour voir le dialogue
+      }
+      response = {ok: true, isActive: isActive}
+    } catch (err) {
+      log.error("ERREURS IN /work/check-activity", err);
+      response = {ok: false, error: (err as any).message }
+    }
+    res.json(response);
+  });
+
   app.post('/check/id-existence', (req, res) => {
     const dreq = req.body;
     const idExists = db.workIdExists(dreq.workId);
@@ -220,6 +187,40 @@ export function setupRoutes(app: Express) {
     const stats = statSync(dreq.file);
     const isExecutable = !!(stats.mode & 0o111);
     res.json(Object.assign(dreq, {ok: true, isExecutable, error: ''}));
+  })
+
+  app.post('/tool/open-folder', (req, res) => {
+    const dreq = req.body;
+    let result = {ok: true, error: ''};
+    if (existsSync(path.resolve(dreq.folder))) {
+      try {
+        execSync(`open -a Finder "${dreq.folder}"`);
+      } catch(err: any) {
+        console.error("ERREUR OUVERTURE FOLDER: ", err);
+        result = {ok: false, error: String(err.stderr)}
+      }
+    } else {
+      result = {ok: false, error: 'Unfound folder ' + dreq.folder};
+    }
+    res.json(result);
+  });
+
+  app.post('/tool/run-script', (req, res) => {
+    const dreq = req.body;
+    let result = {ok: true, error: ''};
+    dreq.script = path.resolve(dreq.script);
+    // log.info("Je dois jouer le script", dreq.script);
+    if (existsSync(dreq.script)) {
+      try {
+        const res = execFileSync(dreq.script, {encoding: 'utf8'});
+        log.info("Résultat du script", res);
+      } catch(err: any) {
+        result = {ok: false, error: err.stderr}
+      }
+    } else {
+      result = {ok: false, error: 'Script "'+dreq.script+'"unfound.'}
+    }
+    res.json(result);
   })
 
   app.post('/tool/reset-cycle', async (req, res) => {

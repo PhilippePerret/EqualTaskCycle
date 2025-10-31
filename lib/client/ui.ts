@@ -183,7 +183,7 @@ export class UI {
   private async onRunScript(ev: Event){
     ev && stopEvent(ev);
     const curwork: Work = Work.currentWork;
-    const result = await postToServer('/task/run-script', {workId: curwork.id, script: curwork.script});
+    const result = await postToServer('/tool/run-script', {workId: curwork.id, script: curwork.script});
     if ( result.ok ) { Flash.success(t('script.ran_successfully')) }
     return false;
   }
@@ -192,7 +192,7 @@ export class UI {
   private async onOpenFolder(ev: Event){
     ev && stopEvent(ev);
     const curwork: Work = Work.currentWork;
-    const result = await postToServer('/task/open-folder', {workId: curwork.id, folder: curwork.folder});
+    const result = await postToServer('/tool/open-folder', {workId: curwork.id, folder: curwork.folder});
     if ( result.ok ) { Flash.success(t('folder.opened_in_finder')) }
     return false;
   }
