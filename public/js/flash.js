@@ -46,7 +46,7 @@ export class Flash {
   }
 
   static notice(message, options) {
-    this.buildMessage({content: message, type: 'notice'})
+    this.buildMessage({content: message, type: 'notice', options})
   }
   static info(message, options){return this.notice(message, options)}
 
@@ -68,7 +68,7 @@ export class Flash {
    * Pour détruire un message affiché
    */
   static removeMessage(message){
-    if ( message.type != 'error') {
+    if (message.timer) {
       clearTimeout(message.timer);
       message.timer = null
     }
@@ -88,7 +88,7 @@ class FlashMessage {
     this.options = data.options || {};
     this.build()
     this.show()
-    if ( this.type != 'error' || this.options.keep === false ) this.temporize();
+    this.options.keep === true || this.temporize();
     this.observe()
   }
 
