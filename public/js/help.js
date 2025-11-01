@@ -17330,6 +17330,10 @@ class Help {
   }
   static inst;
   texts;
+  listenOn(e, helpIds) {
+    helpIds = typeof helpIds === "string" ? [helpIds] : helpIds;
+    e.addEventListener("click", help.show.bind(help, helpIds));
+  }
   async show(helpIds) {
     this.isOpened() || ui.toggleHelp();
     this.content.innerHTML = "";

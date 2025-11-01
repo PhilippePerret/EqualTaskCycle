@@ -76,6 +76,7 @@ ui:
     are_you_still_working: "Êtes-vous encore en train de travailler ?"
     baton_relais: Bâton de relais
     confirmation_suppression_work: "Confirmez-vous la destruction du travail/projet « _0_ » ?"
+    click_on_this_to_help_cron: "Pour définir le « cron » du travail. Cliquer sur ce point d'interrogation pour rejoindre l'aide."
     counter_mode: Mode de compteur
     cycle: Cycle
     default_duration: Durée par défaut

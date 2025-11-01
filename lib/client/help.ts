@@ -88,12 +88,21 @@ t(help.cron.text)
 }
 
 
-class Help { /* singleton */
+class Help { /* singleton help */
   private constructor(){}
   public static getInst(){return this.inst || (this.inst = new Help())}
   private static inst: Help;
-
   private texts!: string[];
+
+  /**
+   * Place un observateur sur l'élément +e+ pour afficher
+   * l'aide ou les aides pour +helpIds+ qui peut être un
+   * identifiant d'aide seul ou une liste ordonnée.
+   */
+  public listenOn(e: HTMLElement, helpIds: string | string[]){
+    helpIds = 'string' === typeof helpIds ? [helpIds] : helpIds;
+    e.addEventListener('click', help.show.bind(help, helpIds));
+  }
 
   public async show(helpIds: string[]){
     this.isOpened() || ui.toggleHelp();

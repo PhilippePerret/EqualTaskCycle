@@ -3,7 +3,7 @@ help:
     title: Crontab
     level: '##'
     text: |
-      The "Cron" property of the job allows you to define very precisely 
+      The “Cron” property of the job allows you to define very precisely 
       when a job should be triggered. For example, it makes it possible 
       to schedule tasks that need to be performed regularly, on a given 
       day, at a specific time. This is typically the case for something 
@@ -13,7 +13,7 @@ help:
       chose not to complicate things with date forms or other properties.
 
       To help you configure the cron, you can visit the 
-      [Crontab Guru](https://crontab.guru) website, which lets you 
+      <a href="https://crontab.guru" target="_blank" rel="noopener noreferrer">Crontab Guru</a> website, which lets you 
       compose your crontab and then copy/paste it into the job field.
 
   show: Show help

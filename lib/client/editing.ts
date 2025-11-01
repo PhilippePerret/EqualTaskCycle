@@ -7,6 +7,7 @@ import { t } from '../shared/Locale';
 import { Work } from "./work";
 import log from 'electron-log/renderer';
 import { Dialog } from "./Dialog";
+import { help } from "./help";
 
 class Editing {
 
@@ -315,6 +316,9 @@ class Editing {
       const actif = menuActive.value === '1';
       owork.classList[actif?'remove':'add']('off'); 
     });
+    // Les boutons d'aide
+    const btnHelpCron = DGet('sup.to-help-cron', owork);
+    help.listenOn(btnHelpCron, 'cron');
   }
 
 

@@ -17639,6 +17639,10 @@ class Help {
   }
   static inst;
   texts;
+  listenOn(e, helpIds) {
+    helpIds = typeof helpIds === "string" ? [helpIds] : helpIds;
+    e.addEventListener("click", help.show.bind(help, helpIds));
+  }
   async show(helpIds) {
     this.isOpened() || ui.toggleHelp();
     this.content.innerHTML = "";
@@ -17984,6 +17988,8 @@ class Editing {
       const actif = menuActive.value === "1";
       owork.classList[actif ? "remove" : "add"]("off");
     });
+    const btnHelpCron = DGet("sup.to-help-cron", owork);
+    help.listenOn(btnHelpCron, "cron");
   }
   onUp(owork, ev) {
     if (owork.previousSibling) {

@@ -4,7 +4,7 @@ help:
     title: Crontab
     level: '##'
     text: |
-      La propriété « Cron » du travail, permet de définir très 
+      La propriété « Cron » du travail permet de définir très 
       précisément quand un travail doit être activé. Il permet, 
       par exemple, de programmer des travails qui doivent être
       fait régulièrement, un jour donné, à une heure donnée. C'est
@@ -16,7 +16,8 @@ help:
       propriété.
 
       Pour vous aider à programmer le cron, vous pouvez rejoindre
-      le site [Crontab Guru](https://crontab.guru) qui permet de
+      le site <a href="https://crontab.guru" target="_blank" 
+      rel="noopener noreferrer">Crontab Guru</a> qui permet de
       composer votre crontab puis de le copier/coller dans le 
       champ du travail.
 
