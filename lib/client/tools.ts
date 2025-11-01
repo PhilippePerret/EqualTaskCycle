@@ -6,7 +6,7 @@ import { markdown } from "../shared/utils_shared";
 import { postToServer } from "./utils";
 import { Work } from "./work.js";
 import prefs from "./prefs.js";
-import type { RecType, WorkType } from "../shared/types";
+import type { WorkType } from "../shared/types";
 import { Panel } from "./Panel.js";
 import { clock } from "./Clock.js";
 
@@ -57,14 +57,14 @@ class Tools { /* singleton */
 
   private async openManual(ev: Event){
     stopEvent(ev);
-    await postToServer('/manual/open', {lang: prefs.getLang()});
+    await postToServer('/manual/open', {process: 'Tools.openManual', lang: prefs.getLang()});
   }
 
   // --- //
 
   private async produceManual(ev: Event){
     stopEvent(ev);
-    const retour = await postToServer('/manual/produce', {lang: prefs.getLang()});
+    const retour = await postToServer('/manual/produce', {process: 'Tools.produceManual', lang: prefs.getLang()});
     if (retour.ok) { Flash.success(t('manual.produced')) }
   }
 

@@ -241,18 +241,16 @@ export function setupRoutes(app: Express) {
   app.post('/manual/produce', (req, res) => {
     log.info('->route /manual/produce');
     const data = req.body;
-    if (manual.produce(data.lang)) {
-      return res.json(Object.assign(data, {ok: true}));
-    } else {
-      return res.json(Object.assign(data, {ok: false, error: 'manual.not_produced'}))
-    }
+    const result: ResultType = manual.produce(data.lang);
+    res.json(Object.assign(data, result));
   });
 
   app.post('/manual/open', (req, res) => {
     log.info('->route /manual/open');
-    const lang = req.body.lang;
+    const data = req.body;
+    const lang = data.lang;
     manual.open(lang);
-    return {ok: true}
+    res.json(Object.assign(data, {ok: true}));
   })
 
 }// fin de setupRoutes

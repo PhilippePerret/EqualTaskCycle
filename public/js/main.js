@@ -17367,11 +17367,11 @@ class Tools {
   }
   async openManual(ev) {
     stopEvent(ev);
-    await postToServer("/manual/open", { lang: prefs_default.getLang() });
+    await postToServer("/manual/open", { process: "Tools.openManual", lang: prefs_default.getLang() });
   }
   async produceManual(ev) {
     stopEvent(ev);
-    const retour = await postToServer("/manual/produce", { lang: prefs_default.getLang() });
+    const retour = await postToServer("/manual/produce", { process: "Tools.produceManual", lang: prefs_default.getLang() });
     if (retour.ok) {
       Flash.success(t("manual.produced"));
     }

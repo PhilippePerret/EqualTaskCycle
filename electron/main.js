@@ -45,8 +45,8 @@ const envProps = {
 }
 const cwdPath = path.join(__dirname, '..').replace('app.asar', 'app.asar.unpacked')
 
-function startAServer(){
-  const server = spawn(bunPath, ['--no-cache', 'run', serverPath], {
+function startAServer(onReady){
+  server = spawn(bunPath, ['--no-cache', 'run', serverPath], {
     // cwd: path.join(__dirname, '..'), // ORIGINAL
     cwd: cwdPath,
     env: envProps
@@ -54,7 +54,14 @@ function startAServer(){
 
   if (!server) { return }
   
-  server.stdout.on('data', (data) => console.log(`SERVER STDOUT: ${data}`));
+  server.stdout.on('data', (data) => {
+    const message = data.toString();
+    console.log(`SERVER STDOUT: ${message}`);
+    if (message.includes('Server running on') && onReady) {
+      onReady();
+      onReady = null;
+    }
+  });
   server.stderr.on('data', (data) => console.error(`SERVER STDERR: ${data}`));
   server.on('error', (err) => console.error('SERVER FAILED TO START:', err));
   server.on('exit', (code, signal) => {
@@ -112,7 +119,9 @@ app.whenReady().then(() => {
   
   win.webContents.session.clearCache();
 
-  setTimeout(() => win.loadURL(HOST), 1000);
+  startAServer(() => {
+    win.loadURL(HOST);
+  });
 
 });
 
