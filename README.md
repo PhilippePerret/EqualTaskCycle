@@ -1,4 +1,4 @@
-# Equal Task Cycle (ETC) 
+# ETC (Equal Task Cycle) 
 
 **ETC** est une application qui permet de travailler un ensemble de tâches en leur alouant un temps afin de les exécuter toutes parallèlement sans en délaisser.
 
