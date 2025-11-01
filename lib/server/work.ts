@@ -2,7 +2,7 @@ import db from "./db";
 import { prefs } from "./prefs";
 import { DEFAULT_WORK, type RecType, type WorkType } from "../shared/types";
 import { t } from '../shared/Locale';
-import { startOfToday } from "../shared/utils";
+import { startOfToday } from "../shared/utils_shared";
 import log from 'electron-log/main';
 
 export class Work /* server */ {

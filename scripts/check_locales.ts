@@ -2,7 +2,7 @@ import path from 'path';
 import yaml from 'js-yaml';
 import fs from 'fs';
 import type { RecType } from '../lib/shared/types';
-import { blue, green, red, subTitleize } from '../lib/shared/utils';
+import { blue, green, red, subTitleize } from '../lib/shared/utils_shared';
 import { loc, t } from '../lib/shared/Locale';
 
 loc.init('en');

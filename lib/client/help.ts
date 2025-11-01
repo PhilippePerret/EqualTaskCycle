@@ -2,7 +2,8 @@ import type { RecType } from "../shared/types";
 import { DGet } from "../../public/js/dom";
 import { ui } from "./ui";
 import { tt, t } from "../shared/Locale";
-import { listenBtn, markdown } from "../shared/utils";
+import { markdown } from "../shared/utils_shared";
+import { listenBtn } from "./utils";
 
 /**
  * Module pour la gestion de l'aide

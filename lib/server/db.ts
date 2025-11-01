@@ -4,7 +4,7 @@ import { existsSync } from 'fs';
 import { Database } from "bun:sqlite"
 import { DEFAULT_WORK, type RecType, type WorkType } from "../shared/types";
 import { userDataPath } from './constants_server';
-import { startOfToday } from '../shared/utils';
+import { startOfToday } from '../shared/utils_shared';
 import { t } from '../shared/Locale';
 import { prefs } from './prefs';
 import log from 'electron-log/main';

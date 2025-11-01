@@ -7,7 +7,6 @@ import { Flash } from '../../public/js/flash';
 import { DGet } from '../../public/js/dom';
 import { help } from './help';
 import { editor } from './editing';
-import { Dialog } from './Dialog';
 
 class Client { /* singleton */
 

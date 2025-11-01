@@ -1,7 +1,6 @@
 const { existsSync } = require('fs');
 const { app, BrowserWindow } = require('electron');
 const { spawn } = require('child_process');
-const { HOST } = require('../public/js/constants');
 const userDataPath = app.getPath('userData');
 const log = require('electron-log/main');
 log.initialize();
@@ -9,6 +8,8 @@ log.initialize();
 // const WITH_CONSOLE_DEV = true;
 const WITH_CONSOLE_DEV = false;
 
+const PORT = 3002;
+const HOST = `http://localhost:${PORT}`;
 
 let server = null;
 

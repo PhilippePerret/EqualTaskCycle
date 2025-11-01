@@ -96,7 +96,7 @@ class Locale {
     if ( typeof window === 'undefined' /* server side */) {
       return this.initServerSide(lang);
     } else /* client side */ {
-      const { postToServer } = await import("./utils");
+      const { postToServer } = await import("../client/utils");
       const retour = await postToServer('/localization/get-all', {lang: lang});
       if (retour.ok) { 
         // console.log("Locales remontées : ", retour.locales);

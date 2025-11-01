@@ -4,7 +4,7 @@ import { ActivityTracker } from "./activityTracker";
 import { DGet } from "../../public/js/dom";
 import { Flash } from "../../public/js/flash";
 import { t } from '../shared/Locale';
-import { postToServer } from "../shared/utils";
+import { postToServer } from "./utils";
 import type { RecType } from "../shared/types";
 
 function stopEvent(ev: Event){

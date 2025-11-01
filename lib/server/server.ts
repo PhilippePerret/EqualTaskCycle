@@ -1,7 +1,7 @@
 import express from 'express';
 import log from 'electron-log/main';
 import { setupRoutes } from './routes';
-import { HOST, PORT } from '../../public/js/constants';
+import { HOST, PORT } from '../server/constants_server';
 
 const app = express();
 

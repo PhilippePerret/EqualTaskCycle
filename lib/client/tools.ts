@@ -1,11 +1,12 @@
-import { t } from "../shared/Locale.js";
+import { t } from "../shared/Locale";
 import { DGet, stopEvent } from "../../public/js/dom.js";
 import { Flash } from "../../public/js/flash.js";
 import { ui } from "./ui";
-import { markdown, postToServer } from "../shared/utils.js";
+import { markdown } from "../shared/utils_shared";
+import { postToServer } from "./utils";
 import { Work } from "./work.js";
 import prefs from "./prefs.js";
-import type { RecType, WorkType } from "../shared/types.js";
+import type { RecType, WorkType } from "../shared/types";
 import { Panel } from "./Panel.js";
 import { clock } from "./Clock.js";
 

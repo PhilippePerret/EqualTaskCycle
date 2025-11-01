@@ -1,11 +1,12 @@
-import { clock } from "./Clock.js";
-import type { RecType, WorkType } from "../shared/types.js";
+import { clock } from "./Clock";
+import type { RecType, WorkType } from "../shared/types";
 import { DGet } from "../../public/js/dom.js";
 import { Flash } from "../../public/js/flash.js";
-import { ui } from "./ui.js";
-import { EndWorkReport } from "./stop_report.js";
-import { markdown, postToServer } from "../shared/utils.js";
-import { t } from "../shared/Locale.js";
+import { ui } from "./ui";
+import { EndWorkReport } from "./stop_report";
+import { markdown } from "../shared/utils_shared";
+import { postToServer } from "./utils";
+import { t } from "../shared/Locale";
 
 export class Work {
 

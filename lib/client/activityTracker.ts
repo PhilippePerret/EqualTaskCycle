@@ -1,6 +1,6 @@
 import { Work } from "./work";
 import { ui } from "./ui";
-import { postToServer } from "../shared/utils";
+import { postToServer } from "./utils";
 import { Dialog } from "./Dialog";
 import { t } from '../shared/Locale';
 import log from 'electron-log/renderer';

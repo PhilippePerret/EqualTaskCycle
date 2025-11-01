@@ -2,7 +2,7 @@ import { WORK_PROPS, type RecType, type WorkType } from "../shared/types";
 import { DGet } from "../../public/js/dom";
 import { Flash } from "../../public/js/flash";
 import { ui } from "./ui";
-import { listenBtn, postToServer } from "../shared/utils";
+import { listenBtn, postToServer } from "./utils";
 import { t } from '../shared/Locale';
 import { Work } from "./work";
 import log from 'electron-log/renderer';

@@ -3,7 +3,7 @@ import type { PrefsDataType, RecType } from "../shared/types";
 import { DGet, stopEvent } from "../../public/js/dom";
 import { Flash } from "../../public/js/flash";
 import { ui } from "./ui";
-import { listenBtn, postToServer } from "../shared/utils";
+import { listenBtn, postToServer } from "./utils";
 import { t } from '../shared/Locale';
 import { tools } from "./tools";
 import log from 'electron-log/renderer';

@@ -1,5 +1,5 @@
 import type { Work } from "./work";
-import { listenBtn } from "../shared/utils";
+import { listenBtn } from "./utils";
 import { DGet, stopEvent } from "../../public/js/dom";
 import { Flash } from "../../public/js/flash";
 import { t } from '../shared/Locale';
