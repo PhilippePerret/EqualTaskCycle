@@ -6,6 +6,15 @@ Par exemple, si nous avons 5 tâches, et un temps par défaut de 2 heures, les t
 
 ---
 
+## Démarrage rapide
+
+* télécharger le zip de l'application
+* la décompresser
+* ouvrir un terminal au dossier de l'application
+* jouer `bun install`
+* jouer `bun run start` pour lancer l'application en mode développement
+* jouer `bun run build` pour construire une release
+
 ## Essai (mode développement)
 
 Démarrer l’application avec : 
