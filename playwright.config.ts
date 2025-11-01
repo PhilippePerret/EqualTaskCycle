@@ -14,4 +14,12 @@ export default defineConfig({
   testDir: './test',
   timeout: 30000,
   workers: 1, // un seul test à la fois
+  use: {
+    launchOptions: {
+      env: {
+        ...process.env,
+        NODE_ENV: 'test'
+      }
+    }
+  }
 });
