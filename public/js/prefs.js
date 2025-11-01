@@ -140,9 +140,10 @@ class FlashMessage {
 var init_flash = () => {};
 
 // public/js/constants.js
-var PORT = 3002, HOST;
+var PORT, HOST;
 var init_constants = __esm(() => {
   console.log("window.location.port = ", window.location.port);
+  PORT = window.location.port;
   HOST = `http://localhost:${PORT}`;
 });
 

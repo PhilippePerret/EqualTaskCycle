@@ -8,9 +8,6 @@ log.initialize();
 // const WITH_CONSOLE_DEV = true;
 const WITH_CONSOLE_DEV = false;
 
-const PORT = 3002;
-const HOST = `http://localhost:${PORT}`;
-
 let server = null;
 
 const path = require('path');
@@ -30,12 +27,21 @@ app.name = "ETC";
 const bunPath = app.isPackaged 
 ? path.join(process.resourcesPath, 'bun')
 : 'bun';
+
+const PORT = app.isPackaged
+? 3003
+: 3002
+const HOST = `http://localhost:${PORT}`;
+
+
 const serverPath = path.join(__dirname, '..', 'lib', 'server', 'server.ts').replace('app.asar', 'app.asar.unpacked');
 const envProps = { 
   ...process.env, 
   USER_DATA_PATH: userDataPath,
   APP_ICON_PATH: ICON_PATH,
-  ETC_MODE: app.isPackaged ? 'prod' : 'dev'
+  ETC_MODE: app.isPackaged ? 'prod' : 'dev',
+  PORT: PORT,
+  HOST: HOST
 }
 const cwdPath = path.join(__dirname, '..').replace('app.asar', 'app.asar.unpacked')
 
