@@ -10,6 +10,7 @@ import { Dialog } from "./Dialog";
 import { help } from "./help";
 import { CronExpressionParser } from 'cron-parser';
 import prefs from "./prefs";
+import type { HTMLInputTypeAttribute } from "react";
 
 class Editing {
 
@@ -326,6 +327,11 @@ class Editing {
         // 5 valeurs dans l'app mais il doit avoir 6 valeurs
         // (les secondes en plus) pour la libraire.
         if ( value ) { value = value.split(' ').slice(0, 5).join(' ')}
+      } else if (prop === 'script') {
+        this.setBtnRunScriptVisibility(
+          DGet('.btn-run-script', obj) as HTMLButtonElement,
+          !!value
+        )
       }
       field.value = typeof value === 'undefined' ? '' : value;
     });
@@ -335,6 +341,7 @@ class Editing {
     listenBtn('up', this.onUp.bind(this, owork), owork);
     listenBtn('down', this.onDown.bind(this, owork), owork);
     listenBtn('remove', this.onRemove.bind(this, work), owork);
+    listenBtn('run-script', this.onRunScript.bind(this, work), owork);
     owork.querySelectorAll('input[type="text"]').forEach(o => {
       o.addEventListener('focus', () => {(o as HTMLInputElement).select()})
     })
@@ -346,6 +353,9 @@ class Editing {
     // Le champ pour le cron
     const fieldCron = DGet('.form-work-cron', owork);
     fieldCron.addEventListener('change', this.onChangeCron.bind(this, fieldCron));
+    // Champ pour le script (masquer/afficher le bouton "run")
+    const fieldScript = DGet('.form-work-script', owork);
+    fieldScript.addEventListener('change', this.onChangeScript.bind(this, fieldScript));
     // Les boutons d'aide
     const btnHelpCron = DGet('sup.to-help-cron', owork);
     help.listenOn(btnHelpCron, 'cron');
@@ -366,6 +376,14 @@ class Editing {
       } else {
         (owork.parentNode as HTMLDivElement).appendChild(owork);
       }
+    }
+  }
+
+  private async onRunScript(work: WorkType, ev: MouseEvent) {
+    if (work.script) {
+      postToServer('/tool/run-script', {process: 'Editing.onRunScript', script: work.script});
+    } else {
+      Flash.error(t('error.no_script_to_run'));
     }
   }
   private async onRemove(work: WorkType, ev: MouseEvent){
@@ -432,6 +450,23 @@ class Editing {
     }
   }
 
+
+  /**
+   * Fonction appelée quand on change le script
+   * 
+   * Si le champ est défini, on montre le bouton
+   */
+  private onChangeScript(field: HTMLInputElement, ev: Event){
+    const value = field.value.trim();
+    this.setBtnRunScriptVisibility(
+      field.nextSibling as HTMLButtonElement,
+      !!value
+    )
+  }
+  private setBtnRunScriptVisibility(btn: HTMLButtonElement, state: boolean){
+    console.log("[setBtnRunScriptVisibility] bouton, state", btn, state);
+    btn.classList[state?'remove':'add']('invisible');
+  }
 
   /**
    * Fonction appelée quand on change le cron.

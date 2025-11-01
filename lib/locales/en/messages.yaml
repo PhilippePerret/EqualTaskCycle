@@ -4,6 +4,7 @@ app:
   is_ready: App is ready.
 error:
   no_other_work_complete_that_one: "No other works found. You must complete that one."
+  no_script_to_run: "No script to run…"
   occurred: "An error occurred: _0_"
   work_already_changed_today: "Task has been already changed today (only one exemption per day…)."
   unfound_field: "Unfound field: _0_"

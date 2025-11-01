@@ -89,6 +89,8 @@
 - [ ] Le bouton « Finir » ferme le panneau si aucune modification/création/suppression
 - [ ] Le bouton « Finir » affiche une boite de confirmation si modification/création/suppression
 - [ ] Le bouton « Enregistrer » enregistre la nouvelle liste (création + suppression + ordre)
+- [ ] Le champ « cron » affiche tout de suite un message d’erreur s’il est mauvai
+- [ ] Le champ « cron » affiche tout de suite la prochaine échéance (quand il est correct)
 
 ### Enregistrement
 

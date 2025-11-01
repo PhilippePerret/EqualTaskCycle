@@ -29,6 +29,8 @@ ui:
     stop: ⏹
     use_template: Utiliser modèle…
     yes_still: Oui, encore
+  action:
+    run: Jouer
   title:
     config_data: Données de configuration
     confirmation_required: Confirmation requise

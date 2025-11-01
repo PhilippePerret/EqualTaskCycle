@@ -29,6 +29,8 @@ ui:
     stop: STOP
     use_template: Use template…
     yes_still: Yes, still
+  action:
+    run: Run
   title:
     config_data: Config Data
     confirmation_required: Confirmation required

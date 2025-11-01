@@ -24373,6 +24373,8 @@ class Editing {
         if (value) {
           value = value.split(" ").slice(0, 5).join(" ");
         }
+      } else if (prop === "script") {
+        this.setBtnRunScriptVisibility(DGet(".btn-run-script", obj), !!value);
       }
       field.value = typeof value === "undefined" ? "" : value;
     });
@@ -24382,6 +24384,7 @@ class Editing {
     listenBtn("up", this.onUp.bind(this, owork), owork);
     listenBtn("down", this.onDown.bind(this, owork), owork);
     listenBtn("remove", this.onRemove.bind(this, work), owork);
+    listenBtn("run-script", this.onRunScript.bind(this, work), owork);
     owork.querySelectorAll('input[type="text"]').forEach((o) => {
       o.addEventListener("focus", () => {
         o.select();
@@ -24394,6 +24397,8 @@ class Editing {
     });
     const fieldCron = DGet(".form-work-cron", owork);
     fieldCron.addEventListener("change", this.onChangeCron.bind(this, fieldCron));
+    const fieldScript = DGet(".form-work-script", owork);
+    fieldScript.addEventListener("change", this.onChangeScript.bind(this, fieldScript));
     const btnHelpCron = DGet("sup.to-help-cron", owork);
     help.listenOn(btnHelpCron, "cron");
   }
@@ -24409,6 +24414,13 @@ class Editing {
       } else {
         owork.parentNode.appendChild(owork);
       }
+    }
+  }
+  async onRunScript(work, ev) {
+    if (work.script) {
+      postToServer("/tool/run-script", { process: "Editing.onRunScript", script: work.script });
+    } else {
+      Flash.error(t("error.no_script_to_run"));
     }
   }
   async onRemove(work, ev) {
@@ -24466,6 +24478,14 @@ class Editing {
       idField.value = idProjet;
       dispField.innerHTML = idProjet;
     }
+  }
+  onChangeScript(field, ev) {
+    const value = field.value.trim();
+    this.setBtnRunScriptVisibility(field.nextSibling, !!value);
+  }
+  setBtnRunScriptVisibility(btn, state) {
+    console.log("[setBtnRunScriptVisibility] bouton, state", btn, state);
+    btn.classList[state ? "remove" : "add"]("invisible");
   }
   onChangeCron(field, ev) {
     this.showNextTime(field);
