@@ -9,8 +9,15 @@ import { t } from '../shared/Locale';
 import { prefs } from './prefs';
 import log from 'electron-log/main';
 
-class DBWorks {
+class DBWorks { /* singleton db */
 
+  public exec(request: string, params?: any) {
+    if (params) {
+      return this.db.run(request, params);
+    } else {
+      return this.db.run(request);
+    }
+  }
   public init(){
     // On s'assure que la base existe, avec un premier travail
     existsSync(this.dbPath) || this.buildDatabase();
@@ -106,6 +113,27 @@ class DBWorks {
       dw.id
     ];
     this.db.run(request, data as any);
+
+    // Actualisation de l'état du Cron (cf. la fonction)
+    if (dw.leftTime <= 0 && dw.cron){ this.updateCronAtOf(dw) }
+  }
+
+  /**
+   * Fonction qui doit être appelée quand le travail est achevé
+   * et qu'il possède un cron. Dans ce cas, puisqu'on vient de
+   * l'exécuter, il faut désactiver ce travail et enregistrer
+   * la date de dernière échéance réalisée pour savoir quand 
+   * déclencher la prochaine fois le travail.
+   * 
+   * @param dw Les données complètes du travail
+   */
+  private updateCronAtOf(dw: WorkType): void {
+    const request = `
+      UPDATE works 
+      SET cronedAt = ?, active = ?
+      WHERE id = ?
+      `
+    this.db.run(request, [new Date().getTime(), 0, dw.id] as any);
   }
 
   /**

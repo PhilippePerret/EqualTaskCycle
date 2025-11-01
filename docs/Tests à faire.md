@@ -101,3 +101,10 @@
 - [ ] Produit une erreur si le dossier n’existe pas
 - [ ] Produit une erreur si le script est défini mais n’existe pas
 - [ ] Produit une erreur si le cron est mal défini
+
+
+
+## Traitement des travaux
+
+- [ ] Vérifier le démarrage d’un travail avec cron (le rendre inactif et mettre son échéance à peu de temps avant, et démarrer l’application)
+- [ ] Vérifier le non démarrage d’un travail avec cron (si un cronedAt est enregistré après la date de dernière échéance)

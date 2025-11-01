@@ -1,5 +1,29 @@
 # Manuel de développement
 
+
+
+## Réflexion
+
+### Réflexion sur le cron
+
+**Question** : Comment peut-on savoir que le cron est à lancer ?
+
+**Réponse** : quand 1) le travail n’est pas actif, 2) la prochaine échéance est passée 2) la date d’enregistrement du dernier cron est supérieure à l’échéance précédente et 3) la date d’enregistrement du dernier cron (`cronedAt`) est inférieure à la prochaine date.
+
+Ou plutôt : 1) le travail est inactif, 2) on a passé la dernière date de déclenchement et 3) aucun cronedAt n’a été enregistré après cette date de déclenchement (ce qui sous-entend que le dernier déclenchement n’a pas pu être activé, certainement parce que l’application n’était pas en service à ce moment (c’est ça, en fait, qui pose problème dans l’algorithme.
+
+Dès que le travail est fini, s’il a un cron, il faut enregistrer la date de dernier enregistrement du cronAt.
+
+### Réflexion sur le script
+
+**Question** : Comment lancer un script dans une fenêtre Terminal. Cette question doit être abordée dans le manuel d’utilisation (ajouter un « (?) » dans l’éditing des travaux).
+
+**Exemple** : Par exemple, j’ai mis le script `iced`, mais il se lance, en développement, dans la console de lancement de ETC, sans interactivité.
+
+**Solution :** Normalement, il faudrait passer par AppleScript mais je voudrais absolument m’en passer.
+
+## Blocages
+
 En cas de blocage du port, jouer : 
 
 ~~~shell
@@ -8,6 +32,15 @@ pkill -f electron
 ~~~
 
 … pour tuer tous les processus. Mais attention : ça tue vraiment tous les processus. Si d’autres applications identiques sont en route, elles seront aussi arrêtées. Peut-être passer plutôt par le monitor d’activité.
+
+On peut jouer aussi : 
+
+~~~shell
+bun run reset
+bun run force-vide-cache-macos
+~~~
+
+
 
 
 

@@ -4,6 +4,7 @@ import { DEFAULT_WORK, type RecType, type WorkType } from "../shared/types";
 import { t } from '../shared/Locale';
 import { startOfToday } from "../shared/utils_shared";
 import log from 'electron-log/main';
+import { CronExpressionParser } from 'cron-parser';
 
 export class Work /* server */ {
   public static defaultDuration: number;
@@ -30,7 +31,12 @@ export class Work /* server */ {
    * Retourne le travail courant, le travail à faire.
    */
   public static getCurrentWork(options: RecType | undefined = {}): WorkType | {ok: boolean, error: string} {
-    log.info("-> getCurrentWork")
+    log.info("-> getCurrentWork");
+    // Avant toutes choses, il faut "réveiller" les travaux qui
+    // doivent l'être, c'est-à-dire les travaux qui définissent
+    // un cron d'échéance (voir le détail dans la fonction)
+    this.awakeCronWorksAtHeadline()
+    // Filtre qui permet de relever tous les candidats
     const filtre: string | string[] = []
     filtre.push('active = 1 AND leftTime > 0');
     if (options.no_lasttime_constraint !== true) {
@@ -78,6 +84,36 @@ export class Work /* server */ {
     return {ok: false, error: 'Ça ne doit pas pouvoir arriver'}
   }; 
   private static deuxiemeFois: boolean = false;
+
+
+  /**
+   * Réveil des travaux a
+   * - avoir un cron défini
+   * - être inactif
+   * - avoir une échéance dans le passé
+   *   MAIS aucun enregistrement cronedAt 
+   *   OU aucun enregistrement après cette échéance (ce qui 
+   *   prouve que le travail n'a pas été démarré et accompli)
+   */
+  private static awakeCronWorksAtHeadline(){
+    const candidats = db.findAll('active = 0 AND cron IS NOT null');
+    const idsToAwake: string[] = candidats.filter((w: WorkType) => {
+      const lastHeadline = CronExpressionParser.parse(w.cron as string).prev().toDate().getTime();
+      return (w.cronedAt === null || Number(w.cronedAt) < lastHeadline);
+    })
+    .map(c => c.id);
+    // Construction de la requête qui va les réveiller
+    const interos = idsToAwake.map(_x => '?').join(', ')
+    const request = `
+    UPDATE works
+    SET
+      active = 1, leftTime = defaultLeftTime
+    WHERE 
+      id IN (${interos})
+    `
+    db.exec(request, idsToAwake)
+  }
+
 
   private static noActiveWork(): boolean {
     return db.findAll('active = 1').length === 0;

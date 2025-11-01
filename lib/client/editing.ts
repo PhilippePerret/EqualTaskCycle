@@ -10,7 +10,6 @@ import { Dialog } from "./Dialog";
 import { help } from "./help";
 import { CronExpressionParser } from 'cron-parser';
 import prefs from "./prefs";
-import type { HTMLInputTypeAttribute } from "react";
 
 class Editing {
 
