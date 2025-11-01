@@ -72,9 +72,9 @@ class DBWorks {
     INTO 
       works
     VALUES
-      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `
-    this.db.run(request, [work.id, work.project, work.content, work.folder, (work.script || null), 0, 0, 0, duration, 0, new Date().getTime(), null, 1,  duration, ""])
+    this.db.run(request, [work.id, work.project, work.content, work.folder, (work.script || null), (work.cron || null), 0, 0, 0, duration, 0, new Date().getTime(), null, 1,  duration, ""])
   }
 
   /**
@@ -258,6 +258,7 @@ class DBWorks {
       content TEXT,
       folder TEXT,
       script TEXT,
+      cron TEXT,
       totalTime INTEGER,
       cycleTime INTEGER,
       sessionTime INTEGER,

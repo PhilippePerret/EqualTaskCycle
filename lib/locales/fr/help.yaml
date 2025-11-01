@@ -1,5 +1,25 @@
 ---
 help:
+  cron:
+    title: Crontab
+    level: '##'
+    text: |
+      La propriété « Cron » du travail, permet de définir très 
+      précisément quand un travail doit être activé. Il permet, 
+      par exemple, de programmer des travails qui doivent être
+      fait régulièrement, un jour donné, à une heure donnée. C'est
+      typiquement le cas d'un anniversaire à souhaiter.
+
+      Sa syntaxe demande un peu de pratique, mais elle est 
+      tellement puissante que nous avons fait le choix de ne pas
+      compliquer les choses avec des formulaires de date et autres
+      propriété.
+
+      Pour vous aider à programmer le cron, vous pouvez rejoindre
+      le site [Crontab Guru](https://crontab.guru) qui permet de
+      composer votre crontab puis de le copier/coller dans le 
+      champ du travail.
+
   show: Afficher l’aide
   times:
     duree_cycle: Durée d’exécution pour un cycle de travail.

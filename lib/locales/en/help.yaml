@@ -1,4 +1,21 @@
 help:
+  cron:
+    title: Crontab
+    level: '##'
+    text: |
+      The "Cron" property of the job allows you to define very precisely 
+      when a job should be triggered. For example, it makes it possible 
+      to schedule tasks that need to be performed regularly, on a given 
+      day, at a specific time. This is typically the case for something 
+      like sending a birthday greeting.
+
+      Its syntax takes a bit of practice, but it is so powerful that we 
+      chose not to complicate things with date forms or other properties.
+
+      To help you configure the cron, you can visit the 
+      [Crontab Guru](https://crontab.guru) website, which lets you 
+      compose your crontab and then copy/paste it into the job field.
+
   show: Show help
   times:
     duree_cycle: Execution time for one work cycle.

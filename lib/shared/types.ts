@@ -21,6 +21,7 @@ export interface WorkType {
     content: string;
     folder: string; // Required (to watch activity)
     script?: string; // path du script de démarrage
+    cron?: string;
     defaultLeftTime?: number;
     totalTime: number;  // Le nombre total de minutes de travail
     cycleTime: number;  // Le nombre de minutes travaillées dans le cycle courant
@@ -38,6 +39,7 @@ export const DEFAULT_WORK = {
   folder: '/path/to/default',
   defaultLeftTime: 0,
   script: '',
+  cron: '',
   totalTime: 0,
   cycleTime: 0,
   leftTime: 0,

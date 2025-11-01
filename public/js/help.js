@@ -17315,6 +17315,11 @@ t(help.durcycvsdursess.text)
 # t(help.stop_report.title)
 
 t(help.stop_report.text)
+`,
+  cron: `
+# t(help.cron.title)
+
+t(help.cron.text)
 `
 };
 
