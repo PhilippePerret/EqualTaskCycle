@@ -49,13 +49,15 @@ ui:
     Clock: Clock
     Chronometer: Carhronometer
     Countdown: Countdown
+    Cron: Cron
     Cycle: Cycle
     Duration: Duration
+    Folder: Folder
     guil_close: '"'
     guil_open: '"'
     minute: minute
     minutes: minutes
-    Folder: Folder
+    Script: Script
     Theme: Theme
     Work: Work
   adj:

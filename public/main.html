@@ -120,6 +120,7 @@
       <input type="hidden" class="form-work-leftTime" value="" data-type="number" />
       <input type="hidden" class="form-work-cycleCount" value="" data-type="number" />
       <input type="hidden" class="form-work-startedAt" value="" data-type="number-or-nil" />
+      <input type="hidden" class="form-work-cronedAt" value="" data-type="number-or-nil" />
       <input type="hidden" class="form-work-lastWorkedAt" value="" data-type="number-or-nil" />
       <input type="hidden" class="form-work-report" value="" data-type="string" />
 
@@ -151,9 +152,14 @@
         <div class="form-work-folder-err err"></div>
       </div>
       <div class="row-flex">
-        <label>Script</label>
+        <label>t(ui.thing.Script)</label>
         <input type="text" class="form-work-script" data-type="string"/>
         <div class="form-work-script-err err"></div>
+      </div>
+      <div class="row-flex">
+        <label>t(ui.thing.Cron)</label>
+        <input type="text" class="form-work-cron" data-type="string"/>
+        <div class="form-work-cron-err err"></div>
       </div>
       <div class="row">
         <label>t(ui.thing.Duration)</label>

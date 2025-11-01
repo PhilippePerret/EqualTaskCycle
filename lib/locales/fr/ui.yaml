@@ -49,13 +49,15 @@ ui:
     Clock: Horloge
     Chronometer: Chronomètre
     Countdown: Compte à rebours
+    Cron: Cron
     Cycle: Cycle
     Duration: Durée
+    Folder: Dossier
     guil_close: ' »'
     guil_open: '« '
     minute: minute
     minutes: minutes
-    Folder: Dossier
+    Script: Script
     Theme: Thème
     Work: Travail
   adj:

@@ -71,6 +71,7 @@ class DBWorks {
     INSERT 
     INTO 
       works
+      (id, project, content, folder, script, cron, cronedAt, totalTime, cycleTime, sessionTime, leftTime, cycleCount, startedAt, lastWorkedAt, active, defaultLeftTime, report)
     VALUES
       (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `

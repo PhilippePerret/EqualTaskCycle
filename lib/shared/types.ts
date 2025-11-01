@@ -22,6 +22,7 @@ export interface WorkType {
     folder: string; // Required (to watch activity)
     script?: string; // path du script de démarrage
     cron?: string;
+    cronedAt?: number;
     defaultLeftTime?: number;
     totalTime: number;  // Le nombre total de minutes de travail
     cycleTime: number;  // Le nombre de minutes travaillées dans le cycle courant
