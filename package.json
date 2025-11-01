@@ -33,6 +33,7 @@
   "dependencies": {
     "@types/marked": "^6.0.0",
     "better-sqlite3": "^12.4.1",
+    "cron-parser": "^5.4.0",
     "electron-log": "^5.4.3",
     "express": "^5.1.0",
     "js-yaml": "^4.1.0",

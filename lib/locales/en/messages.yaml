@@ -8,6 +8,7 @@ error:
   work_already_changed_today: "Task has been already changed today (only one exemption per day…)."
   unfound_field: "Unfound field: _0_"
   data:
+    cron_invalid: "Cron is invalid."
     undefined_project: "Project Title is required."
     id_exists: "_0_ ID is already in use."
     folder_required: "Folder of work is mandatory (cf. manual)."

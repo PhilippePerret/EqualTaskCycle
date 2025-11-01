@@ -41,6 +41,7 @@ export const DEFAULT_WORK = {
   defaultLeftTime: 0,
   script: '',
   cron: '',
+  cronedAt: null,
   totalTime: 0,
   cycleTime: 0,
   leftTime: 0,

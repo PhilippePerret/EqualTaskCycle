@@ -8,6 +8,8 @@ import { Work } from "./work";
 import log from 'electron-log/renderer';
 import { Dialog } from "./Dialog";
 import { help } from "./help";
+import { CronExpressionParser } from 'cron-parser';
+import prefs from "./prefs";
 
 class Editing {
 
@@ -185,11 +187,12 @@ class Editing {
    */
   private async checkChangeset(changeset: any, errorCount: number): Promise<number> {
     const idw: string = changeset.id;
-    log.info('Check des changements du travail ', idw);
+    log.info('Check des changements du travail ', idw, changeset.change);
     // console.info('Check des changements du travail ', idw);
     if (changeset.count === 0) { return errorCount } 
     for (const prop of changeset.change) {
-      const newValue = (this.modifiedWorks as any)[idw][prop];
+      let newValue = (this.modifiedWorks as any)[idw][prop];
+      log.info("Check de prop '%s' de nouvelle valeur %s", prop, newValue);
       switch(prop){
       case 'project':
         if (newValue === '') {
@@ -219,6 +222,22 @@ class Editing {
             ++ errorCount;
           } else if (await this.isNotExecutable(newValue)){
             Object.assign(changeset.errors, {'script': t('error.data.script_not_executable', [newValue])});
+            ++ errorCount;
+          }
+        }
+        break;
+      case 'cron':
+        if (newValue !== '') {
+          try {
+            log.info("Check de newValue", newValue);
+            if (newValue.split(' ').length === 5) {
+              newValue = `* ${newValue}`;
+              (this.modifiedWorks as any)[idw]['con'] = newValue;
+            }
+            const interval = CronExpressionParser.parse(newValue, {strict: true});
+            log.info("Interval", interval.next());
+          } catch(error) {
+            Object.assign(changeset.errors, {'cron': t('error.data.cron_invalid', [newValue])});
             ++ errorCount;
           }
         }
@@ -282,6 +301,9 @@ class Editing {
     this.observeWorkForm(owork, work);
     owork.classList.remove('hidden');
     if (work.active) owork.classList.remove('off');
+    if (work.cron) {
+      this.showNextTime(owork.querySelector('input.form-work-cron') as HTMLInputElement);
+    }
     return owork;
   }
 
@@ -299,6 +321,11 @@ class Editing {
       if ( value === 'null') {
         (work as any)[prop] = null; 
         value = null;
+      } else if (prop === 'cron') {
+        // Petite complication avec le cron : il doit faire
+        // 5 valeurs dans l'app mais il doit avoir 6 valeurs
+        // (les secondes en plus) pour la libraire.
+        if (value !== '') { value = value.split(' ').slice(0, 5).join(' ')}
       }
       field.value = typeof value === 'undefined' ? '' : value;
     });
@@ -316,6 +343,9 @@ class Editing {
       const actif = menuActive.value === '1';
       owork.classList[actif?'remove':'add']('off'); 
     });
+    // Le champ pour le cron
+    const fieldCron = DGet('.form-work-cron', owork);
+    fieldCron.addEventListener('change', this.onChangeCron.bind(this, fieldCron));
     // Les boutons d'aide
     const btnHelpCron = DGet('sup.to-help-cron', owork);
     help.listenOn(btnHelpCron, 'cron');
@@ -401,6 +431,44 @@ class Editing {
       dispField.innerHTML = idProjet;
     }
   }
+
+
+  /**
+   * Fonction appelée quand on change le cron.
+   * 
+   * S'il est valide, il affiche à côté la date et l'heure du
+   * prochain, sinon il signale une erreur.
+   */
+  private onChangeCron(field:HTMLInputElement, ev: Event){
+    this.showNextTime(field);
+  }
+
+  private showNextTime(field: HTMLInputElement){
+    let cron = field.value.trim();
+    console.log("field", field);
+    let span = field.nextSibling as HTMLElement;
+    span.classList.remove('error');
+    span.innerHTML = '';
+    console.log("span", span);
+    if (cron === '') { return }
+    if (cron.split(' ').length === 5) { cron = `* ${cron}`; }
+    try {
+      const nextTime = CronExpressionParser.parse(cron, {strict: true}).next();
+      console.log("next", nextTime);
+      const lang = `${prefs.getLang()}-${prefs.getLang().toUpperCase()}`;
+      const jour = nextTime.toDate().toLocaleDateString(lang);
+      const heure = nextTime
+        .toDate().toLocaleTimeString(lang)
+        .split(':').slice(0,2).join(':');
+      span.innerHTML = `${jour} ${heure}`;
+    } catch(err){
+      span.classList.add('error');
+      span.innerHTML = '-bad cron-'
+    }
+  }
+
+
+
   private getDefaultId(){
     const now = String(new Date().getTime());
     const len = now.length;

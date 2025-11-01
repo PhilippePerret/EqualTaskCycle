@@ -156,10 +156,12 @@
         <input type="text" class="form-work-script" data-type="string"/>
         <div class="form-work-script-err err"></div>
       </div>
-      <div class="row-flex">
+      <div class="row" style="width:100%;">
         <label>t(ui.thing.Cron) <sup class="to-help-cron" title="t(ui.text.click_on_this_to_help_cron)">(?)</sup></label>
-        <input type="text" class="form-work-cron" data-type="string"/>
-        <a href="https://crontab.guru" target="_blank" style="width: 180px;text-align:right;text-decoration:none;font-size:0.75em;">CRONTAB GURU</a>
+        <input type="text" class="form-work-cron" data-type="string" style="width:120px;"/><span class="cron-next-time" style="display:inline-block;text-align:center;font-size:11pt;width:140px;background-color:blue;color:white;margin-right:0.5em;"></span>
+        <span style="text-align:right;float:right;">
+          <a href="https://crontab.guru" target="_blank" style="width: 180px;text-align:right;text-decoration:none;font-size:0.75em;">CRONTAB GURU</a>
+        </span>
         <div class="form-work-cron-err err"></div>
       </div>
       <div class="row">

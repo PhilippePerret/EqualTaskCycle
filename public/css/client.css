@@ -13,7 +13,7 @@ body {
   border: 1px solid red;
 }
 .error, .error * {
-  background-color: rgb(221, 148, 148);
+  background-color: rgb(221, 148, 148)!important;
 }
 
 .w120 {width: 120px;}

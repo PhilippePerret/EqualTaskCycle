@@ -8,6 +8,7 @@ error:
   work_already_changed_today: "La tâche a déjà été changée aujourd'hui (une seule dérogation par jour…)."
   unfound_field: "Champ introuvable : _0_"
   data:
+    cron_invalid: "Le Cron est invalide. Faites-vous aider par le guru !"
     undefined_project: "Le titre du projet est requis."
     id_exists: "L’identifiant _0_ est déjà utilisé."
     folder_required: "Un dossier du travail est requis (cf. manuel)"
