@@ -8,14 +8,17 @@
   "main": "electron/main.js",
   "devDependencies": {
     "@electron/rebuild": "^4.0.1",
+    "@playwright/test": "^1.56.1",
     "@types/better-sqlite3": "^7.6.13",
     "@types/bun": "latest",
     "@types/express": "^5.0.3",
     "@types/js-yaml": "^4.0.9",
     "electron": "38.3.0",
-    "electron-builder": "^26.0.12"
+    "electron-builder": "^26.0.12",
+    "playwright": "^1.56.1"
   },
   "scripts": {
+    "tests": "playwright test",
     "reset": "cat .secret/password | sudo -S pkill -f \"bun.*server\" 2>/dev/null; cat .secret/password | rm -rf ~/.bun/install/cache",
     "watch_ts": "bun build ./lib/client/main.ts --outfile=./public/js/main.js --target=browser --watch & bun build ./lib/client/ui.ts --outfile=./public/js/ui.js --target=browser --watch & bun build ./lib/client/prefs.ts --outfile=./public/js/prefs.js --target=browser --watch & bun build ./lib/client/help.ts --outfile=./public/js/help.js --target=browser --watch",
     "start": "bun pm cache rm && npx electron .",

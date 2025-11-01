@@ -15,6 +15,11 @@ Par exemple, si nous avons 5 tâches, et un temps par défaut de 2 heures, les t
 * jouer `bun run start` pour lancer l'application en mode développement
 * jouer `bun run build` pour construire une release
 
+Pour les tests
+
+* jouer `bunx playwright install`
+* jouer `bun run tests`
+
 ## Essai (mode développement)
 
 Démarrer l’application avec : 
