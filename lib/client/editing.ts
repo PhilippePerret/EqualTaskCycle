@@ -325,7 +325,7 @@ class Editing {
         // Petite complication avec le cron : il doit faire
         // 5 valeurs dans l'app mais il doit avoir 6 valeurs
         // (les secondes en plus) pour la libraire.
-        if (value !== '') { value = value.split(' ').slice(0, 5).join(' ')}
+        if ( value ) { value = value.split(' ').slice(0, 5).join(' ')}
       }
       field.value = typeof value === 'undefined' ? '' : value;
     });

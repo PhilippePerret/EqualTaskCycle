@@ -16,6 +16,10 @@ help:
       <a href="https://crontab.guru" target="_blank" rel="noopener noreferrer">Crontab Guru</a> website, which lets you 
       compose your crontab and then copy/paste it into the job field.
 
+      Note that to be effective, the job should remain in inactive mode. 
+      Otherwise, it will appear normally in your work cycle and will 
+      not be triggered specifically.
+
   show: Show help
   times:
     duree_cycle: Execution time for one work cycle.

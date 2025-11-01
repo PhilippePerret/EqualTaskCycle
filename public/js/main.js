@@ -24370,7 +24370,7 @@ class Editing {
         work[prop] = null;
         value = null;
       } else if (prop === "cron") {
-        if (value !== "") {
+        if (value) {
           value = value.split(" ").slice(0, 5).join(" ");
         }
       }

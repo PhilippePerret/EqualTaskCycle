@@ -21,6 +21,10 @@ help:
       composer votre crontab puis de le copier/coller dans le 
       champ du travail.
 
+      Noter que pour être efficace, il faut laisser le travail en
+      mode inactif. Sinon, il appararaitra normalement dans votre
+      cycle de travail et ne sera pas spécialement déclenché…
+
   show: Afficher l’aide
   times:
     duree_cycle: Durée d’exécution pour un cycle de travail.

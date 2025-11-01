@@ -3,6 +3,10 @@ body {
   padding:2em;
 }
 
+textarea {
+  resize: none;
+}
+
 .fleft {float: left;}
 .fright {float: right;}
 
